@@ -6,14 +6,29 @@ import { createMuiTheme, MuiThemeProvider  } from '@material-ui/core/styles'
 
 import './App.css';
 
+
+
 class App extends Component {
   state = {
     auth: false
   }
 
+  changeTab(b) {
+    var foo = <Login onAuth={this.handleAuth} />;
+    if (b)
+    {
+      foo = <DicomViewer />;
+    }
+    else
+    {
+
+    }    
+    return(foo)
+  }
+
   handleAuth = event =>{
     this.setState({auth:true})
-    console.log("handle auth")
+    console.log("handle auth " + this.state.auth)
   }
 
   render() {
@@ -23,9 +38,7 @@ class App extends Component {
       <MuiThemeProvider>
       <div>
         <NavBar auth={auth}/>
-
-        <Login onAuth={this.handleAuth} />
-
+        {this.changeTab(this.state.auth)}        
       </div>
       </MuiThemeProvider>
     );

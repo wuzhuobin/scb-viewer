@@ -42,8 +42,8 @@ class NavBar extends React.Component {
                 Sucabot WebViewer
                 </Typography>
                 <Tabs style={styles.tabs} onChange={this.handleChange}>
-                    <Tab label="Image Management" />
-                    <Tab label="Viewer" />
+                    {auth && (<Tab label="Image Management" />)} 
+                    {auth && (<Tab label="Viewer" />)}                    
                 </Tabs>
                 { auth && (
                     <div>
