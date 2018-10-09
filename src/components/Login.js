@@ -46,7 +46,6 @@ class Login extends Component {
 		this.state={
 			username: '',
 			password: '',
-			foo: false,
 		}
 	}
 
@@ -54,25 +53,15 @@ class Login extends Component {
 		loginEvent.preventDefault()
 		console.log("username: " + this.state.username)
 		console.log("password: " + this.state.password)
-		console.log(this.props.auth)
-
 
 		if (this.state.username === "user" && this.state.password === "sucabot"){
 			console.log("correct");
-			this.setState({username: "bar"});
-			console.log(this.state.username)
-			console.log(this.state.foo)
-			this.setState({foo: !this.state.foo});
-			console.log(this.state.foo)
+			this.props.onAuth();
+			// this.setState({foo: !this.state.foo});
 		}
 		else{
 			console.log("wrong");
-			console.log(this.state.foo)
-			this.setState({foo: false});
 		}
-
-		console.log("wa:" + this.state.foo)
-
 	}
 
 	handleChange = e =>{

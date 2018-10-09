@@ -11,6 +11,11 @@ class App extends Component {
     auth: false
   }
 
+  handleAuth = event =>{
+    this.setState({auth:true})
+    console.log("handle auth")
+  }
+
   render() {
     const {auth} = this.state
 
@@ -19,7 +24,7 @@ class App extends Component {
       <div>
         <NavBar auth={auth}/>
 
-        <Login auth={auth} />
+        <Login onAuth={this.handleAuth} />
 
       </div>
       </MuiThemeProvider>

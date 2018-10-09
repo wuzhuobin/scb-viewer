@@ -23,7 +23,6 @@ class NavBar extends React.Component {
         super(props);
         this.state = {
             value:0,
-            auth: false,
         };
     }
 
@@ -32,7 +31,8 @@ class NavBar extends React.Component {
     };
 
     render(){
-        const {value, auth} = this.state
+        const {value} = this.state
+        const {auth, classes} = this.props
 
         return(
         <div>
