@@ -9,14 +9,23 @@ function TabContainer(props){
         )
 };
 
-var styles = {
+const styles = theme=> (
+{
+    root:{
+        flexGrow: 1,    
+        zIndex: 1,
+        overflow: 'hidden',
+        position: 'relative',
+        display: 'flex',
+        // height: '10vh',
+    },
     appBar:{
-        // flexWrap: 'wrap',
+        zIndex: theme.zIndex.drawer + 1,
     },
     tabs:{
         width:"100%",
     },
-}
+})
 
 class NavBar extends React.Component {
     constructor(props){
@@ -33,10 +42,11 @@ class NavBar extends React.Component {
     render(){
         const {value} = this.state
         const {auth, classes} = this.props
+        console.log(styles)
 
         return(
-        <div>
-        <AppBar position="static" style={styles.appBar}>
+        <div className={classes.root}>
+            <AppBar position="static" className={classes.appBar} style={styles.appBar}>
             <Toolbar>
                 <Typography variant="title" color="inherit">
                 Sucabot WebViewer

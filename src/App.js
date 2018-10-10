@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import NavBar from './components/NavBar';
 import Login from './components/Login';
+import ImageManagement from './components/ImageManagement';
 import DicomViewer from "./dicom-viewer";
 import { createMuiTheme, MuiThemeProvider  } from '@material-ui/core/styles'
 
@@ -23,9 +24,7 @@ class App extends Component {
       <MuiThemeProvider>
       <div>
         <NavBar auth={auth}/>
-
-        <Login onAuth={this.handleAuth} />
-
+        <ImageManagement />
       </div>
       </MuiThemeProvider>
     );
@@ -33,5 +32,6 @@ class App extends Component {
 }
 
 export default App;
-
-        // <DicomViewer />
+// <DicomViewer />
+        // <Login onAuth={this.handleAuth} />
+        
