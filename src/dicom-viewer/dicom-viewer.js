@@ -4,10 +4,27 @@ import * as cornerstone from "cornerstone-core";
 import * as cornerstoneTools from "cornerstone-tools";
 import * as cornerstoneMath from "cornerstone-math";
 import dicomLoader from "./dicom-loader";
+import {withStyles} from '@material-ui/core/styles'
 // import exampleImageIdLoader from "./exampleImageIdLoader";
 
 import Button from '@material-ui/core/Button';
 import Checkbox from '@material-ui/core/Checkbox';
+
+const styles = theme=> ({
+    root:{
+        flexGrow: 1,    
+        zIndex: 1,
+        overflow: 'hidden',
+        position: 'relative',
+        display: 'flex',
+    },
+    content: {
+    flexGrow: 1,
+    backgroundColor: theme.palette.background.default,
+    padding: theme.spacing.unit * 3,
+    minWidth: 0, // So the Typography noWrap works
+  },
+})
 
 class DicomViewer extends React.Component {
   componentWillMount() {
@@ -88,7 +105,10 @@ class DicomViewer extends React.Component {
     this.dicomImage = el;
   };
   render() {
+    const {classes} = this.props
+
     return (
+      <main className={classes.content}>
       <div className="container">
         <div className="row">
           <div className="col-3">
@@ -284,8 +304,9 @@ class DicomViewer extends React.Component {
           </div>
         </div>
       </div>
+      </main>
     );
   }
 }
 
-export default DicomViewer;
+export default withStyles(styles)(DicomViewer);

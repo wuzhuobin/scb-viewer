@@ -18,7 +18,7 @@ const styles = theme => ({
   },
   drawerPaper: {
     position: 'relative',
-    height: '92vh',
+    height: '93vh',
     width: drawerWidth,
   },
   content: {
@@ -68,7 +68,7 @@ class ImageManagement extends React.Component {
         </Drawer>
 
         <main className={classes.content}>
-          hello
+          <Button>hello </Button>
         </main>
       </div>
     );
