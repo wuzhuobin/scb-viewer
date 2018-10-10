@@ -4,22 +4,62 @@ import * as cornerstone from "cornerstone-core";
 import * as cornerstoneTools from "cornerstone-tools";
 import * as cornerstoneMath from "cornerstone-math";
 import dicomLoader from "./dicom-loader";
-// import exampleImageIdLoader from "./exampleImageIdLoader";
+import exampleImageIdLoader from "./imageIdLoader";
+import imageIdLoader from "./imageIdLoader";
 
 import Button from '@material-ui/core/Button';
 import Checkbox from '@material-ui/core/Checkbox';
+import daikon from "daikon";
 
 class DicomViewer extends React.Component {
+  currentImageIndex = 0;
+
+
   componentWillMount() {
     cornerstoneTools.external.cornerstone = cornerstone;
     cornerstoneTools.external.cornerstoneMath = cornerstoneMath;
     cornerstoneTools.external.Hammer = Hammer;
-    dicomLoader(cornerstone);
+    imageIdLoader(cornerstone);
+    var currentImageIndex = 0;
+
+    setTimeout(function(){    console.log("Read done");
+
+      this.updateTheImage(0);
+      const mouseWheelEvents=['mousewheel','DOMMouseScroll'];
+      mouseWheelEvents.forEach(function(eventType){
+        this.addEventListener(eventType,function(e){
+          if(e.wheelDelta<0 || e.detail>0){
+            if (currentImageIndex === 0){
+              this.updateTheImage(1);
+            }
+          } else {
+            if (currentImageIndex === 1){
+              this.updateTheImage(0);
+            }
+          }
+          return false;
+        })
+      })
+    },4000);
   }
   componentDidMount() {
     this.loadImage();
   }
+  updateTheImage(imageIndex) {
+    this.currentImageIndex = imageIndex;
+    cornerstone.loadImage(dicomLoader.series.images[this.currentImageIndex]).then(function(image) {
+      if (this.dicomImage){
+        cornerstone.displayImage(this.dicomImage, image);
+      }
+      else {
+        console.log("not newed");
+      }
+    });
+  }
+
+
   dicomImage = null;
+  currentImageIndex = 0;
   loadImage = () => {
     const element = this.dicomImage;
     // Listen for changes to the viewport so we can update the text overlays in the corner
@@ -87,6 +127,8 @@ class DicomViewer extends React.Component {
   dicomImageRef = el => {
     this.dicomImage = el;
   };
+
+
   render() {
     return (
       <div className="container">
