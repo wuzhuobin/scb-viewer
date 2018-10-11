@@ -12,7 +12,6 @@ const httpGetAsync = (theUrl, callback) => {
   xmlHttp.send(null);
 };
 
-
 function computeImageMinMax(a){
   const dataArray = a.getInterpretedData();
   // const numPixel = dataArray.length;
@@ -27,68 +26,30 @@ function computeImageMinMax(a){
       max = dataArray[i];
     }
   }
-
-  // var http = require('http'); 
-  // var request = require('request');
-  // http.get('http://127.0.0.1:8081/GetDicom', function(err, result){
-  //   var res = [];
-  //   result.on('data', function (chunk) {
-  //       res.write(chunk);
-  //   });
-  //   result.on('end', function () {
-  //       res.end();
-  //   });
-  //   console.log(res);
-  // });
-
-
   return [min,max];
-}
+};
 
 const dicomLoader = cs => {
-  // const image1PixelData = new Promise(resolve => {
-  //   httpGetAsync("assets/dicom-image", response => {
-  //     const data = new DataView(response);
-  //     const image = daikon.Series.parseImage(data);
-  //     const spacing = image.getPixelSpacing();
-  //     console.log(image.getImageMax());
-  //     resolve({
-  //       minPixelValue: image.getImageMin(),
-  //       maxPixelValue: image.getImageMax(),
-  //       // slope: image.getDataScaleSlope(),
-  //       // intercept: image.getDataScaleIntercept(),
-  //       windowCenter: image.getWindowCenter(),
-  //       windowWidth: image.getWindowWidth(),
-  //       getPixelData: () => image.getInterpretedData(),
-  //       rows: image.getRows(),
-  //       columns: image.getCols(),
-  //       height: image.getCols(),
-  //       width: image.getRows(),
-  //       color: false,
-  //       columnPixelSpacing: spacing[1],
-  //       rowPixelSpacing: spacing[0],
-  //       sizeInBytes: image.getRows() * image.getCols() * 2
-  //     });
-  //   });
-  // });
-
   var HardCodeArray = [];
-  var series = [];
-  const num_dcm = 3;
+  const num_dcm = 50;
+  var series = new Array(num_dcm);
   for (var i=0;i<num_dcm;i++){
     HardCodeArray.push("assets/Test1/0"+String((i-i%100)/100)+String((i-(i-i%100)-i%10)/10)+String(i%10)+".dcm");
-    series.push(new daikon.series());
   }
-  console.log(HardCodeArray);
 
-  for (var ctr in HardCodeArray[ctr]){
+
+  for (var ctr in HardCodeArray){
     console.log(HardCodeArray[ctr]);
+    series[ctr] = new Promise(resolve=>{
     httpGetAsync(HardCodeArray[ctr], response => {
-      const data = new DataView(response);
-      const image = series[ctr].parseImage(data);
-      const spacing = image.getPixelSpacing();
 
+      const data = new DataView(response);
+      const image = daikon.Series.parseImage(data);
+      const spacing = image.getPixelSpacing();
+      console.log(String(image.getImageNumber()-1)+'-th image has the follwing data');
+      console.log(image.getInterpretedData());
       if (image.getImageMin()){
+        console.log("Type1");
         resolve({
           minPixelValue: image.getImageMin(),
           maxPixelValue: image.getImageMax(),
@@ -109,6 +70,7 @@ const dicomLoader = cs => {
       }
       else {
         const range = computeImageMinMax(image);
+        console.log("Type2");
         resolve({
           minPixelValue: range[0],
           maxPixelValue: range[1],
@@ -128,88 +90,12 @@ const dicomLoader = cs => {
           });
       }
 
+    });
 
+    });
+  }
 
-  // const image1PixelData = new Promise(resolve => {
-
-  //   // var num_completed = 0;
-  //   if (series === null){
-  //     series = new daikon.series();
-  //     for (var ctr in HardCodeArray){
-  //       console.log(HardCodeArray[ctr]);
-  //       httpGetAsync(HardCodeArray[ctr], response => {
-  //         const data = new DataView(response);
-  //         const image = daikon.Series.parseImage(data);
-  //         const spacing = image.getPixelSpacing();
-
-  //         if (image.getImageMin()){
-  //           resolve({
-  //             minPixelValue: image.getImageMin(),
-  //             maxPixelValue: image.getImageMax(),
-  //         // slope: image.getDataScaleSlope(),
-  //         // intercept: image.getDataScaleIntercept(),
-  //         windowCenter: image.getWindowCenter(),
-  //         windowWidth: image.getWindowWidth(),
-  //         getPixelData: () => image.getInterpretedData(),
-  //         rows: image.getRows(),
-  //         columns: image.getCols(),
-  //         height: image.getCols(),
-  //         width: image.getRows(),
-  //         color: false,
-  //         columnPixelSpacing: spacing[1],
-  //         rowPixelSpacing: spacing[0],
-  //         sizeInBytes: image.getRows() * image.getCols() * 2
-  //       });
-  //         }
-  //         else {
-  //           const range = computeImageMinMax(image);
-  //           resolve({
-  //             minPixelValue: range[0],
-  //             maxPixelValue: range[1],
-  //           // slope: image.getDataScaleSlope(),
-  //           // intercept: image.getDataScaleIntercept(),
-  //           windowCenter: image.getWindowCenter(),
-  //           windowWidth: image.getWindowWidth(),
-  //           getPixelData: () => image.getInterpretedData(),
-  //           rows: image.getRows(),
-  //           columns: image.getCols(),
-  //           height: image.getCols(),
-  //           width: image.getRows(),
-  //           color: false,
-  //           columnPixelSpacing: spacing[1],
-  //           rowPixelSpacing: spacing[0],
-  //           sizeInBytes: image.getRows() * image.getCols() * 2
-  //         });
-  //         }
-  //         if (image ==null){
-  //           console.log('imagei null');
-  //         }
-  //         else {
-  //           console.log('imagei good');
-  //         }
-  //         series.addImage(image);
-  //       // num_completed++;
-  //     });
-  //     }
-  //     setTimeout(function(){
-
-  //       series.buildSeries();
-  //     // output some header info
-  //     console.log("Number of images read is " + series.images.length);
-  //     console.log("Each slice is " + series.images[0].getCols() + " x " + series.images[0].getRows());
-  //     console.log("Each voxel is " + series.images[0].getBitsAllocated() + " bits, " + 
-  //       (series.images[0].littleEndian ? "little" : "big") + " endian");
-
-  //           // concat the image data into a single ArrayBuffer
-  //           series.concatenateImageData(null, function (imageData) {
-  //             console.log("Total image data size is " + imageData.byteLength + " bytes");
-  //           });
-  //         },2000);
-
-
-  //   }//end(if series is null)
-
-  // });
+ 
   
   function getImageI(imageId) {
     const width = 256;
@@ -218,8 +104,9 @@ const dicomLoader = cs => {
     function getPixelData() {
       if (String(imageId).substring(0,10) === "example://"){
         const id = String(imageId).substring(10,String(imageId).length);
-        console.log("Accessing " + id + "-th image");
-        return series[id].getInterpretedData();
+        console.log("Accessing " + id + "-th image out of " + series.length + " images");
+        console.log(series[id]);
+        return series[id];
       }
       else {
         console.log("Received unknown request starting from " + imageId);
@@ -237,7 +124,8 @@ const dicomLoader = cs => {
 
     return {
       promise: new Promise(resolve =>
-        getPixelData().then(pixelData =>
+        getPixelData()
+        .then(pixelData =>
           resolve({
             imageId,
             minPixelValue: 0,

@@ -32,7 +32,11 @@ class DicomViewer extends React.Component {
 
 
   dicomImage = null;
-  HardCodeIdArray = ["example://1", "example://2"];
+  HardCodeIdArray = [...Array(50).keys()].map(function(number){
+    return "example://" + String(number);
+  });
+  // HardCodeIdArray = ["example://1", "example://2"];
+  // console.log(HardCodeIdArray);
 
 
   updateTheImage(imageIndex) {
@@ -121,9 +125,10 @@ class DicomViewer extends React.Component {
     for (var i=0;i<wheelEvents.length;i++){
       element.addEventListener(wheelEvents[i],this.wheelEventsHandler);
     }
-
+    console.log(this.HardCodeIdArray[this.state.imageId]);
     cornerstone.enable(element);
     cornerstone.loadImage(this.HardCodeIdArray[this.state.imageId]).then(image => {
+      console.log("Displaying");
       cornerstone.displayImage(element, image);
       cornerstoneTools.mouseInput.enable(element);
       cornerstoneTools.mouseWheelInput.enable(element);
