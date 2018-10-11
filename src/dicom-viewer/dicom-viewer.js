@@ -16,6 +16,8 @@ class DicomViewer extends React.Component {
     this.state={
       username: '',
       imageId: 0,
+      imagePathArray:[],
+      hardCodeNumDcm:50,
     }
   }
 
@@ -23,12 +25,29 @@ class DicomViewer extends React.Component {
     cornerstoneTools.external.cornerstone = cornerstone;
     cornerstoneTools.external.cornerstoneMath = cornerstoneMath;
     cornerstoneTools.external.Hammer = Hammer;
-    dicomLoader(cornerstone);
+    this.readImage(this.state, cornerstone);
+    // dicomLoader(cornerstone,this.state);
   }
 
   componentDidMount() {
     this.loadImage();
   }
+
+  readImage(state, cornerstoneInstance){
+    //Get image path Array first
+    var cacheArray = [];
+    for (var i=0;i<state.hardCodeNumDcm;i++){
+      cacheArray.push("assets/Test1/0"+String((i-i%100)/100)+String((i-(i-i%100)-i%10)/10)+String(i%10)+".dcm");
+    }
+    dicomLoader(cornerstoneInstance,cacheArray);
+    this.setState(function(state, returnArray){
+      return {
+        imagePathArray:returnArray
+      };
+    });
+  }
+
+
 
 
   dicomImage = null;
@@ -125,7 +144,7 @@ class DicomViewer extends React.Component {
     for (var i=0;i<wheelEvents.length;i++){
       element.addEventListener(wheelEvents[i],this.wheelEventsHandler);
     }
-    console.log(this.HardCodeIdArray[this.state.imageId]);
+    // console.log(this.HardCodeIdArray[this.state.imageId]);
     cornerstone.enable(element);
     cornerstone.loadImage(this.HardCodeIdArray[this.state.imageId]).then(image => {
       console.log("Displaying");

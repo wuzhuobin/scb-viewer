@@ -29,25 +29,19 @@ function computeImageMinMax(a){
   return [min,max];
 };
 
-const dicomLoader = cs => {
-  var HardCodeArray = [];
-  const num_dcm = 50;
+const dicomLoader = (cs,imageArray) => {
+  const num_dcm = imageArray.length;
   var series = new Array(num_dcm);
-  for (var i=0;i<num_dcm;i++){
-    HardCodeArray.push("assets/Test1/0"+String((i-i%100)/100)+String((i-(i-i%100)-i%10)/10)+String(i%10)+".dcm");
-  }
 
-
-  for (var ctr in HardCodeArray){
-    console.log(HardCodeArray[ctr]);
+  for (var ctr in imageArray){
     series[ctr] = new Promise(resolve=>{
-    httpGetAsync(HardCodeArray[ctr], response => {
+    httpGetAsync(imageArray[ctr], response => {
 
       const data = new DataView(response);
       const image = daikon.Series.parseImage(data);
       const spacing = image.getPixelSpacing();
-      console.log(String(image.getImageNumber()-1)+'-th image has the follwing data');
-      console.log(image.getInterpretedData());
+      // console.log(String(image.getImageNumber()-1)+'-th image has the follwing data');
+      // console.log(image.getInterpretedData());
       if (image.getImageMin()){
         console.log("Type1");
         resolve({
@@ -105,21 +99,13 @@ const dicomLoader = cs => {
       if (String(imageId).substring(0,10) === "example://"){
         const id = String(imageId).substring(10,String(imageId).length);
         console.log("Accessing " + id + "-th image out of " + series.length + " images");
-        console.log(series[id]);
+        // console.log(series[id]);
         return series[id];
       }
       else {
         console.log("Received unknown request starting from " + imageId);
         throw new Error("unknown imageId");
       }
-
-
-
-      // if (imageId === "example://1") {
-      //   return image1PixelData;
-      // }
-
-      // throw new Error("unknown imageId");
     }
 
     return {
