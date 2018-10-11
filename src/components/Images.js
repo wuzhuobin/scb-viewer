@@ -2,7 +2,7 @@ import React from "react";
 import Hammer from "hammerjs";
 
 import {Button, Checkbox, Drawer, List, ListItem, ListItemIcon, ListItemText, Typography} from '@material-ui/core';
-import {Collections, Portrait} from '@material-ui/icons'
+
 
 import { withStyles } from '@material-ui/core/styles';
 
@@ -31,7 +31,7 @@ const styles = theme => ({
 });
 
 
-class ImageManagement extends React.Component {
+class Images extends React.Component {
   constructor(props){
     super(props);
     this.state={
@@ -45,34 +45,12 @@ class ImageManagement extends React.Component {
 
     return (
       <div className={classes.root}>
-        <Drawer
-          variant="permanent"
-          classes={{
-            paper: classes.drawerPaper,
-          }}
-        >
-           <List>
-              <ListItem button>
-                <ListItemIcon>
-                  <Collections />
-                </ListItemIcon>
-                <ListItemText primary="Image" />
-              </ListItem>
-              <ListItem button>
-                <ListItemIcon>
-                  <Portrait />
-                </ListItemIcon>
-                <ListItemText primary="Projects" />
-              </ListItem>
-            </List>
-        </Drawer>
+        
 
-        <main className={classes.content}>
-          <Button>hello </Button>
-        </main>
+        
       </div>
     );
   }
 }
 
-export default withStyles(styles)(ImageManagement);
+export default withStyles(styles)(Images);
