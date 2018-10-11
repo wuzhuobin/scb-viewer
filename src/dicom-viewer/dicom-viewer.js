@@ -11,19 +11,15 @@ import Button from '@material-ui/core/Button';
 import Checkbox from '@material-ui/core/Checkbox';
 
 const styles = theme=> ({
-    root:{
-        flexGrow: 1,    
+    root:{    
         zIndex: 1,
-        overflow: 'hidden',
-        position: 'relative',
+        overflow: 'auto',
         display: 'flex',
+        height: '100%',
+        backgroundColor: theme.palette.background.default,
+        minWidth: 0, // So the Typography noWrap works
+        padding: 0,
     },
-    content: {
-    flexGrow: 1,
-    backgroundColor: theme.palette.background.default,
-    padding: theme.spacing.unit * 3,
-    minWidth: 0, // So the Typography noWrap works
-  },
 })
 
 class DicomViewer extends React.Component {
@@ -108,8 +104,7 @@ class DicomViewer extends React.Component {
     const {classes} = this.props
 
     return (
-      <main className={classes.content}>
-      <div className="container">
+      <div className={classes.root}>
         <div className="row">
           <div className="col-3">
             <ul className="list-group">
@@ -300,11 +295,54 @@ class DicomViewer extends React.Component {
                 Tool handles - left click drag on any measurement tool handle
                 (the circle) to change the handles position
               </li>
+              <li>
+                Tool handles - left click drag on any measurement tool handle
+                (the circle) to change the handles position
+              </li>
+              <li>
+                Tool handles - left click drag on any measurement tool handle
+                (the circle) to change the handles position
+              </li>
+              <li>
+                Tool handles - left click drag on any measurement tool handle
+                (the circle) to change the handles position
+              </li>
+              <li>
+                Tool handles - left click drag on any measurement tool handle
+                (the circle) to change the handles position
+              </li>
+              <li>
+                Tool handles - left click drag on any measurement tool handle
+                (the circle) to change the handles position
+              </li>
+              <li>
+                Tool handles - left click drag on any measurement tool handle
+                (the circle) to change the handles position
+              </li>
+              <li>
+                Tool handles - left click drag on any measurement tool handle
+                (the circle) to change the handles position
+              </li>
+              <li>
+                Tool handles - left click drag on any measurement tool handle
+                (the circle) to change the handles position
+              </li>
+              <li>
+                Tool handles - left click drag on any measurement tool handle
+                (the circle) to change the handles position
+              </li>
+              <li>
+                Tool handles - left click drag on any measurement tool handle
+                (the circle) to change the handles position
+              </li>
+              <li>
+                Tool handles - left click drag on any measurement tool handle
+                (the circle) to change the handles position
+              </li>
             </ul>
           </div>
         </div>
       </div>
-      </main>
     );
   }
 }

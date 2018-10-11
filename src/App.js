@@ -10,8 +10,7 @@ import './App.css';
 
 class App extends Component {
   state = {
-    auth: false,
-    tab: 0,
+    auth: true,
   }
 
   handleLogin(auth) {
@@ -32,7 +31,7 @@ class App extends Component {
   }
 
   render() {
-    const {auth,tab} = this.state
+    const {auth} = this.state
 
     return (
       <MuiThemeProvider>
@@ -47,6 +46,3 @@ class App extends Component {
 }
 
 export default App;
-// <DicomViewer />
-        // <Login onAuth={this.handleAuth} />
-        

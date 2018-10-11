@@ -14,16 +14,16 @@ const styles = theme=> ({
     overflow: 'hidden',
     position: 'relative',
     display: 'flex',
+    height: '93vh',
   },
   drawerPaper: {
     position: 'relative',
-    height: '93vh',
+    height: '100%',
     width: drawerWidth,
   },
   content: {
     flexGrow: 1,
     backgroundColor: theme.palette.background.default,
-    padding: theme.spacing.unit * 3,
     minWidth: 0, // So the Typography noWrap works
   },
   toolbar: theme.mixins.toolbar,
@@ -33,7 +33,7 @@ class Content extends React.Component {
     constructor(props){
         super(props);
         this.state = {
-            page: 0,
+            page: 2,
         };
     }
 
@@ -55,6 +55,7 @@ class Content extends React.Component {
           classes={{
             paper: classes.drawerPaper,
           }}
+          containerStyle={{height: 'calc(100% - 64px)', top: 64}}
         >
            <List>
               <ListItem button onClick={() => {this.setState({page: 0});}}>
@@ -81,12 +82,11 @@ class Content extends React.Component {
             </List>
         </Drawer>
 
-        <main className={classes.content}>
+        <body className={classes.content}>
         	{page === 0 && <Images />}
         	{page === 1 && <div>Projects</div>}
         	{page === 2 && <DicomViewer />}
-        </main>
-
+        </body>
         </div>
     );
 }
