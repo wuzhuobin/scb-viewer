@@ -10,7 +10,7 @@ import './App.css';
 
 class App extends Component {
   state = {
-    auth: true,
+    auth: false,
   }
 
   handleLogin(auth) {
