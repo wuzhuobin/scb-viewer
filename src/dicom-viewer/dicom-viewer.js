@@ -6,20 +6,45 @@ import * as cornerstoneMath from "cornerstone-math";
 import dicomLoader from "./dicom-loader";
 import {withStyles} from '@material-ui/core/styles'
 // import exampleImageIdLoader from "./exampleImageIdLoader";
-
+import AppBar from '@material-ui/core/AppBar';
+import Toolbar from '@material-ui/core/Toolbar';
 import Button from '@material-ui/core/Button';
 import Checkbox from '@material-ui/core/Checkbox';
+import Tooltip from '@material-ui/core/Tooltip';
+import Brightness6Icon from '@material-ui/icons/Brightness6';
+import OpenWithIcon from '@material-ui/icons/OpenWith';
+import SearchIcon from '@material-ui/icons/Search';
+import StraightenIcon from '@material-ui/icons/Straighten';
+import AdjustIcon from '@material-ui/icons/Adjust';
+import PanoramaFishEyeIcon from '@material-ui/icons/PanoramaFishEye';
+import CropDinIcon from '@material-ui/icons/CropDin';
+import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
+import EditIcon from '@material-ui/icons/Edit';
 
 const styles = theme=> ({
     root:{    
         zIndex: 1,
-        overflow: 'auto',
         display: 'flex',
-        height: '100%',
+        height: '93vh',
         backgroundColor: theme.palette.background.default,
         minWidth: 0, // So the Typography noWrap works
         padding: 0,
     },
+
+    appBar:{
+            // flexGrow: 1,
+            zIndex: 1,
+            // width: '100%',
+            overflow: 'auto',
+            display: 'flex',
+            position: 'relative',
+            // display: 'flex',
+    },
+
+    functionBar:{
+          width: '100%',
+          overflow: 'auto',
+            }
 })
 
 class DicomViewer extends React.Component {
@@ -105,104 +130,88 @@ class DicomViewer extends React.Component {
 
     return (
       <div className={classes.root}>
-        <div className="row">
-          <div className="col-3">
-            <ul className="list-group">
-              <Button variant="contained" color="primary"
-                onClick={() => {
-                  this.enableTool("wwwc", 1);
-                }}
-                className="list-group-item"
-              >
-                WW/WC
-              </Button>
-              <Button variant="contained" color="primary"
-                onClick={() => {
-                  this.enableTool("pan", 3);
-                }}
-                className="list-group-item"
-              >
-                Pan
-              </Button>
-              <Button variant="contained" color="primary"
-                onClick={() => {
-                  this.enableTool("zoom", 5);
-                }}
-                className="list-group-item"
-              >
-                Zoom
-              </Button>
-              <Button variant="contained" color="primary"
-                onClick={() => {
-                  this.enableTool("length", 1);
-                }}
-                className="list-group-item"
-              >
-                Length
-              </Button>
-              <Button variant="contained" color="primary"
-                onClick={() => {
-                  this.enableTool("probe", 1);
-                }}
-                className="list-group-item"
-              >
-                Probe
-              </Button>
-              <Button variant="contained" color="primary"
-                onClick={() => {
-                  this.enableTool("ellipticalRoi", 1);
-                }}
-                className="list-group-item"
-              >
-                Elliptical ROI
-              </Button>
-              <Button variant="contained" color="primary"
-                onClick={() => {
-                  this.enableTool("rectangleRoi", 1);
-                }}
-                className="list-group-item"
-              >
-                Rectangle ROI
-              </Button>
-              <Button variant="contained" color="primary"
-                onClick={() => {
-                  this.enableTool("angle", 1);
-                }}
-                className="list-group-item"
-              >
-                Angle
-              </Button>
-              <Button variant="contained" color="primary"
-                onClick={() => {
-                  this.enableTool("highlight", 1);
-                }}
-                className="list-group-item"
-              >
-                Highlight
-              </Button>
-              <Button variant="contained" color="primary"
-                onClick={() => {
-                  this.enableTool("freehand", 1);
-                }}
-                className="list-group-item"
-              >
-                Freeform ROI
-              </Button>
-            </ul>
-            <div className="checkbox">
-               <Checkbox value="chkshadow" id="chkshadow" label="Apply shadow"/>
-               Apply shadow
-            </div>
-            <br />
-          </div>
-          <div className="col-9">
-            <div
+           <div className={classes.functionBar}>
+              <AppBar position="static" className={classes.appBar}>
+                <Toolbar>
+
+                  <Tooltip title="Window Level"> 
+                    <Button color="inherit" size="medium" onClick={() => { this.enableTool("wwwc", 1); }}>
+                      <Brightness6Icon />
+                    </Button>
+                  </Tooltip>
+
+                  <Tooltip title="Pan"> 
+                    <Button color="inherit" size="medium" onClick={() => {this.enableTool("pan", 3);}}>
+                      <OpenWithIcon />
+                    </Button>
+                  </Tooltip>
+
+                  <Tooltip title="Zoom">                   
+                    <Button color="inherit" size="medium" onClick={() => {this.enableTool("zoom", 5);}}>
+                      <SearchIcon />
+                    </Button>
+                  </Tooltip>
+
+                  <Tooltip title="Length">   
+                    <Button color="inherit" size="medium" onClick={() => {this.enableTool("length", 1);}}>
+                      <StraightenIcon />
+                    </Button>
+                  </Tooltip>
+
+                  <Tooltip title="Angle">   
+                    <Button color="inherit" size="medium" onClick={() => {this.enableTool("angle", 1);}}>
+                      <ArrowBackIosIcon />
+                    </Button>
+                  </Tooltip>
+
+                  <Tooltip title="Probe">   
+                    <Button color="inherit" size="medium" onClick={() => {this.enableTool("probe", 1);}}>
+                      <AdjustIcon />
+                    </Button>
+                  </Tooltip>
+                  
+                  <Tooltip title="Elliptical ROI">  
+                    <Button color="inherit" size="medium" onClick={() => {this.enableTool("ellipticalRoi", 1);}}>
+                      <PanoramaFishEyeIcon />
+                    </Button>
+                  </Tooltip>
+                  
+                  <Tooltip title="Rectangle ROI">  
+                    <Button color="inherit" size="medium" onClick={() => {this.enableTool("rectangleRoi", 1);}}>
+                      <CropDinIcon />
+                    </Button>
+                  </Tooltip>
+
+                  
+                  <Tooltip title="Freeform ROI">  
+                    <Button color="inherit" size="medium" onClick={() => {this.enableTool("freehand", 1);}}>
+                      <EditIcon />
+                    </Button>
+                  </Tooltip>
+
+                  <Tooltip title="Highlight">  
+                    <Button color="inherit" size="medium" onClick={() => {this.enableTool("highlight", 1);}}>
+                      <EditIcon />
+                    </Button>
+                  </Tooltip>
+
+                  <div className="checkbox">
+                     <Checkbox value="chkshadow" id="chkshadow" label="Apply shadow"/>
+                     Apply shadow
+                  </div>
+
+                </Toolbar>
+              </AppBar>
+
+              <div
               style={{
-                width: 512,
-                height: 512,
+                flexGrow: 1,    
+                display: 'flex',
+                width: "100%",
+                height: "100%",
                 position: "relative",
                 display: "inline-block",
-                color: "white"
+                color: "yellow"
               }}
               onContextMenu={() => false}
               className="cornerstone-enabled-image"
@@ -210,138 +219,38 @@ class DicomViewer extends React.Component {
               onSelectStart={() => false}
               onMouseDown={() => false}
             >
+              
               <div
                 ref={this.dicomImageRef}
                 style={{
-                  width: 512,
-                  height: 512,
+                  flexGrow: 1,    
+                  display: 'flex',
+                  width: "100%",
+                  height: "100%",
                   top: 0,
                   left: 0,
-                  position: "absolute"
+                  position: "relative",
                 }}
               />
-              <div
-                id="mrtopleft"
-                style={{ position: "absolute", top: 3, left: 3 }}
-              >
+              <div id="mrtopleft" style={{ position: "absolute", top: 3, left: 3 }}>
                 Patient Name: Chan Tai Man
               </div>
-              <div
-                id="mrtopright"
-                style={{ position: "absolute", top: 3, right: 3 }}
-              >
+              
+              <div id="mrtopright" style={{ position: "absolute", top: 3, right: 3 }}>
                 Hospital: PWH
               </div>
-              <div
-                id="mrbottomright"
-                style={{ position: "absolute", bottom: 3, right: 3 }}
-              >
+              
+              <div id="mrbottomright" style={{ position: "absolute", bottom: 3, right: 3 }}>
                 Zoom:
               </div>
-              <div
-                id="mrbottomleft"
-                style={{ position: "absolute", bottom: 3, left: 3 }}
-              >
+
+              <div id="mrbottomleft" style={{ position: "absolute", bottom: 3, left: 3 }}>
                 WW/WC:
               </div>
+        </div>
             </div>
-          </div>
-        </div>
-        <div className="row">
-          <div className="col-xs-12">
-            <h3>Functionality</h3>
-            <ul>
-              <li>
-                Activation of a tool for the left mouse button
-                <ul>
-                  <li>
-                    WW/WC - Adjust the window width and window center of the
-                    image (activated by default)
-                  </li>
-                  <li>Pan - Pan the image</li>
-                  <li>Zoom - Zoom the image</li>
-                  <li>Length - Length measurement tool</li>
-                  <li>
-                    Probe - Display the image x,y coordinate under cursor as
-                    well as the pixel value (stored pixel and modality)
-                  </li>
-                  <li>
-                    Elliptical ROI - An elliptical ROI that shows mean, stddev
-                    and area
-                  </li>
-                  <li>
-                    Rectangle ROI - A rectangular ROI that shows mean, stddev
-                    and area
-                  </li>
-                  <li>
-                    Highlight - Darkens the image around a rectangular ROI
-                  </li>
-                  <li>Angle - Cobb angle tool</li>
-                </ul>
-              </li>
-              <li>Use the activated tool by dragging the left mouse button</li>
-              <li>Pan by dragging the middle mouse button</li>
-              <li>Zoom by dragging the right mouse button</li>
-              <li>Zoom by rolling the mouse wheel</li>
-              <li>
-                Tool dragging - left click drag on any measurement tool line to
-                move it
-              </li>
-              <li>
-                Tool deletion - left click drag on any measurement tool line and
-                drop it off the image to delete it
-              </li>
-              <li>
-                Tool handles - left click drag on any measurement tool handle
-                (the circle) to change the handles position
-              </li>
-              <li>
-                Tool handles - left click drag on any measurement tool handle
-                (the circle) to change the handles position
-              </li>
-              <li>
-                Tool handles - left click drag on any measurement tool handle
-                (the circle) to change the handles position
-              </li>
-              <li>
-                Tool handles - left click drag on any measurement tool handle
-                (the circle) to change the handles position
-              </li>
-              <li>
-                Tool handles - left click drag on any measurement tool handle
-                (the circle) to change the handles position
-              </li>
-              <li>
-                Tool handles - left click drag on any measurement tool handle
-                (the circle) to change the handles position
-              </li>
-              <li>
-                Tool handles - left click drag on any measurement tool handle
-                (the circle) to change the handles position
-              </li>
-              <li>
-                Tool handles - left click drag on any measurement tool handle
-                (the circle) to change the handles position
-              </li>
-              <li>
-                Tool handles - left click drag on any measurement tool handle
-                (the circle) to change the handles position
-              </li>
-              <li>
-                Tool handles - left click drag on any measurement tool handle
-                (the circle) to change the handles position
-              </li>
-              <li>
-                Tool handles - left click drag on any measurement tool handle
-                (the circle) to change the handles position
-              </li>
-              <li>
-                Tool handles - left click drag on any measurement tool handle
-                (the circle) to change the handles position
-              </li>
-            </ul>
-          </div>
-        </div>
+
+
       </div>
     );
   }
