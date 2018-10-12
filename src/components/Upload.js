@@ -40,11 +40,8 @@ class Upload extends React.Component {
   		output.push(event.target.files[i])
   	}
 
-  	console.log('calling change upload')
-
   	this.setState((prevState, props)=>(
   		{
-  			// uploadTasks: [{id: 1, info:{seriesName:'123',progress: 10}, files:output]
   		uploadTasks: [...prevState.uploadTasks,
   			{
   				id: Date.now(),
@@ -56,36 +53,43 @@ class Upload extends React.Component {
   	)
   }
 
+
   handleUpload = () =>{
   	var numOfTasks = this.state.uploadTasks.length
+  	const uploadTasks = this.state.uploadTasks
+  	const uploadTask = this.state.uploadTasks[numOfTasks-1]
+  	var successCount = 0;
+  	var failCount = 0;
 
-  	console.log(numOfTasks)
+  	for (var i =0;i< uploadTask.files.length;i++)
+  	{
+  		const formData = new FormData();
+	  	formData.append('file', uploadTask.files[i])
+	  	formData.append('headers', {'Access-Control-Allow-Origin': '*'})
 
-  	console.log(this.state.uploadTasks[numOfTasks-1].files[0])
-  	const formData = new FormData();
-  	formData.append('file', this.state.uploadTasks[numOfTasks-1].files[0])
-  	const config = {
-  		headers:{
-  			'content-type': 'multipart/form-data',
-  			'Access-Control-Allow-Origin': '*'
-  		}
+	  	axios.post('http://192.168.1.126:3000/orthanc/instances', formData)
+	      .then(res => {
+	      	// console.log(this.state.uploadTasks[numOfTasks-1].info)
+	        // console.log(res.data);
+	        if (res.data.Status == "Success" || res.data.Status == "AlreadyStored")
+	        {
+	        	successCount++;
+	        }
+	        else
+	        {
+	        	failCount++;	
+	        }
+
+	        var progress = (successCount + failCount)/uploadTask.files.length*100;
+
+	        uploadTasks[numOfTasks-1].info.progress = progress;
+
+	        this.setState({uploadTasks,})
+
+	      }).catch((error)=>{
+	      	console.log(error)
+	      })
   	}
-
-  	// axios.post('http://192.168.1.126:8042/instances', formData, config)
-   //    .then(res => {
-   //      console.log(res);
-   //      console.log(res.data);
-   //    })
-
-    //   const user = {
-    //   name: this.state.name
-    // };
-
-    // axios.post(`https://jsonplaceholder.typicode.com/users`, { user })
-    //   .then(res => {
-    //     console.log(res);
-    //     console.log(res.data);
-    //   })
   }
 
   render() {
