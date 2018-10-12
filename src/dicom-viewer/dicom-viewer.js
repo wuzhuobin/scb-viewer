@@ -11,13 +11,14 @@ import Checkbox from '@material-ui/core/Checkbox';
 import daikon from "daikon";
 
 class DicomViewer extends React.Component {
+
   constructor(props){
     super(props);
     this.state={
       username: '',
       imageId: 0,
       imagePathArray:[],
-      hardCodeNumDcm:50,
+      hardCodeNumDcm:1,
     }
   }
 
@@ -33,16 +34,28 @@ class DicomViewer extends React.Component {
     this.loadImage();
   }
 
+  getImagePathList(IP,Port,GET){//sync request for now
+    // return ['./assets/Test1/0000.dcm'];
+    // return ['http://192.168.1.126:8042/instances/593b7f4f-a6a19241-e255c4be-3e9fef2c-6d8f96a8/file'];
+    return ['http://127.0.0.1:8080/0100.dcm'];
+  }
+
   readImage(state, cornerstoneInstance){
     //Get image path Array first
+    const pathlist = this.getImagePathList(1,1,1);
+    // console.log(pathlist);
+
     var cacheArray = [];
-    for (var i=0;i<state.hardCodeNumDcm;i++){
-      cacheArray.push("assets/Test1/0"+String((i-i%100)/100)+String((i-(i-i%100)-i%10)/10)+String(i%10)+".dcm");
+    for (var i=0;i<pathlist.length;i++){
+      cacheArray.push(pathlist[i]);
+      // cacheArray.push("assets/Test1/0"+String((i-i%100)/100)+String((i-(i-i%100)-i%10)/10)+String(i%10)+".dcm");
     }
+    console.log(cacheArray);
     dicomLoader(cornerstoneInstance,cacheArray);
     this.setState(function(state, returnArray){
       return {
-        imagePathArray:returnArray
+        imagePathArray:returnArray,
+        hardCodeNumDcm:pathlist.length,
       };
     });
   }
@@ -51,7 +64,7 @@ class DicomViewer extends React.Component {
 
 
   dicomImage = null;
-  HardCodeIdArray = [...Array(50).keys()].map(function(number){
+  HardCodeIdArray = [...Array(1).keys()].map(function(number){
     return "example://" + String(number);
   });
   // HardCodeIdArray = ["example://1", "example://2"];

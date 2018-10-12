@@ -2,10 +2,19 @@ import daikon from "daikon";
 
 const httpGetAsync = (theUrl, callback) => {
   const xmlHttp = new XMLHttpRequest();
+  console.log('abc');
+  console.log(theUrl);
+  console.log('abc1');
   xmlHttp.onreadystatechange = () => {
     if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
+      console.log('anotherabc');
       callback(xmlHttp.response);
     }
+    // if (xmlHttp.readyState === 4) {
+    //   console.log(xmlHttp.status);
+    //   console.log('anotherabc');
+    //   callback(xmlHttp.response);
+    // }
   };
   xmlHttp.open("GET", theUrl, true); // true for asynchronous
   xmlHttp.responseType = "arraybuffer";
@@ -32,11 +41,13 @@ function computeImageMinMax(a){
 const dicomLoader = (cs,imageArray) => {
   const num_dcm = imageArray.length;
   var series = new Array(num_dcm);
+  console.log(imageArray[0]);
+
 
   for (var ctr in imageArray){
     series[ctr] = new Promise(resolve=>{
     httpGetAsync(imageArray[ctr], response => {
-
+      console.log('abc');
       const data = new DataView(response);
       const image = daikon.Series.parseImage(data);
       const spacing = image.getPixelSpacing();
