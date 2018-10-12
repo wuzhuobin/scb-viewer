@@ -3,7 +3,8 @@ import {Avatar, Button, CssBaseline, Paper, Typography, FormControl, InputLabel,
 import React, { Component } from 'react';
 import {withStyles} from '@material-ui/core/styles'
 import PropTypes from 'prop-types';
-import {Lock} from '@material-ui/icons'
+import {Lock} from '@material-ui/icons';
+import axios from 'axios';
 
 const styles = theme=> ({
   layout: {
@@ -53,15 +54,47 @@ class Login extends Component {
 		loginEvent.preventDefault()
 		console.log("username: " + this.state.username)
 		console.log("password: " + this.state.password)
+		const formData = new FormData();
+		const userName = this.state.username;
+		const passWord = this.state.password;
+	  	formData.append('headers', {'Access-Control-Allow-Origin': '*'});
+	  	formData.append('body',{'username': this.state.username});
+	  	//formData.append({'password': 'sucabot'});
+	  	axios({
+  				method: 'post',
+  				url: 'http://192.168.1.112:5000/handleLogin',
+  				data: {
+    			username: this.state.username,
+    			password: this.state.password
+			  	},
+			  	headers:  {'Access-Control-Allow-Origin': '*'},
+			})
+	      .then(res => {
+	      	// console.log(this.state.uploadTasks[numOfTasks-1].info)
+	         console.log(res);
+	        if (res.data.Status == 'Success' )
+	        {
+	        	console.log("correct");
+	        	this.props.onAuth();
+	        }
+	        else
+	        {
+	        	console.log("wrong");	
+	        }
 
-		if (this.state.username === "user" && this.state.password === "sucabot"){
-			console.log("correct");
-			this.props.onAuth();
+	      }).catch((error)=>{
+	      	console.log(error)
+	      })
+
+
+		//if (this.state.username === "user" && this.state.password === "sucabot"){
+		//	console.log("correct");
+		//	this.props.onAuth();
 			// this.setState({foo: !this.state.foo});
-		}
-		else{
-			console.log("wrong");
-		}
+		//}
+		//else{
+		//	
+		//}
 	}
 
 	handleChange = e =>{
