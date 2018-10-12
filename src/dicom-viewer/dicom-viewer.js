@@ -39,7 +39,8 @@ class DicomViewer extends React.Component {
   getImagePathList(IP,Port,GET){//sync request for now
     // return ['./assets/Test1/0000.dcm'];
     // return ['http://192.168.1.126:3000/orthanc/instances/2d3e243d-8b918a6f-b3456d3e-0546d044-dab91ee0/file'];
-    return ['http://127.0.0.1:8080/0100.dcm'];
+    // return ['http://127.0.0.1:8080/0100.dcm'];
+    return ['http://127.0.0.1:8080/0100.dcm','http://127.0.0.1:8080/1010.dcm','http://127.0.0.1:8080/0400.dcm'];
   }
 
   readImage(state, cornerstoneInstance){
@@ -71,23 +72,17 @@ class DicomViewer extends React.Component {
 
 
   dicomImage = null;
-  HardCodeIdArray = [...Array(1).keys()].map(function(number){
-    return "example://" + String(number);
-  });
 
 
   updateTheImage(imageIndex) {
     console.log("UpdateTheImage");
     this.imageId = imageIndex;
     this.loadImage(this.HardCodeIdArray[imageIndex]
-    // .then(function(image) {
-    //   cornerstone.displayImage(element, image);
-    // }
-    );
+      );
   }
 
   wheelUp(state){
-    if (state.imageId<this.HardCodeIdArray.length-1){
+    if (state.imageId<state.hardCodeNumDcm-1){
       // this.loadImage(this.HardCodeIdArray[state.imageId+1]);
       console.log(state.imageId+"a->"+String(state.imageId+1));
       return {...state, imageId: state.imageId+1};
@@ -112,7 +107,7 @@ class DicomViewer extends React.Component {
     }
   }
   refreshImage(state){
-    this.loadImage1(this.HardCodeIdArray[state.imageId]);
+    this.loadImage1(state.imageLoaderHintsArray[state.imageId]);
     console.log('Getting' + this.state.imageId + "-th image");
   }
 
@@ -163,10 +158,7 @@ class DicomViewer extends React.Component {
     }
     // console.log(this.currentstate);
     cornerstone.enable(element);
-    cornerstone.loadImage(this.HardCodeIdArray[this.state.imageId]).then(image => {
-      console.log('abc');
-      console.log(this.state.imageLoaderHintsArray);
-      console.log('abc');
+    cornerstone.loadImage(this.state.imageLoaderHintsArray[this.state.imageId]).then(image => {
       cornerstone.displayImage(element, image);
       cornerstoneTools.mouseInput.enable(element);
       cornerstoneTools.mouseWheelInput.enable(element);

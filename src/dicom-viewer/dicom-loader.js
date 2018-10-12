@@ -6,15 +6,19 @@ const httpGetAsync = (theUrl, callback) => {
   console.log(theUrl);
   console.log('abc1');
   xmlHttp.onreadystatechange = () => {
-    if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
-      console.log('anotherabc');
-      callback(xmlHttp.response);
-    }
-    // if (xmlHttp.readyState === 4) {
-    //   console.log(xmlHttp.status);
+    // if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
     //   console.log('anotherabc');
     //   callback(xmlHttp.response);
     // }
+    if (xmlHttp.readyState === 4) {
+      if (xmlHttp.status === 200){
+        callback(xmlHttp.response);
+      }
+      else {
+        console.log('404');
+        callback(null);
+      }
+    }
   };
   xmlHttp.open("GET", theUrl, true); // true for asynchronous
   xmlHttp.responseType = "arraybuffer";
@@ -23,11 +27,9 @@ const httpGetAsync = (theUrl, callback) => {
 
 function computeImageMinMax(a){
   const dataArray = a.getInterpretedData();
-  // const numPixel = dataArray.length;
   var min = dataArray[0];
   var max = dataArray[0];
-  var i;
-  for (i=0;i<dataArray.length;i++){
+  for (var i=0;i<dataArray.length;i++){
     if (min>dataArray[i]){
       min = dataArray[i];
     }
@@ -40,19 +42,17 @@ function computeImageMinMax(a){
 
 const dicomLoader = (cs,imageArray) => {
   const num_dcm = imageArray.length;
-  var series = new Array(num_dcm);
-  console.log(imageArray[0]);
-
+  var imageSeries = new Array(num_dcm);
 
   for (var ctr in imageArray){
-    series[ctr] = new Promise(resolve=>{
+    imageSeries[ctr] = new Promise(resolve=>{
     httpGetAsync(imageArray[ctr], response => {
-      console.log('abc');
+      if(response==null){
+        reject({});
+      }
       const data = new DataView(response);
       const image = daikon.Series.parseImage(data);
       const spacing = image.getPixelSpacing();
-      // console.log(String(image.getImageNumber()-1)+'-th image has the follwing data');
-      // console.log(image.getInterpretedData());
       if (image.getImageMin()){
         console.log("Type1");
         resolve({
@@ -95,6 +95,8 @@ const dicomLoader = (cs,imageArray) => {
           });
       }
 
+    }, reject => {
+      console.log("wrong image detected");
     });
 
     });
@@ -109,9 +111,9 @@ const dicomLoader = (cs,imageArray) => {
     function getPixelData() {
       if (String(imageId).substring(0,10) === "example://"){
         const id = String(imageId).substring(10,String(imageId).length);
-        console.log("Accessing " + id + "-th image out of " + series.length + " images");
+        console.log("Accessing " + id + "-th image out of " + imageSeries.length + " images");
         // console.log(series[id]);
-        return series[id];
+        return imageSeries[id];
       }
       else {
         console.log("Received unknown request starting from " + imageId);
