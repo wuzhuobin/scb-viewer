@@ -18,6 +18,7 @@ class DicomViewer extends React.Component {
       username: '',
       imageId: 0,
       imagePathArray:[],
+      imageLoaderHintsArray:[],
       hardCodeNumDcm:1,
     }
   }
@@ -31,12 +32,13 @@ class DicomViewer extends React.Component {
   }
 
   componentDidMount() {
-    this.loadImage();
+    console.log(this.state);
+    this.loadImage1();
   }
 
   getImagePathList(IP,Port,GET){//sync request for now
     // return ['./assets/Test1/0000.dcm'];
-    // return ['http://192.168.1.126:8042/instances/593b7f4f-a6a19241-e255c4be-3e9fef2c-6d8f96a8/file'];
+    // return ['http://192.168.1.126:3000/orthanc/instances/2d3e243d-8b918a6f-b3456d3e-0546d044-dab91ee0/file'];
     return ['http://127.0.0.1:8080/0100.dcm'];
   }
 
@@ -45,19 +47,24 @@ class DicomViewer extends React.Component {
     const pathlist = this.getImagePathList(1,1,1);
     // console.log(pathlist);
 
-    var cacheArray = [];
+    var cacheimagePathArray = [];
+    const cacheimageLoaderHintsArray = [...Array(pathlist.length).keys()].map(function(number){
+      return "example://" + String(number);
+    });
     for (var i=0;i<pathlist.length;i++){
-      cacheArray.push(pathlist[i]);
+      cacheimagePathArray.push(pathlist[i]);
       // cacheArray.push("assets/Test1/0"+String((i-i%100)/100)+String((i-(i-i%100)-i%10)/10)+String(i%10)+".dcm");
     }
-    console.log(cacheArray);
-    dicomLoader(cornerstoneInstance,cacheArray);
-    this.setState(function(state, returnArray){
-      return {
-        imagePathArray:returnArray,
-        hardCodeNumDcm:pathlist.length,
-      };
-    });
+    console.log('abcd');
+    console.log(cacheimagePathArray);
+    console.log(cacheimageLoaderHintsArray);
+    console.log('abcd');
+    dicomLoader(cornerstoneInstance,cacheimagePathArray);
+    this.setState(state => ({
+      imagePathArray:cacheimagePathArray,
+      imageLoaderHintsArray:cacheimageLoaderHintsArray,
+      hardCodeNumDcm:cacheimagePathArray.length
+    }));
   }
 
 
@@ -67,8 +74,6 @@ class DicomViewer extends React.Component {
   HardCodeIdArray = [...Array(1).keys()].map(function(number){
     return "example://" + String(number);
   });
-  // HardCodeIdArray = ["example://1", "example://2"];
-  // console.log(HardCodeIdArray);
 
 
   updateTheImage(imageIndex) {
@@ -107,7 +112,7 @@ class DicomViewer extends React.Component {
     }
   }
   refreshImage(state){
-    this.loadImage(this.HardCodeIdArray[state.imageId]);
+    this.loadImage1(this.HardCodeIdArray[state.imageId]);
     console.log('Getting' + this.state.imageId + "-th image");
   }
 
@@ -125,7 +130,7 @@ class DicomViewer extends React.Component {
   }
 
 
-  loadImage = () => {
+  loadImage1 = () => {
     const element = this.dicomImage;
     // Listen for changes to the viewport so we can update the text overlays in the corner
     function onImageRendered(e) {
@@ -152,15 +157,16 @@ class DicomViewer extends React.Component {
       cornerstoneTools.angle.setConfiguration({ shadow: this.checked });
       cornerstone.updateImage(element);
     });
-
     const wheelEvents = ['mousewheel', 'DOMMouseScroll'];
     for (var i=0;i<wheelEvents.length;i++){
       element.addEventListener(wheelEvents[i],this.wheelEventsHandler);
     }
-    // console.log(this.HardCodeIdArray[this.state.imageId]);
+    // console.log(this.currentstate);
     cornerstone.enable(element);
     cornerstone.loadImage(this.HardCodeIdArray[this.state.imageId]).then(image => {
-      console.log("Displaying");
+      console.log('abc');
+      console.log(this.state.imageLoaderHintsArray);
+      console.log('abc');
       cornerstone.displayImage(element, image);
       cornerstoneTools.mouseInput.enable(element);
       cornerstoneTools.mouseWheelInput.enable(element);
@@ -177,6 +183,7 @@ class DicomViewer extends React.Component {
       cornerstoneTools.highlight.enable(element);
     });
   };
+
   enableTool = (toolName, mouseButtonNumber) => {
     this.disableAllTools();
     cornerstoneTools[toolName].activate(this.dicomImage, mouseButtonNumber);
