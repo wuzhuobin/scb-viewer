@@ -1,5 +1,5 @@
 import React from 'react'
-import {List, ListItem, ListItemIcon, ListItemText, Drawer, Divider, Button} from '@material-ui/core'
+import {List, ListItem, ListItemIcon, ListItemText, Drawer, Divider} from '@material-ui/core'
 import {withStyles} from '@material-ui/core/styles'
 import Images from './Images';
 import DicomViewer from "../dicom-viewer";
@@ -33,7 +33,7 @@ class Content extends React.Component {
     constructor(props){
         super(props);
         this.state = {
-            page: 2,
+            page: 0,
         };
     }
 
@@ -45,7 +45,7 @@ class Content extends React.Component {
   	}
 
     render(){
-        const {classes, onTab} = this.props
+        const {classes} = this.props
         const {page} = this.state
 
         return(

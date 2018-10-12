@@ -1,33 +1,28 @@
 import React from "react";
-import Hammer from "hammerjs";
 
-import {Button, Checkbox, Drawer, List, ListItem, ListItemIcon, ListItemText, Typography} from '@material-ui/core';
-
+import {Button,Divider} from '@material-ui/core';
+import {CloudUpload} from '@material-ui/icons'
 
 import { withStyles } from '@material-ui/core/styles';
-
-const drawerWidth = 240;
+import Upload from './Upload';
 
 const styles = theme => ({
   root: {
-    flexGrow: 1,
+    // flexGrow: 1,
     zIndex: 1,
-    overflow: 'hidden',
-    position: 'relative',
-    display: 'flex',
+    // width: '100%',
+    height: '100%',
+    overflow: 'auto',
+    // position: 'relative',
+    // display: 'flex',
   },
-  drawerPaper: {
-    position: 'relative',
-    height: '93vh',
-    width: drawerWidth,
+  form:{
   },
-  content: {
-    flexGrow: 1,
-    backgroundColor: theme.palette.background.default,
-    padding: theme.spacing.unit * 3,
-    minWidth: 0, // So the Typography noWrap works
+  fab: {
+    position: 'absolute',
+    bottom: theme.spacing.unit * 5,
+    right: theme.spacing.unit * 5,
   },
-  toolbar: theme.mixins.toolbar,
 });
 
 
@@ -35,19 +30,34 @@ class Images extends React.Component {
   constructor(props){
     super(props);
     this.state={
-
+      upload:false,
     }
   }
 
+  handleUploadOpen = () => {
+    this.setState({ upload: true });
+  };
+
+  handleUploadClose = () =>{
+    this.setState({upload:false});
+  }
+
   render() {
-    const {username, password} = this.state
+    const {} = this.state
     const {classes} = this.props
 
     return (
       <div className={classes.root}>
+        <form className={classes.form} noValidate autoComplete="off">
+        hello
+        </form>   
+        <Divider />
+        <Button variant="fab" color="secondary" className={classes.fab} onClick={this.handleUploadOpen}>
+          <CloudUpload />
+        </Button>
         
+        <Upload open={this.state.upload} onClose={this.handleUploadClose}/>
 
-        
       </div>
     );
   }

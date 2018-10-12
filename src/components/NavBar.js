@@ -1,5 +1,5 @@
 import React from 'react'
-import {AppBar, Toolbar, Typography, IconButton, Menu, MenuItem} from '@material-ui/core'
+import {AppBar, Toolbar, Typography, IconButton} from '@material-ui/core'
 import {AccountCircle} from '@material-ui/icons';
 import {withStyles} from '@material-ui/core/styles'
 
@@ -51,7 +51,7 @@ class NavBar extends React.Component {
 
         return(
         <div className={classes.root}>
-            <AppBar position="static" className={classes.appBar} style={styles.appBar}>
+            <AppBar position="static" className={classes.appBar} style={styles.appBar} containerStyle={{height: 'calc(100% - 64px)', top: 64}}>
                 <Toolbar>
                     <Typography variant="title" color="inherit" className={classes.grow}>
                         Sucabot WebViewer
