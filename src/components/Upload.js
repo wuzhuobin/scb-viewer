@@ -91,10 +91,6 @@ class Upload extends React.Component {
   render() {
     const {uploadTasks} = this.state
     const {open, onClose, classes} = this.props
-
-    console.log('abc')
-    console.log(this.state.uploadTasks)
-
     return (
       <div className={classes.root}>
         <Dialog
