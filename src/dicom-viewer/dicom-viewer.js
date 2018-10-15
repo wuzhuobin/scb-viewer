@@ -40,7 +40,7 @@ class DicomViewer extends React.Component {
     // return ['./assets/Test1/0000.dcm'];
     // return ['http://192.168.1.126:3000/orthanc/instances/2d3e243d-8b918a6f-b3456d3e-0546d044-dab91ee0/file'];
     // return ['http://127.0.0.1:8080/0100.dcm'];
-    return ['http://127.0.0.1:8080/0100.dcm','http://127.0.0.1:8080/1010.dcm','http://127.0.0.1:8080/0400.dcm'];
+    return ['http://127.0.0.1:8080/0100.dcm','http://127.0.0.1:8080/0010.dcm','http://127.0.0.1:8080/0400.dcm'];
   }
 
   readImage(state, cornerstoneInstance){
@@ -152,13 +152,21 @@ class DicomViewer extends React.Component {
       cornerstoneTools.angle.setConfiguration({ shadow: this.checked });
       cornerstone.updateImage(element);
     });
-    const wheelEvents = ['mousewheel', 'DOMMouseScroll'];
-    for (var i=0;i<wheelEvents.length;i++){
-      element.addEventListener(wheelEvents[i],this.wheelEventsHandler);
-    }
+    // const wheelEvents = ['mousewheel', 'DOMMouseScroll'];
+    // for (var i=0;i<wheelEvents.length;i++){
+    //   element.addEventListener(wheelEvents[i],this.wheelEventsHandler);
+    // }
+
+    var stack = {
+        currentImageIdIndex : 0,
+        imageIds: this.state.imageLoaderHintsArray
+    };
+
+
+
     // console.log(this.currentstate);
     cornerstone.enable(element);
-    cornerstone.loadImage(this.state.imageLoaderHintsArray[this.state.imageId]).then(image => {
+    cornerstone.loadImage(this.state.imageLoaderHintsArray[stack.currentImageIdIndex]).then(image => {
       cornerstone.displayImage(element, image);
       cornerstoneTools.mouseInput.enable(element);
       cornerstoneTools.mouseWheelInput.enable(element);
@@ -173,6 +181,20 @@ class DicomViewer extends React.Component {
       cornerstoneTools.rectangleRoi.enable(element);
       cornerstoneTools.angle.enable(element);
       cornerstoneTools.highlight.enable(element);
+
+      cornerstoneTools.addStackStateManager(element, ['stack']);
+      cornerstoneTools.addToolState(element, 'stack', stack);
+
+      // Enable all tools we want to use with this element
+      // cornerstoneTools.stackScroll.activate(element, 1);<--------------ui button of enablt scrolling through left button
+      cornerstoneTools.stackScrollWheel.activate(element);
+
+      // Uncomment below to enable stack prefetching
+      // With the example images the loading will be extremely quick, though
+      cornerstoneTools.stackPrefetch.enable(element, 3);
+
+
+
     });
   };
 
