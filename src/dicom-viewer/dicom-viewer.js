@@ -67,6 +67,8 @@ const styles = theme=> ({
 
 class DicomViewer extends React.Component {
   
+  dicomImage = null;
+
   componentWillMount() {
     cornerstoneTools.external.cornerstone = cornerstone;
     cornerstoneTools.external.cornerstoneMath = cornerstoneMath;
@@ -77,8 +79,6 @@ class DicomViewer extends React.Component {
   componentDidMount() {
     this.loadImage();
   }
-
-  dicomImage = null;
 
   loadImage = () => {
     
@@ -120,9 +120,10 @@ class DicomViewer extends React.Component {
     cornerstoneTools.angle.enable(element);
     cornerstoneTools.highlight.enable(element);
 
-      cornerstoneTools.length.setConfiguration({ shadow: this.checked });
-      cornerstoneTools.angle.setConfiguration({ shadow: this.checked });
-      cornerstone.updateImage(element);
+    cornerstoneTools.length.setConfiguration({ shadow: this.checked });
+    cornerstoneTools.angle.setConfiguration({ shadow: this.checked });
+
+    cornerstone.updateImage(element);
     });
   };
 
@@ -246,7 +247,13 @@ class DicomViewer extends React.Component {
                     <Button classes={{label: classes.label}} color="inherit" size="small" 
                       onClick={() => {
                         const element = this.dicomImage;
-                        cornerstone.reset(element);}}
+                        cornerstone.reset(element);
+                        
+                        const viewport = cornerstone.getViewport(element);
+                        viewport = cornerstone.getViewport(element);
+                        viewport.hflip = false;
+                        viewport.vflip = false;
+                        viewport.rotation = 0;}}
                         >
                       <ReplayIcon />
                       Reset
@@ -337,7 +344,6 @@ class DicomViewer extends React.Component {
               <div id="mrbottomleft" style={{ position: "absolute", bottom: 3, left: 3 }}>
                 WW/WC:
               </div>
-
 
           </div>
         </div>

@@ -36,7 +36,7 @@ class App extends Component {
     return (
       <MuiThemeProvider>
       <div>
-        <NavBar />
+        <DicomViewer />
         
 
       </div>
