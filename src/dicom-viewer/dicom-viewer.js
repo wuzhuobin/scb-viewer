@@ -206,7 +206,7 @@ class DicomViewer extends React.Component {
       cornerstoneTools.mouseInput.enable(element);
       cornerstoneTools.mouseWheelInput.enable(element);
       // // Enable all tools we want to use with this element
-      cornerstoneTools.wwwc.activate(element, 1); // ww/wc is the default tool for left mouse button
+      // cornerstoneTools.wwwc.activate(element, 1); // ww/wc is the default tool for left mouse button
       cornerstoneTools.pan.activate(element, 2); // pan is the default tool for middle mouse button
       cornerstoneTools.zoom.activate(element, 4); // zoom is the default tool for right mouse button
       // cornerstoneTools.zoomWheel.activate(element); // zoom is the default tool for middle mouse wheel
@@ -225,7 +225,7 @@ class DicomViewer extends React.Component {
       cornerstone.updateImage(element);
 
       // Enable all tools we want to use with this element
-      //cornerstoneTools.stackScroll.activate(element, 1);//<--------------ui button of enablt scrolling through left button
+      cornerstoneTools.stackScroll.activate(element, 1);//<--------------ui button of enablt scrolling through left button
       cornerstoneTools.stackScrollWheel.activate(element);
 
       // Uncomment below to enable stack prefetching
@@ -242,9 +242,9 @@ class DicomViewer extends React.Component {
   // helper function used by the tool button handlers to disable the active tool
   // before making a new tool active
   disableAllTools = () => {
+    console.log("AAA");
     cornerstoneTools.wwwc.disable(this.dicomImage);
-    cornerstoneTools.pan.activate(this.dicomImage, 2); // 2 is middle mouse button
-    cornerstoneTools.zoom.activate(this.dicomImage, 4); // 4 is right mouse button
+    cornerstoneTools.stackScroll.deactivate(this.dicomImage, 1);
     cornerstoneTools.probe.deactivate(this.dicomImage, 1);
     cornerstoneTools.length.deactivate(this.dicomImage, 1);
     cornerstoneTools.ellipticalRoi.deactivate(this.dicomImage, 1);
@@ -252,6 +252,8 @@ class DicomViewer extends React.Component {
     cornerstoneTools.angle.deactivate(this.dicomImage, 1);
     cornerstoneTools.highlight.deactivate(this.dicomImage, 1);
     cornerstoneTools.freehand.deactivate(this.dicomImage, 1);
+    cornerstoneTools.pan.activate(this.dicomImage, 2); // 2 is middle mouse button
+    cornerstoneTools.zoom.activate(this.dicomImage, 4); // 4 is right mouse button
   };
 
   dicomImageRef = el => {
@@ -268,7 +270,7 @@ class DicomViewer extends React.Component {
               <AppBar position="static" className={classes.appBar}>
                 <ToggleButtonGroup exclusive >
 
-                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => { this.enableTool("wwwc", 1); }}>
+                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => { this.enableTool("stackScroll", 1); }}>
                       <NavigationIcon />
                       Navigate
                     </Button>
