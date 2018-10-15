@@ -73,11 +73,47 @@ function createData(name, patientId, birthDate, gender) {
   return { id, name, patientId, birthDate, gender};
 }
 
-const rows = [
-      createData('A123456', 'Chan Tai Man', getToday(),'M'),
-      createData('B234567', 'Wong Siu Ming', getToday(), 'F'),
-   ];
+// const rows = ;
+class PACS {
+  
+  static allPatients(action){
+    fetch("http://223.255.146.2:8042/orthanc/patients/").
+      then((res) => { return res.json(); }).
+      then((json) => { action(json); });
+  }
+  static patientInfo(id, action) {
+    fetch("http://223.255.146.2:8042/orthanc/patients/" + id).
+      then((res) => { return res.json(); }).
+      then((json) => { action(json); });
+  }
 
+  static studyInfo(id, action) {
+    fetch("http://223.255.146.2:8042/orthanc/studies/" + id).
+      then((res) => { return res.json(); }).
+      then((json) => { action(json); });
+  }
+
+  static serieInfo(id, action) {
+    fetch("http://223.255.146.2:8042/orthanc/series/" + id).
+      then((res) => { return res.json(); }).
+      then((json) => { action(json); });
+  }
+
+  static serieImages(id, action) {
+    fetch("http://223.255.146.2:8042/orthanc/series/" + id).
+      then((res) => { return res.json(); }).
+      then((json) => {
+        let paths = [];
+        json.Instances.forEach(element => {
+          paths.push("http://223.255.146.2:8042/orthanc/instances/" + element + "/file");
+        });
+        action(paths);
+      });
+  }
+}
+
+      // createData('A123456', 'Chan Tai Man', getToday(),'M'),
+      // createData('B234567', 'Wong Siu Ming', getToday(), 'F'),
 class Images extends React.Component {
   constructor(props){
     super(props);
@@ -88,11 +124,22 @@ class Images extends React.Component {
       startDate: '',
       endDate: '',
       modality: 'all',
+      rows: [],
     }
+    PACS.allPatients((json) => {
+      for (let i = 0; i < json.length; ++i) {
+        PACS.patientInfo(json[i], (json) => {
+          let row = createData(json.MainDicomTags.PatientID, json.MainDicomTags.PatientName, json.MainDicomTags.PatientBirthDate, json.MainDicomTags.PatientSex);
+          const rows = this.state.rows.slice();
+          rows.push(row);
+          this.setState({rows: rows});
+        });
+      }
+    });
   }
 
   handleUploadOpen = () => {
-    this.setState({ upload: true });
+  this.setState({ upload: true });
   };
 
   handleUploadClose = () =>{
@@ -179,7 +226,7 @@ class Images extends React.Component {
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows.map( row => {
+            {this.state.rows.map( row => {
               console.log(row)
               return (
                 <TableRow id={row.id}>
