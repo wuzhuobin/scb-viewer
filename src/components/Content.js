@@ -4,6 +4,7 @@ import {withStyles} from '@material-ui/core/styles'
 import Images from './Images';
 import DicomViewer from "../dicom-viewer";
 import {Collections, Portrait, Visibility} from '@material-ui/icons'
+import classNames from 'classnames';
 
 const drawerWidth = 240;
 
@@ -51,7 +52,7 @@ class Content extends React.Component {
         return(
         <div className={classes.root}>
         <Drawer
-          variant="permanent"
+          variant="persistent"
           classes={{
             paper: classes.drawerPaper,
           }}
