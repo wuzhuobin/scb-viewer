@@ -3,6 +3,7 @@ import {AppBar, Toolbar, Typography, IconButton, Divider, Drawer} from '@materia
 import {AccountCircle, Menu, ChevronRight, ChevronLeft} from '@material-ui/icons';
 import {withStyles} from '@material-ui/core/styles'
 import classNames from 'classnames';
+import DrawerMenu from './DrawerMenu';
 
 const drawerWidth = 240;
 
@@ -13,7 +14,7 @@ const styles = theme=> ({
         overflow: 'hidden',
         position: 'relative',
         display: 'flex',
-        height: '100vh'
+        height: '64px'
     },
     iconButton: {
         marginLeft: 'auto',
@@ -24,7 +25,6 @@ const styles = theme=> ({
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.leavingScreen,
         }),
-
     },
     appBarShift: {
         width: `calc(100% - ${drawerWidth}px)`,
@@ -43,16 +43,6 @@ const styles = theme=> ({
     },
     hide:{
         display: 'none'
-    },
-    drawerPaper: {
-        width: drawerWidth,
-    },
-    drawerHeader: {
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'flex-end',
-        padding: '0 8px',
-        ...theme.mixins.toolbar,
     },
     content: {
         flexGrow: 1,
@@ -86,37 +76,9 @@ class NavBar extends React.Component {
         this.setState({tab: props.tab});
     }
 
-    handleDrawerOpen = () =>{
-        this.setState({open:true});
-    }
-
-    handleDrawerClose = () =>{
-        this.setState({open:false});
-    }
-
     render(){
-        const {classes, theme} = this.props
-        const {auth, open} = this.state
-
-        const drawer = (
-          <Drawer
-            variant="persistent"
-            anchor='left'
-            open={open}
-            classes={{
-              paper: classes.drawerPaper,
-            }}
-          >
-            <div className={classes.drawerHeader}>
-              <IconButton onClick={this.handleDrawerClose}>
-                <ChevronLeft /> 
-              </IconButton>
-            </div>
-            <Divider />
-                hello
-          </Drawer>
-        );
-
+        const {auth, open, onDrawerOpen, classes, theme} = this.props
+          
         return(
         <div className={classes.root}>
             <AppBar 
@@ -129,7 +91,7 @@ class NavBar extends React.Component {
                                 className={classNames(classes.menuButton, open && classes.hide)} 
                                 color='inherit' 
                                 aria-label='Menu'
-                                onClick={this.handleDrawerOpen}
+                                onClick={onDrawerOpen}
                             >
                                 <Menu />
                             </IconButton>
@@ -154,17 +116,21 @@ class NavBar extends React.Component {
                     }
                 </Toolbar>
             </AppBar>
-            {drawer}
-            <main 
-                className={classNames(classes.content,{
-                    [classes.contentShift]: open,
-                })}
-            >
-                helloWorld
-            </main>
+            
         </div>
     );
 }
 }
 export default withStyles(styles)(NavBar);
 
+
+
+// <DrawerMenu onDrawerClose={this.handleDrawerClose} open={open} />
+//             <main 
+//                 className={classNames(classes.content,{
+//                     [classes.contentShift]: open,
+//                 })}
+//             >
+
+//                 helloWorld
+//             </main>
