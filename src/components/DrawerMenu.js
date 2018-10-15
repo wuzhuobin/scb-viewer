@@ -24,21 +24,10 @@ const styles = theme=> ({
 class DrawerMenu extends React.Component {
     constructor(props){
         super(props);
-        this.state = {
-            page: 0,
-        };
     }
 
-    handleChangePage = (event, value)=>{
-    	console.log(event)
-    	console.log(value)
-    	this.setState({page: value});
-    	console.log(this.state.page)
-  	}
-
     render(){
-        const {onDrawerClose, open, classes} = this.props
-        const {page} = this.state
+        const {onDrawerClose, onChangePage, open, classes} = this.props
 
         return(
         <div className={classes.root}>
@@ -57,13 +46,13 @@ class DrawerMenu extends React.Component {
             </div>
             <Divider />
             <List>
-              <ListItem button onClick={() => {this.setState({page: 0});}}>
+              <ListItem button onClick={() => {onChangePage(0)}}>
                 <ListItemIcon>
                   <Collections />
                 </ListItemIcon>
                 <ListItemText primary="Images" />
               </ListItem>
-              <ListItem button onClick={() => {this.setState({page: 1});}}>
+              <ListItem button onClick={() => {onChangePage(1);}}>
                 <ListItemIcon>
                   <Portrait />
                 </ListItemIcon>
@@ -72,7 +61,7 @@ class DrawerMenu extends React.Component {
             </List>
             <Divider />
             <List>
-                <ListItem button onClick={() => {this.setState({page: 2});}}>
+                <ListItem button onClick={() => {onChangePage(2);}}>
                 <ListItemIcon>
                   <Visibility />
                 </ListItemIcon>
@@ -86,9 +75,3 @@ class DrawerMenu extends React.Component {
 }
 }
 export default withStyles(styles)(DrawerMenu);
-
-        // <body className={classes.content}>
-        // 	{page === 0 && <Images />}
-        // 	{page === 1 && <div>Projects</div>}
-        // 	{page === 2 && <DicomViewer />}
-        // </body>

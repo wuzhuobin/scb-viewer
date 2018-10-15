@@ -40,15 +40,12 @@ class Content extends React.Component {
     constructor(props){
         super(props);
         this.state = {
-            page: 2,
+            page: 0,
         };
     }
 
-    handleChangePage = (event, value)=>{
-    	console.log(event)
-    	console.log(value)
+    handleChangePage = (value)=>{
     	this.setState({page: value});
-    	console.log(this.state.page)
   	}
 
     render(){
@@ -57,8 +54,7 @@ class Content extends React.Component {
 
         return(
         <div className={classes.root}>
-
-          <DrawerMenu open={open} onDrawerClose={onDrawerClose} />
+          <DrawerMenu open={open} onDrawerClose={onDrawerClose} onChangePage={this.handleChangePage}/>
           <main 
               className={classNames(classes.content,{
                   [classes.contentShift]: open,
@@ -73,9 +69,3 @@ class Content extends React.Component {
 }
 }
 export default withStyles(styles)(Content);
-
-        // <body className={classes.content}>
-        //   
-        // </body>
-
-          

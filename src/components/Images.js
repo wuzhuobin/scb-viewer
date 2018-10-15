@@ -1,7 +1,8 @@
 import React from "react";
 
-import {Button, Divider, Typography, TextField, Grid, Table, TableBody, TableCell, TableHead, TableRow} from '@material-ui/core';
-import {CloudUpload} from '@material-ui/icons'
+import {Button, Divider, Typography, TextField, Grid, Table, TableBody, TableCell, TableHead, TableRow,
+  Collapse} from '@material-ui/core';
+import {CloudUpload, ExpandMore} from '@material-ui/icons'
 
 import { withStyles } from '@material-ui/core/styles';
 import Upload from './Upload';
@@ -31,7 +32,7 @@ const styles = theme => ({
     // flexGrow: 1,
     // zIndex: 1,
     // width: '100%',
-    height: '100vh',
+    height: 'calc(100vh - 64px)',
     // overflow: 'auto',
     // position: 'relative',
     // display: 'flex',
@@ -73,10 +74,46 @@ function createData(name, patientId, birthDate, gender) {
   return { id, name, patientId, birthDate, gender};
 }
 
-const rows = [
-      createData('A123456', 'Chan Tai Man', getToday(),'M'),
-      createData('B234567', 'Wong Siu Ming', getToday(), 'F'),
-   ];
+// const rows = ;
+class PACS {
+  static URL() {
+    return "http://223.255.146.2:8042/orthanc/";
+  }
+  static allPatients(action){
+    fetch(PACS.URL() + "patients/").
+      then((res) => { return res.json(); }).
+      then((json) => { action(json); });
+  }
+  static patientInfo(id, action) {
+    fetch(PACS.URL() + "patients/" + id).
+      then((res) => { return res.json(); }).
+      then((json) => { action(json); });
+  }
+
+  static studyInfo(id, action) {
+    fetch(PACS.URL() + "studies/" + id).
+      then((res) => { return res.json(); }).
+      then((json) => { action(json); });
+  }
+
+  static serieInfo(id, action) {
+    fetch(PACS.URL() + "series/" + id).
+      then((res) => { return res.json(); }).
+      then((json) => { action(json); });
+  }
+
+  static serieImages(id, action) {
+    fetch(PACS.URL() + "series/" + id).
+      then((res) => { return res.json(); }).
+      then((json) => {
+        let paths = [];
+        json.Instances.forEach(element => {
+          paths.push(URL() + "instances/" + element + "/file");
+        });
+        action(paths);
+      });
+  }
+}
 
 class Images extends React.Component {
   constructor(props){
@@ -88,11 +125,22 @@ class Images extends React.Component {
       startDate: '',
       endDate: '',
       modality: 'all',
+      rows: [],
     }
+    PACS.allPatients((json) => {
+      for (let i = 0; i < json.length; ++i) {
+        PACS.patientInfo(json[i], (json) => {
+          let row = createData(json.MainDicomTags.PatientID, json.MainDicomTags.PatientName, json.MainDicomTags.PatientBirthDate, json.MainDicomTags.PatientSex);
+          const rows = this.state.rows.slice();
+          rows.push(row);
+          this.setState({rows: rows});
+        });
+      }
+    });
   }
 
   handleUploadOpen = () => {
-    this.setState({ upload: true });
+  this.setState({ upload: true });
   };
 
   handleUploadClose = () =>{
@@ -176,20 +224,28 @@ class Images extends React.Component {
               <TableCell>Patient Name</TableCell>
               <TableCell>Birth Date</TableCell>
               <TableCell>Gender</TableCell>
+              <TableCell></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows.map( row => {
+            {this.state.rows.map( row => {
               console.log(row)
               return (
+                <React.Fragment>
                 <TableRow id={row.id}>
                   <TableCell>{row.name}</TableCell>
                   <TableCell>{row.patientId}</TableCell>
                   <TableCell>{row.birthDate}</TableCell>
                   <TableCell>{row.gender}</TableCell>
+                  <TableCell > 
+                     <ExpandMore />
+                  </TableCell>
                 </TableRow>
+                  hello
+                </React.Fragment>
                 )
-            })
+            }
+            )
             }
           </TableBody>
         </Table>
