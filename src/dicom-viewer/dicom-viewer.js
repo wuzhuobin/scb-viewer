@@ -27,45 +27,78 @@ class DicomViewer extends React.Component {
     cornerstoneTools.external.cornerstone = cornerstone;
     cornerstoneTools.external.cornerstoneMath = cornerstoneMath;
     cornerstoneTools.external.Hammer = Hammer;
-    this.readImage(this.state, cornerstone);
+    
     // dicomLoader(cornerstone,this.state);
   }
 
   componentDidMount() {
-    console.log(this.state);
-    this.loadImage1();
+    this.readImage(this.state, cornerstone).then(res=>this.displayImage());
   }
 
   getImagePathList(IP,Port,GET){//sync request for now
     // return ['./assets/Test1/0000.dcm'];
     // return ['http://192.168.1.126:3000/orthanc/instances/2d3e243d-8b918a6f-b3456d3e-0546d044-dab91ee0/file'];
     // return ['http://127.0.0.1:8080/0100.dcm'];
-    return ['http://127.0.0.1:8080/0100.dcm','http://127.0.0.1:8080/0010.dcm','http://127.0.0.1:8080/0400.dcm'];
+    // return ['http://127.0.0.1:8080/0100.dcm','http://127.0.0.1:8080/1010.dcm','http://127.0.0.1:8080/0400.dcm'];
+    return new Promise(function(resolve,reject){
+      var queryResult =   fetch("http://223.255.146.2:8042/orthanc/series/" + GET).
+      then((res)=>{return res.json();}).
+      then((json)=>{ 
+        let cacheImagePathArray = [];
+        for(let i = 0; i < json.Instances.length; ++i){
+          let path = "http://192.168.1.126:3000/orthanc/instances/" + json.Instances[i] + "/file"; 
+          cacheImagePathArray.push(path);
+        }
+        // console.log(cacheImagePathArray);
+        return cacheImagePathArray;
+      });
+      resolve(queryResult);
+
+    });
   }
 
-  readImage(state, cornerstoneInstance){
-    //Get image path Array first
-    const pathlist = this.getImagePathList(1,1,1);
-    // console.log(pathlist);
-
-    var cacheimagePathArray = [];
-    const cacheimageLoaderHintsArray = [...Array(pathlist.length).keys()].map(function(number){
-      return "example://" + String(number);
-    });
-    for (var i=0;i<pathlist.length;i++){
-      cacheimagePathArray.push(pathlist[i]);
-      // cacheArray.push("assets/Test1/0"+String((i-i%100)/100)+String((i-(i-i%100)-i%10)/10)+String(i%10)+".dcm");
+  seriesImages(id){
+  fetch("http://223.255.146.2:8042/orthanc/series/" + id).
+  then((res)=>{return res.json();}).
+  then((json)=>{ 
+    let cacheImagePathArray = [];
+    for(let i = 0; i < json.Instances.length; ++i){
+      let path = "http://192.168.1.126:3000/orthanc/instances/" + json.Instances[i] + "/file"; 
+      cacheImagePathArray.push(path);
     }
-    console.log('abcd');
-    console.log(cacheimagePathArray);
-    console.log(cacheimageLoaderHintsArray);
-    console.log('abcd');
-    dicomLoader(cornerstoneInstance,cacheimagePathArray);
-    this.setState(state => ({
-      imagePathArray:cacheimagePathArray,
-      imageLoaderHintsArray:cacheimageLoaderHintsArray,
-      hardCodeNumDcm:cacheimagePathArray.length
-    }));
+    // console.log(cacheImagePathArray);
+    return cacheImagePathArray;
+   });
+} 
+
+
+  readImage(state, cornerstoneInstance){
+      //Get image path Array first
+      const loadingResult = this.getImagePathList(1,1,"488a9f1a-326b289e-3c7de31a-9fd050e0-c4e16360").
+      then((queryList)=>{
+        var cacheimagePathArray = [];
+        const cacheimageLoaderHintsArray = [...Array(queryList.length).keys()].map(function(number){
+          return "example://" + String(number);
+        });
+        for (var i=0;i<queryList.length;i++){
+          cacheimagePathArray.push(queryList[i]);
+        // cacheArray.push("assets/Test1/0"+String((i-i%100)/100)+String((i-(i-i%100)-i%10)/10)+String(i%10)+".dcm");
+      }
+      // console.log('abcd');
+      // console.log(cacheimagePathArray);
+      // console.log(cacheimageLoaderHintsArray);
+      // console.log('abcd');
+      this.setState(state => ({
+        imagePathArray:cacheimagePathArray,
+        imageLoaderHintsArray:cacheimageLoaderHintsArray,
+        hardCodeNumDcm:cacheimagePathArray.length
+      }));
+      dicomLoader(cornerstoneInstance,cacheimagePathArray);
+    });
+
+  return loadingResult;
+
+
   }
 
 
@@ -73,59 +106,7 @@ class DicomViewer extends React.Component {
 
   dicomImage = null;
 
-
-  updateTheImage(imageIndex) {
-    console.log("UpdateTheImage");
-    this.imageId = imageIndex;
-    this.loadImage(this.HardCodeIdArray[imageIndex]
-      );
-  }
-
-  wheelUp(state){
-    if (state.imageId<state.hardCodeNumDcm-1){
-      // this.loadImage(this.HardCodeIdArray[state.imageId+1]);
-      console.log(state.imageId+"a->"+String(state.imageId+1));
-      return {...state, imageId: state.imageId+1};
-    }
-    else {
-      // this.loadImage(this.HardCodeIdArray[state.imageId]);
-      console.log(state.imageId+"b->"+String(state.imageId));
-      return state;
-    }
-  }
-  wheelDown(state){
-    console.log(state.imageId);
-    if (state.imageId>0){
-      // this.loadImage(this.HardCodeIdArray[state.imageId-1]);
-      console.log(state.imageId+"c->"+String(state.imageId-1));
-      return {...state, imageId: state.imageId-1};
-    }
-    else {
-      // this.loadImage(this.HardCodeIdArray[state.imageId]);
-      console.log(state.imageId+"d->"+String(state.imageId));
-      return state;
-    }
-  }
-  refreshImage(state){
-    this.loadImage1(state.imageLoaderHintsArray[state.imageId]);
-    console.log('Getting' + this.state.imageId + "-th image");
-  }
-
-  wheelEventsHandler =(e)=> {
-    console.log("wheel_move "+ e.wheelDelta + " ");
-    // console.log("wheel_move "+ e.wheelDelta + " " + this.state.imageId);
-    if (e.wheelDelta < 0 || e.detail > 0) {
-      this.setState(this.wheelDown);
-    } else {
-      this.setState(this.wheelUp);
-    }
-    this.refreshImage(this.state);
-    // Prevent page fom scrolling
-    return false;
-  }
-
-
-  loadImage1 = () => {
+  displayImage = () => {
     const element = this.dicomImage;
     // Listen for changes to the viewport so we can update the text overlays in the corner
     function onImageRendered(e) {

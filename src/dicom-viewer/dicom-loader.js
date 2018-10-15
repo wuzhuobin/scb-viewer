@@ -37,9 +37,17 @@ function computeImageMinMax(a){
   return [min,max];
 };
 
+
+
+
 const dicomLoader = (cs,imageArray) => {
   const num_dcm = imageArray.length;
   var imageSeries = new Array(num_dcm);
+
+  function GetNullImage(){
+    return null;
+  }
+
 
   for (var ctr in imageArray){
     imageSeries[ctr] = new Promise(function(resolve,reject){
@@ -47,7 +55,7 @@ const dicomLoader = (cs,imageArray) => {
       if(response===null){
         console.log('wrongabc');
         // reject(Error("null1"));
-        return "null1";
+        // return "null1";
       }
       else {
         const data = new DataView(response);
@@ -70,7 +78,7 @@ const dicomLoader = (cs,imageArray) => {
             color: false,
             columnPixelSpacing: spacing[1],
             rowPixelSpacing: spacing[0],
-            sizeInBytes: image.getRows() * image.getCols() * 2
+            sizeInBytes: image.getRows() * image.getCols() * 2,
           });
         }
         else {
@@ -91,14 +99,18 @@ const dicomLoader = (cs,imageArray) => {
               color: false,
               columnPixelSpacing: spacing[1],
               rowPixelSpacing: spacing[0],
-              sizeInBytes: image.getRows() * image.getCols() * 2
+              sizeInBytes: image.getRows() * image.getCols() * 2,
             });
         }
       } //else(response null) end
     });
 
-    })
-    // .catch(function(error){return "null1";});
+    // })
+    // .catch(function(error){
+    //   alert("Refresh!!!");
+    //       // return null
+           
+    });
   }
 
  
@@ -111,7 +123,7 @@ const dicomLoader = (cs,imageArray) => {
       if (String(imageId).substring(0,10) === "example://"){
         const id = String(imageId).substring(10,String(imageId).length);
         console.log("Accessing " + id + "-th image out of " + imageSeries.length + " images");
-        if (imageSeries[id]=="null1"){
+        if (imageSeries[id]===null){
           alert("The " + id + "-th image is not loaded");
           console.log(imageSeries[id]);
           return null;
@@ -151,6 +163,9 @@ const dicomLoader = (cs,imageArray) => {
             ...pixelData
           })
           )
+
+
+
         ),
       cancelFn: undefined
     };
