@@ -51,9 +51,10 @@ const dicomLoader = (cs,imageArray) => {
 
   for (var ctr in imageArray){
     imageSeries[ctr] = new Promise(function(resolve,reject){
+      console.log(imageArray[ctr]);
     httpGetAsync(imageArray[ctr], response => {
       if(response===null){
-        console.log('wrongabc');
+        console.log('Load image failed');
         // reject(Error("null1"));
         // return "null1";
       }
@@ -62,7 +63,7 @@ const dicomLoader = (cs,imageArray) => {
         const image = daikon.Series.parseImage(data);
         const spacing = image.getPixelSpacing();
         if (image.getImageMin()){
-          console.log("Type1");
+          // console.log("Type1");
           resolve({
             minPixelValue: image.getImageMin(),
             maxPixelValue: image.getImageMax(),
@@ -83,7 +84,7 @@ const dicomLoader = (cs,imageArray) => {
         }
         else {
           const range = computeImageMinMax(image);
-          console.log("Type2");
+          // console.log("Type2");
           resolve({
             minPixelValue: range[0],
             maxPixelValue: range[1],
@@ -128,10 +129,9 @@ const dicomLoader = (cs,imageArray) => {
           console.log(imageSeries[id]);
           return null;
         }
-        console.log(id);
-        console.log(imageSeries[id]);
-        console.log(id);
-
+        // console.log(id);
+        // console.log(imageSeries[id]);
+        // console.log(id);
         return imageSeries[id];
       }
       else {

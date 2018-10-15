@@ -27,8 +27,6 @@ class DicomViewer extends React.Component {
     cornerstoneTools.external.cornerstone = cornerstone;
     cornerstoneTools.external.cornerstoneMath = cornerstoneMath;
     cornerstoneTools.external.Hammer = Hammer;
-    
-    // dicomLoader(cornerstone,this.state);
   }
 
   componentDidMount() {
@@ -74,7 +72,7 @@ class DicomViewer extends React.Component {
 
   readImage(state, cornerstoneInstance){
       //Get image path Array first
-      const loadingResult = this.getImagePathList(1,1,"488a9f1a-326b289e-3c7de31a-9fd050e0-c4e16360").
+      const loadingResult = this.getImagePathList(1,1,"cf8192f8-50e817d9-2aae4764-3c85d142-dc59a8d0").
       then((queryList)=>{
         var cacheimagePathArray = [];
         const cacheimageLoaderHintsArray = [...Array(queryList.length).keys()].map(function(number){
@@ -85,8 +83,8 @@ class DicomViewer extends React.Component {
         // cacheArray.push("assets/Test1/0"+String((i-i%100)/100)+String((i-(i-i%100)-i%10)/10)+String(i%10)+".dcm");
       }
       // console.log('abcd');
-      // console.log(cacheimagePathArray);
-      // console.log(cacheimageLoaderHintsArray);
+      console.log(cacheimagePathArray);
+      console.log(cacheimageLoaderHintsArray);
       // console.log('abcd');
       this.setState(state => ({
         imagePathArray:cacheimagePathArray,
@@ -172,7 +170,7 @@ class DicomViewer extends React.Component {
 
       // Uncomment below to enable stack prefetching
       // With the example images the loading will be extremely quick, though
-      cornerstoneTools.stackPrefetch.enable(element, 3);
+      // cornerstoneTools.stackPrefetch.enable(element, 3);
 
 
 
