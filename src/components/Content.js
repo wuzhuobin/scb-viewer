@@ -4,36 +4,43 @@ import {withStyles} from '@material-ui/core/styles'
 import Images from './Images';
 import DicomViewer from "../dicom-viewer";
 import {Collections, Portrait, Visibility} from '@material-ui/icons'
+import classNames from 'classnames';
+import DrawerMenu from "./DrawerMenu";
 
 const drawerWidth = 240;
 
 const styles = theme=> ({
-    root: {
-    flexGrow: 1,
-    zIndex: 1,
-    overflow: 'hidden',
-    position: 'relative',
+  root: {
     display: 'flex',
-    height: '93vh',
   },
   drawerPaper: {
     position: 'relative',
-    height: '100%',
     width: drawerWidth,
+    height: 'calc(100% - 64px)',
   },
   content: {
-    flexGrow: 1,
+    position: 'relative',
+    height: 'calc(100vh-64px)',
+    width: '100%',
     backgroundColor: theme.palette.background.default,
-    minWidth: 0, // So the Typography noWrap works
+    transition: theme.transitions.create('margin', {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.leavingScreen,
+    }),
   },
-  toolbar: theme.mixins.toolbar,
+  contentShift: {
+      marginLeft: drawerWidth,
+      transition: theme.transitions.create('margin', {
+          easing: theme.transitions.easing.easeOut,
+          duration: theme.transitions.duration.enteringScreen,
+  })}
 })
 
 class Content extends React.Component {
     constructor(props){
         super(props);
         this.state = {
-            page: 0,
+            page: 2,
         };
     }
 
@@ -45,50 +52,30 @@ class Content extends React.Component {
   	}
 
     render(){
-        const {classes} = this.props
+        const {open, onDrawerClose, classes} = this.props
         const {page} = this.state
 
         return(
         <div className={classes.root}>
-        <Drawer
-          variant="permanent"
-          classes={{
-            paper: classes.drawerPaper,
-          }}
-          containerStyle={{height: 'calc(100% - 64px)', top: 64}}
-        >
-           <List>
-              <ListItem button onClick={() => {this.setState({page: 0});}}>
-                <ListItemIcon>
-                  <Collections />
-                </ListItemIcon>
-                <ListItemText primary="Images" />
-              </ListItem>
-              <ListItem button onClick={() => {this.setState({page: 1});}}>
-                <ListItemIcon>
-                  <Portrait />
-                </ListItemIcon>
-                <ListItemText primary="Projects" />
-              </ListItem>
-            </List>
-            <Divider />
-            <List>
-             	<ListItem button onClick={() => {this.setState({page: 2});}}>
-                <ListItemIcon>
-                  <Visibility />
-                </ListItemIcon>
-                <ListItemText primary="2D Viewer" />
-              	</ListItem>
-            </List>
-        </Drawer>
 
-        <body className={classes.content}>
-        	{page === 0 && <Images />}
-        	{page === 1 && <div>Projects</div>}
-        	{page === 2 && <DicomViewer />}
-        </body>
+          <DrawerMenu open={open} onDrawerClose={onDrawerClose} />
+          <main 
+              className={classNames(classes.content,{
+                  [classes.contentShift]: open,
+                })}
+            >
+              {page === 0 && <Images />}
+              {page === 1 && <div>Projects</div>}
+              {page === 2 && <DicomViewer />}
+          </main>
         </div>
     );
 }
 }
 export default withStyles(styles)(Content);
+
+        // <body className={classes.content}>
+        //   
+        // </body>
+
+          

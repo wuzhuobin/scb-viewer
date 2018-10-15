@@ -121,7 +121,7 @@ class DicomViewer extends React.Component {
     cornerstoneTools.highlight.enable(element);
 
     cornerstoneTools.length.setConfiguration({ shadow: this.checked });
-    cornerstoneTools.angle.setConfiguration({ shadow: this.checked });
+    cornerstoneTools.simpleAngle.setConfiguration({ shadow: this.checked });
 
     cornerstone.updateImage(element);
     });
@@ -142,7 +142,7 @@ class DicomViewer extends React.Component {
     cornerstoneTools.length.deactivate(this.dicomImage, 1);
     cornerstoneTools.ellipticalRoi.deactivate(this.dicomImage, 1);
     cornerstoneTools.rectangleRoi.deactivate(this.dicomImage, 1);
-    cornerstoneTools.angle.deactivate(this.dicomImage, 1);
+    cornerstoneTools.simpleAngle.deactivate(this.dicomImage, 1);
     cornerstoneTools.highlight.deactivate(this.dicomImage, 1);
     cornerstoneTools.freehand.deactivate(this.dicomImage, 1);
   };
@@ -186,7 +186,7 @@ class DicomViewer extends React.Component {
                       Length
                     </Button>
 
-                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {this.enableTool("angle", 1);}}>
+                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {this.enableTool("simpleAngle", 1);}}>
                       <ArrowBackIosIcon />
                       Angle
                     </Button>
