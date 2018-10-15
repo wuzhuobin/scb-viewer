@@ -31,7 +31,7 @@ const styles = theme => ({
     // flexGrow: 1,
     // zIndex: 1,
     // width: '100%',
-    height: '100vh',
+    height: 'calc(100vh - 64px)',
     // overflow: 'auto',
     // position: 'relative',
     // display: 'flex',
