@@ -1,9 +1,10 @@
 import React from 'react'
-import {AppBar, Toolbar, Typography, IconButton} from '@material-ui/core'
-import {AccountCircle} from '@material-ui/icons';
+import {AppBar, Toolbar, Typography, IconButton, Divider, Drawer} from '@material-ui/core'
+import {AccountCircle, Menu, ChevronRight, ChevronLeft} from '@material-ui/icons';
 import {withStyles} from '@material-ui/core/styles'
+import classNames from 'classnames';
 
-
+const drawerWidth = 240;
 
 const styles = theme=> ({
     root:{
@@ -12,27 +13,72 @@ const styles = theme=> ({
         overflow: 'hidden',
         position: 'relative',
         display: 'flex',
+        height: '100vh'
     },
     iconButton: {
         marginLeft: 'auto',
         marginRight: 'auto',
     },
     appBar:{
-        // zIndex: theme.zIndex.drawer + 1,
+        transition: theme.transitions.create(['margin', 'width'], {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.leavingScreen,
+        }),
+
     },
-    tabs:{
-        width:"100%",
-    },
+    appBarShift: {
+        width: `calc(100% - ${drawerWidth}px)`,
+        marginLeft: drawerWidth, 
+        transition: theme.transitions.create(['margin', 'width'], {
+          easing: theme.transitions.easing.easeOut,
+          duration: theme.transitions.duration.enteringScreen,
+        }),
+      },
      grow: {
         flexGrow: 1,
      },
+    menuButton:{
+        marginLeft: -12,
+        marginRight: 20,
+    },
+    hide:{
+        display: 'none'
+    },
+    drawerPaper: {
+        width: drawerWidth,
+    },
+    drawerHeader: {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'flex-end',
+        padding: '0 8px',
+        ...theme.mixins.toolbar,
+    },
+    content: {
+        flexGrow: 1,
+        backgroundColor: theme.palette.background.default,
+        
+        marginTop: 64,
+        transition: theme.transitions.create('margin', {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.leavingScreen,
+        }),
+    },
+    contentShift: {
+        marginLeft: drawerWidth,
+        transition: theme.transitions.create('margin', {
+            easing: theme.transitions.easing.easeOut,
+            duration: theme.transitions.duration.enteringScreen,
+    }),
+  },
 })
 
 class NavBar extends React.Component {
     constructor(props){
         super(props);
         this.state = {
-            tab: 0,
+            auth: true,
+            open: false,
         };
     }
 
@@ -40,19 +86,55 @@ class NavBar extends React.Component {
         this.setState({tab: props.tab});
     }
 
-    handleChange = (event, value) => {
-        console.log("hanleChange:" + value)
-        this.setState({tab: value});
-    };
+    handleDrawerOpen = () =>{
+        this.setState({open:true});
+    }
+
+    handleDrawerClose = () =>{
+        this.setState({open:false});
+    }
 
     render(){
-        const {auth, classes, onTab} = this.props
-        const {tab} = this.state
+        const {classes, theme} = this.props
+        const {auth, open} = this.state
+
+        const drawer = (
+          <Drawer
+            variant="persistent"
+            anchor='left'
+            open={open}
+            classes={{
+              paper: classes.drawerPaper,
+            }}
+          >
+            <div className={classes.drawerHeader}>
+              <IconButton onClick={this.handleDrawerClose}>
+                <ChevronLeft /> 
+              </IconButton>
+            </div>
+            <Divider />
+                hello
+          </Drawer>
+        );
 
         return(
         <div className={classes.root}>
-            <AppBar position="static" className={classes.appBar} style={styles.appBar} containerStyle={{height: 'calc(100% - 64px)', top: 64}}>
+            <AppBar 
+                position="absolute" 
+                className={classNames(classes.appBar, {[classes.appBarShift]: open,})}
+                style={styles.appBar} 
+                containerStyle={{height: 'calc(100% - 64px)', top: 64}}>
                 <Toolbar>
+                    { auth && (<IconButton 
+                                className={classNames(classes.menuButton, open && classes.hide)} 
+                                color='inherit' 
+                                aria-label='Menu'
+                                onClick={this.handleDrawerOpen}
+                            >
+                                <Menu />
+                            </IconButton>
+                        )
+                    }
                     <Typography variant="title" color="inherit" className={classes.grow}>
                         Sucabot WebViewer
                     </Typography>
@@ -61,9 +143,9 @@ class NavBar extends React.Component {
                         <div>
                             <IconButton
                                 className={classes.iconButton}
-                              aria-haspopup="true"
-                              onClick={this.handleMenu}
-                              color="inherit"
+                                aria-haspopup="true"
+                                onClick={this.handleMenu}
+                                color="inherit"
                             >
                               <AccountCircle />
                             </IconButton>
@@ -72,6 +154,14 @@ class NavBar extends React.Component {
                     }
                 </Toolbar>
             </AppBar>
+            {drawer}
+            <main 
+                className={classNames(classes.content,{
+                    [classes.contentShift]: open,
+                })}
+            >
+                helloWorld
+            </main>
         </div>
     );
 }

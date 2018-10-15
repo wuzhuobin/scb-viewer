@@ -36,8 +36,8 @@ class App extends Component {
     return (
       <MuiThemeProvider>
       <div>
-        <NavBar auth={auth}/>
-        {this.handleLogin(this.state.auth)}        
+        <NavBar />
+        
 
       </div>
       </MuiThemeProvider>
@@ -46,3 +46,5 @@ class App extends Component {
 }
 
 export default App;
+
+// {this.handleLogin(this.state.auth)}        
