@@ -8,7 +8,6 @@ const drawerWidth =240;
 const styles = theme=> ({
   root: {
         overflow: 'hidden',
-        height: '100vh',
         width: 0,
   },
   drawerPaper: {

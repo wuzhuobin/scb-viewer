@@ -12,7 +12,7 @@ const styles = theme=> ({
         flexGrow: 1,    
         zIndex: 1,
         overflow: 'hidden',
-        position: 'relative',
+        position: 'static',
         display: 'flex',
         height: '64px'
     },
@@ -44,23 +44,6 @@ const styles = theme=> ({
     hide:{
         display: 'none'
     },
-    content: {
-        flexGrow: 1,
-        backgroundColor: theme.palette.background.default,
-        
-        marginTop: 64,
-        transition: theme.transitions.create('margin', {
-            easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.leavingScreen,
-        }),
-    },
-    contentShift: {
-        marginLeft: drawerWidth,
-        transition: theme.transitions.create('margin', {
-            easing: theme.transitions.easing.easeOut,
-            duration: theme.transitions.duration.enteringScreen,
-    }),
-  },
 })
 
 class NavBar extends React.Component {
@@ -122,15 +105,3 @@ class NavBar extends React.Component {
 }
 }
 export default withStyles(styles)(NavBar);
-
-
-
-// <DrawerMenu onDrawerClose={this.handleDrawerClose} open={open} />
-//             <main 
-//                 className={classNames(classes.content,{
-//                     [classes.contentShift]: open,
-//                 })}
-//             >
-
-//                 helloWorld
-//             </main>

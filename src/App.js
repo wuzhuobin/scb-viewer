@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import NavBar from './components/NavBar';
 import Login from './components/Login';
+import Content from './components/Content';
 import DicomViewer from "./dicom-viewer";
-import DrawerMenu from "./components/DrawerMenu";
+
 import {withStyles} from '@material-ui/core/styles'
 import classNames from 'classnames';
 
@@ -12,8 +13,7 @@ import './App.css';
 
 const styles = theme=> ({
     root:{
-        
-        height: '100vh'
+        height: '100%'
     },
     navBar:{
         flexGrow: 1,    
@@ -28,7 +28,7 @@ class App extends Component {
   constructor(props){
         super(props);
         this.state = {
-            auth: false,
+            auth: true,
             open: false,
         };
     }
@@ -37,8 +37,7 @@ class App extends Component {
     var foo = null;
     if (auth)
     {
-      console.log(this.state.open)
-      foo = <DrawerMenu open={this.state.open} onDrawerClose={this.handleDrawerClose}/>;
+      foo = <Content open={this.state.open} onDrawerClose={this.handleDrawerClose}/>
     }
     else
     {
