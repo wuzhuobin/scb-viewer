@@ -1,64 +1,105 @@
 import React from 'react'
-import {AppBar, Toolbar, Typography, Tab, Tabs, IconButton} from '@material-ui/core'
-import {AccountCircle} from '@material-ui/icons';
+import {AppBar, Toolbar, Typography, IconButton, Divider, Drawer} from '@material-ui/core'
+import {AccountCircle, Menu, ChevronRight, ChevronLeft} from '@material-ui/icons';
 import {withStyles} from '@material-ui/core/styles'
+import classNames from 'classnames';
+import DrawerMenu from './DrawerMenu';
 
-function TabContainer(props){
-    return(
-        props.children
-        )
-};
+const drawerWidth = 240;
 
-var styles = {
+const styles = theme=> ({
+    root:{
+        flexGrow: 1,    
+        zIndex: 1,
+        overflow: 'hidden',
+        position: 'static',
+        display: 'flex',
+        height: '64px'
+    },
+    iconButton: {
+        marginLeft: 'auto',
+        marginRight: 'auto',
+    },
     appBar:{
-        // flexWrap: 'wrap',
+        transition: theme.transitions.create(['margin', 'width'], {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.leavingScreen,
+        }),
     },
-    tabs:{
-        width:"100%",
+    appBarShift: {
+        width: `calc(100% - ${drawerWidth}px)`,
+        marginLeft: drawerWidth, 
+        transition: theme.transitions.create(['margin', 'width'], {
+          easing: theme.transitions.easing.easeOut,
+          duration: theme.transitions.duration.enteringScreen,
+        }),
+      },
+     grow: {
+        flexGrow: 1,
+     },
+    menuButton:{
+        marginLeft: -12,
+        marginRight: 20,
     },
-}
+    hide:{
+        display: 'none'
+    },
+})
 
 class NavBar extends React.Component {
     constructor(props){
         super(props);
         this.state = {
-            value:0,
+            auth: true,
+            open: false,
         };
     }
 
-    handleChange = (event, value) => {
-        this.setState({value});
-    };
+    componentWillRecieveProps(props){
+        this.setState({tab: props.tab});
+    }
 
     render(){
-        const {value} = this.state
-        const {auth, classes} = this.props
-
+        const {auth, open, onDrawerOpen, classes, theme} = this.props
+          
         return(
-        <div>
-        <AppBar position="static" style={styles.appBar}>
-            <Toolbar>
-                <Typography variant="title" color="inherit">
-                Sucabot WebViewer
-                </Typography>
-                <Tabs style={styles.tabs} onChange={this.handleChange}>
-                    {auth && (<Tab label="Image Management" />)} 
-                    {auth && (<Tab label="Viewer" />)}                    
-                </Tabs>
-                { auth && (
-                    <div>
-                        <IconButton 
-                            aria-haspopup="true"
-                            onClick={this.handleMenu}
-                            color="inherit"
-                        >
-                            <AccountCircle />
-                        </IconButton>
-                    </div> 
-                    )
-                }
-            </Toolbar>
-        </AppBar>
+        <div className={classes.root}>
+            <AppBar 
+                position="absolute" 
+                className={classNames(classes.appBar, {[classes.appBarShift]: open,})}
+                style={styles.appBar} 
+                containerStyle={{height: 'calc(100% - 64px)', top: 64}}>
+                <Toolbar>
+                    { auth && (<IconButton 
+                                className={classNames(classes.menuButton, open && classes.hide)} 
+                                color='inherit' 
+                                aria-label='Menu'
+                                onClick={onDrawerOpen}
+                            >
+                                <Menu />
+                            </IconButton>
+                        )
+                    }
+                    <Typography variant="title" color="inherit" className={classes.grow}>
+                        Sucabot WebViewer
+                    </Typography>
+
+                    { auth && (
+                        <div>
+                            <IconButton
+                                className={classes.iconButton}
+                                aria-haspopup="true"
+                                onClick={this.handleMenu}
+                                color="inherit"
+                            >
+                              <AccountCircle />
+                            </IconButton>
+                        </div>
+                        )
+                    }
+                </Toolbar>
+            </AppBar>
+            
         </div>
     );
 }
