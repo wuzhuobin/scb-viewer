@@ -75,37 +75,39 @@ function createData(name, patientId, birthDate, gender) {
 
 // const rows = ;
 class PACS {
-  
+  static URL() {
+    return "http://223.255.146.2:8042/orthanc/";
+  }
   static allPatients(action){
-    fetch("http://223.255.146.2:8042/orthanc/patients/").
+    fetch(PACS.URL() + "patients/").
       then((res) => { return res.json(); }).
       then((json) => { action(json); });
   }
   static patientInfo(id, action) {
-    fetch("http://223.255.146.2:8042/orthanc/patients/" + id).
+    fetch(PACS.URL() + "patients/" + id).
       then((res) => { return res.json(); }).
       then((json) => { action(json); });
   }
 
   static studyInfo(id, action) {
-    fetch("http://223.255.146.2:8042/orthanc/studies/" + id).
+    fetch(PACS.URL() + "studies/" + id).
       then((res) => { return res.json(); }).
       then((json) => { action(json); });
   }
 
   static serieInfo(id, action) {
-    fetch("http://223.255.146.2:8042/orthanc/series/" + id).
+    fetch(PACS.URL() + "series/" + id).
       then((res) => { return res.json(); }).
       then((json) => { action(json); });
   }
 
   static serieImages(id, action) {
-    fetch("http://223.255.146.2:8042/orthanc/series/" + id).
+    fetch(PACS.URL() + "series/" + id).
       then((res) => { return res.json(); }).
       then((json) => {
         let paths = [];
         json.Instances.forEach(element => {
-          paths.push("http://223.255.146.2:8042/orthanc/instances/" + element + "/file");
+          paths.push(URL() + "instances/" + element + "/file");
         });
         action(paths);
       });
