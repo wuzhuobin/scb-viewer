@@ -43,9 +43,15 @@ function computeImageMinMax(a){
 const dicomLoader = (cs,imageArray) => {
   const num_dcm = imageArray.length;
   var imageSeries = new Array(num_dcm);
+  // var validSeries = new Array(num_dcm);
 
   function GetNullImage(){
+    // return [0,0,0,0,0,0];
     return null;
+  }
+
+  function HttpPathRead2Promise(resolve,reject){
+
   }
 
 
@@ -57,6 +63,7 @@ const dicomLoader = (cs,imageArray) => {
         console.log('Load image failed');
         // reject(Error("null1"));
         // return "null1";
+        reject("Get image failed");
       }
       else {
         const data = new DataView(response);
@@ -109,11 +116,22 @@ const dicomLoader = (cs,imageArray) => {
     // })
     // .catch(function(error){
     //   alert("Refresh!!!");
-    //       // return null
+    //       return {
+    //         getPixelData: GetNullImage()
+    //       }
            
     });
   }
 
+  function GetImcompletePromiseID(PromiseSeries){
+    // console.log("abc");
+    // const cacheSeries=[];
+    // for (var i=0;i<PromiseSeries.length;i++){
+    //   cacheSeries.push([PromiseSeries[i],i]);
+    // }
+    // console.log(cacheSeries);
+    // console.log("abc");
+  }
  
   
   function getImageI(imageId) {
@@ -122,16 +140,28 @@ const dicomLoader = (cs,imageArray) => {
 
     function getPixelData() {
       if (String(imageId).substring(0,10) === "example://"){
-        const id = String(imageId).substring(10,String(imageId).length);
+        GetImcompletePromiseID(imageSeries);
+
+
+
+        const id = parseInt(String(imageId).substring(10,String(imageId).length));
         console.log("Accessing " + id + "-th image out of " + imageSeries.length + " images");
+        // try{
+        //   console.log(imageSeries);
+        //   console.log(id);
+        //   console.log(imageSeries[id].minPixelValue+1);
+        // }
+        // catch(error){
+        //   alert("Wrong!!!!!!!!!!");
+        // }
         if (imageSeries[id]===null){
           alert("The " + id + "-th image is not loaded");
           console.log(imageSeries[id]);
           return null;
         }
-        // console.log(id);
-        // console.log(imageSeries[id]);
-        // console.log(id);
+        console.log(id);
+        console.log(imageSeries[id]);
+        console.log(id);
         return imageSeries[id];
       }
       else {

@@ -4,11 +4,9 @@ import * as cornerstone from "cornerstone-core";
 import * as cornerstoneTools from "cornerstone-tools";
 import * as cornerstoneMath from "cornerstone-math";
 import dicomLoader from "./dicom-loader";
-import exampleImageIdLoader from "./imageIdLoader";
 
 import Button from '@material-ui/core/Button';
 import Checkbox from '@material-ui/core/Checkbox';
-import daikon from "daikon";
 
 class DicomViewer extends React.Component {
 
@@ -37,28 +35,30 @@ class DicomViewer extends React.Component {
     // return ['./assets/Test1/0000.dcm'];
     // return ['http://192.168.1.126:3000/orthanc/instances/2d3e243d-8b918a6f-b3456d3e-0546d044-dab91ee0/file'];
     // return ['http://127.0.0.1:8080/0100.dcm'];
-    // return ['http://127.0.0.1:8080/0100.dcm','http://127.0.0.1:8080/1010.dcm','http://127.0.0.1:8080/0400.dcm'];
     return new Promise(function(resolve,reject){
-      var queryResult =   fetch("http://223.255.146.2:8042/orthanc/series/" + GET).
-      then((res)=>{return res.json();}).
-      then((json)=>{ 
-        let cacheImagePathArray = [];
-        for(let i = 0; i < json.Instances.length; ++i){
-          let path = "http://192.168.1.126:3000/orthanc/instances/" + json.Instances[i] + "/file"; 
-          cacheImagePathArray.push(path);
-        }
-        // console.log(cacheImagePathArray);
-        return cacheImagePathArray;
-      });
-      resolve(queryResult);
+      resolve(['http://127.0.0.1:8080/0100.dcm','http://127.0.0.1:8080/0010.dcm','http://127.0.0.1:8080/1400.dcm','http://127.0.0.1:8080/0250.dcm','http://127.0.0.1:8080/0410.dcm']);
+    })
+    // return new Promise(function(resolve,reject){
+    //   var queryResult =   fetch("http://223.255.146.2:8042/orthanc/series/" + GET).
+    //   then((res)=>{return res.json();}).
+    //   then((json)=>{ 
+    //     let cacheImagePathArray = [];
+    //     for(let i = 0; i < json.Instances.length; ++i){
+    //       let path = "http://192.168.1.126:3000/orthanc/instances/" + json.Instances[i] + "/file"; 
+    //       cacheImagePathArray.push(path);
+    //     }
+    //     // console.log(cacheImagePathArray);
+    //     return cacheImagePathArray;
+    //   });
+    //   resolve(queryResult);
 
-    });
+    // });
   }
 
   seriesImages(id){
-  fetch("http://223.255.146.2:8042/orthanc/series/" + id).
-  then((res)=>{return res.json();}).
-  then((json)=>{ 
+  fetch("http://223.255.146.2:8042/orthanc/series/" + id)
+  .then((res)=>{return res.json();})
+  .then((json)=>{ 
     let cacheImagePathArray = [];
     for(let i = 0; i < json.Instances.length; ++i){
       let path = "http://192.168.1.126:3000/orthanc/instances/" + json.Instances[i] + "/file"; 
@@ -72,8 +72,8 @@ class DicomViewer extends React.Component {
 
   readImage(state, cornerstoneInstance){
       //Get image path Array first
-      const loadingResult = this.getImagePathList(1,1,"cf8192f8-50e817d9-2aae4764-3c85d142-dc59a8d0").
-      then((queryList)=>{
+      const loadingResult = this.getImagePathList(1,1,"cf8192f8-50e817d9-2aae4764-3c85d142-dc59a8d0")
+      .then((queryList)=>{
         var cacheimagePathArray = [];
         const cacheimageLoaderHintsArray = [...Array(queryList.length).keys()].map(function(number){
           return "example://" + String(number);
