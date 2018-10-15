@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@material-ui/icons": "^3.0.1",
+    "@material-ui/lab": "^3.0.0-alpha.20",
     "axios": "^0.18.0",
     "cornerstone-math": "^0.1.6",
     "cornerstone-tools": "^2.3.9",
