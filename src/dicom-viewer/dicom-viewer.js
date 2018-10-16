@@ -29,45 +29,50 @@ import VFlipIcon from '@material-ui/icons/MoreVert';
 import HFlipIcon from '@material-ui/icons/MoreHoriz';
 import RotateRightIcon from '@material-ui/icons/RotateRight';
 import ReplayIcon from '@material-ui/icons/Replay';
+import SaveIcon from '@material-ui/icons/SaveAlt';
+import TextIcon from '@material-ui/icons/Title';
 
-
+import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
+import Card from '@material-ui/core/Card';
+import CardContent from '@material-ui/core/CardContent';
 import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
 
 const styles = theme=> ({
     root:{    
-        zIndex: 1,
-        display: 'flex',
-        height: '93vh',
-        backgroundColor: theme.palette.background.default,
-        minWidth: 0, // So the Typography noWrap works
-        padding: 0,
+        width: '100%',
+        // flexGrow: 1,
     },
 
     appBar:{
-            // flexGrow: 1,
-            zIndex: 1,
-            // width: '100%',
-            overflow: 'auto',
-            display: 'flex',
-            position: 'relative',
-            // display: 'flex',
-    },
+          flexGrow: 1,    
+          zIndex: 1,
+          overflow: 'hidden',
+          position: 'static',
+          display: 'flex',
+          height: '64px'
+     },
 
-    functionBar:{
-          width: '100%',
-          overflow: 'auto',
-            },
+     paper:{
+      padding: 0,
+      borderColor: "blue",
+      borderStyle: "solid",
+     },
 
-    label: {
-    // Aligns the content of the button vertically.
-      flexDirection: 'column'
-            },
+    // label: {
+    // // Aligns the content of the button vertically.
+    //   flexDirection: 'column',
+    // },
 })
 
 class DicomViewer extends React.Component {
   
   dicomImage = null;
+
+  constructor(props) {
+        super(props);
+        this.anonymized= false;
+  }
 
   componentWillMount() {
     cornerstoneTools.external.cornerstone = cornerstone;
@@ -87,6 +92,7 @@ class DicomViewer extends React.Component {
     
     function onImageRendered(e) {
       const viewport = cornerstone.getViewport(e.target);
+
       document.getElementById("mrbottomleft").textContent = `WW/WC: ${Math.round(viewport.voi.windowWidth)}/${Math.round(viewport.voi.windowCenter)}`;
       document.getElementById("mrbottomright").textContent = `Zoom: ${viewport.scale.toFixed(2)}`;
     }
@@ -100,14 +106,18 @@ class DicomViewer extends React.Component {
       preventZoomOutsideImage: true,
     };
 
+    // Comment this out to draw only the top and left markers
+
     cornerstoneTools.zoom.setConfiguration(config);
 
     const imageId = "example://1";
     cornerstone.enable(element);
+    cornerstoneTools.mouseInput.enable(element);
+    cornerstoneTools.touchInput.enable(element);
+    cornerstoneTools.mouseWheelInput.enable(element);
+
     cornerstone.loadImage(imageId).then(image => {
     cornerstone.displayImage(element, image);
-    cornerstoneTools.mouseInput.enable(element);
-    cornerstoneTools.mouseWheelInput.enable(element);
     // // Enable all tools we want to use with this element
     cornerstoneTools.wwwc.activate(element, 1); // ww/wc is the default tool for left mouse button
     cornerstoneTools.pan.activate(element, 2); // pan is the default tool for middle mouse button
@@ -119,11 +129,30 @@ class DicomViewer extends React.Component {
     cornerstoneTools.rectangleRoi.enable(element);
     cornerstoneTools.angle.enable(element);
     cornerstoneTools.highlight.enable(element);
+    cornerstoneTools.arrowAnnotate.enable(element);
+    //cornerstoneTools.scaleOverlayTool.enable(element);
 
     cornerstoneTools.length.setConfiguration({ shadow: this.checked });
     cornerstoneTools.simpleAngle.setConfiguration({ shadow: this.checked });
+  
 
     cornerstone.updateImage(element);
+
+    // var enabledElement = cornerstone.getEnabledElement(element);
+    // var imagePlaneMetaData = cornerstone.metaData.get('imagePlaneModule', enabledElement.image.imageId);
+  
+    // var rowString = cornerstoneTools.orientation.getOrientationString(imagePlaneMetaData.rowCosines);
+    // var columnString = cornerstoneTools.orientation.getOrientationString(imagePlaneMetaData.columnCosines);
+
+    // var oppositeRowString = cornerstoneTools.orientation.invertOrientationString(rowString);
+    // var oppositeColumnString = cornerstoneTools.orientation.invertOrientationString(columnString);
+
+    // console.log(imagePlaneMetaData);
+    // console.log(rowString);
+    // console.log(columnString);
+    // console.log(oppositeRowString);
+    // console.log(oppositeColumnString);
+
     });
   };
 
@@ -145,6 +174,7 @@ class DicomViewer extends React.Component {
     cornerstoneTools.simpleAngle.deactivate(this.dicomImage, 1);
     cornerstoneTools.highlight.deactivate(this.dicomImage, 1);
     cornerstoneTools.freehand.deactivate(this.dicomImage, 1);
+    cornerstoneTools.arrowAnnotate.deactivate(this.dicomImage, 1);
   };
 
   dicomImageRef = el => {
@@ -155,12 +185,12 @@ class DicomViewer extends React.Component {
   render() {
     const {classes} = this.props
 
+    const viewerHeight = window.innerHeight-128-6 //4 is border
+    const viewerWidth = window.viewerWidth-128-6 //4 is border
     return (
       <div className={classes.root}>
-           <div className={classes.functionBar}>
-              <AppBar position="static" className={classes.appBar}>
-                <ToggleButtonGroup exclusive >
-
+          <AppBar className={classes.appBar}>
+            <ToggleButtonGroup exclusive >
                     <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => { this.enableTool("wwwc", 1); }}>
                       <NavigationIcon />
                       Navigate
@@ -211,6 +241,11 @@ class DicomViewer extends React.Component {
                       Freeform
                     </Button>
 
+                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {this.enableTool("arrowAnnotate", 1);}}>
+                      <EditIcon />
+                      Annotate
+                    </Button>
+
                     <Button classes={{label: classes.label}} color="inherit" size="small" 
                       onClick={() => {
                         const element = this.dicomImage;
@@ -219,7 +254,7 @@ class DicomViewer extends React.Component {
                         cornerstone.setViewport(element, viewport);}}
                         >
                       <RotateRightIcon />
-                      Rotatet
+                      Rotate
                     </Button>
 
                     <Button classes={{label: classes.label}} color="inherit" size="small" 
@@ -248,12 +283,7 @@ class DicomViewer extends React.Component {
                       onClick={() => {
                         const element = this.dicomImage;
                         cornerstone.reset(element);
-                        
-                        const viewport = cornerstone.getViewport(element);
-                        viewport = cornerstone.getViewport(element);
-                        viewport.hflip = false;
-                        viewport.vflip = false;
-                        viewport.rotation = 0;}}
+                        }}
                         >
                       <ReplayIcon />
                       Reset
@@ -281,6 +311,33 @@ class DicomViewer extends React.Component {
                     </Button>
 
                     <Button classes={{label: classes.label}} color="inherit" size="small" 
+                      onClick={() => {
+
+                        this.anonymized=!this.anonymized;
+
+                        const element = this.dicomImage;
+                        var viewport = cornerstone.getViewport(element);
+
+                        if(this.anonymized != true)
+                        {
+                          document.getElementById("mrbottomleft").style.visibility = "visible";
+                          document.getElementById("mrbottomright").style.visibility = "visible";
+                          document.getElementById("mrtopleft").style.visibility = "visible";
+                          document.getElementById("mrtopright").style.visibility = "visible";
+                        }
+                        else
+                        {
+                          document.getElementById("mrbottomleft").style.visibility = "hidden";
+                          document.getElementById("mrbottomright").style.visibility = "hidden";;
+                          document.getElementById("mrtopleft").style.visibility = "hidden";
+                          document.getElementById("mrtopright").style.visibility = "hidden";
+                        }
+                      }}>
+                      <TextIcon />
+                      Text
+                    </Button>
+
+                    <Button classes={{label: classes.label}} color="inherit" size="small" 
                         onClick={() => {
                           const element = this.dicomImage;
                           var toolStateManager = cornerstoneTools.getElementToolStateManager(element);
@@ -291,24 +348,34 @@ class DicomViewer extends React.Component {
                       Clear
                     </Button>
 
+                    <Button classes={{label: classes.label}} color="inherit" size="small" 
+                        onClick={() => {
+                          const element = this.dicomImage;
+                          cornerstoneTools.saveAs(element, "image.png");}}
+                          >
+                      <SaveIcon />
+                      Save
+                    </Button>
+
                     <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {}}>
                       <MoreIcon />
                       More
                     </Button>
 
-                </ToggleButtonGroup>
-              </AppBar>
+            </ToggleButtonGroup>
+          </AppBar>
 
-              <div
-                style={{
-                  flexGrow: 1,    
-                  display: 'flex',
-                  width: "100%",
-                  height: "100%",
-                  position: "relative",
-                  display: "inline-block",
-                  color: "yellow"
-                }}
+        <Paper className={classes.paper}>
+          <div
+            style={{
+              // flexGrow: 1,    
+              // display: 'flex',
+              // width: "calc(100vw-4px)",
+              // height: "calc(100vh-4px)",
+              position: "relative",
+              color: "yellow",
+              // margin: 9
+            }}
                 onContextMenu={() => false}
                 className="cornerstone-enabled-image"
                 unselectable="on"
@@ -319,10 +386,12 @@ class DicomViewer extends React.Component {
               <div
                 ref={this.dicomImageRef}
                 style={{
-                  flexGrow: 1,    
-                  display: 'flex',
-                  width: "100%",
-                  height: "100%",
+                  // flexGrow: 1,    
+                  // display: 'flex',
+                  // width: "calc(100vw-4px)",
+                  // height: "calc(100vh-4px)",
+                  width: viewerWidth,
+                  height: viewerHeight,
                   top: 0,
                   left: 0,
                   position: "relative",
@@ -345,9 +414,10 @@ class DicomViewer extends React.Component {
                 WW/WC:
               </div>
 
-          </div>
-        </div>
+            </div>
+        </Paper>
       </div>
+
     );
   }
 }
