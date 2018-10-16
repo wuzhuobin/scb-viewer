@@ -5,6 +5,9 @@ import {withStyles} from '@material-ui/core/styles'
 import classNames from 'classnames';
 import DrawerMenu from './DrawerMenu';
 
+import MenuItem from '@material-ui/core/MenuItem';
+import Menu2 from '@material-ui/core/Menu';
+
 const drawerWidth = 240;
 
 const styles = theme=> ({
@@ -53,6 +56,7 @@ class NavBar extends React.Component {
         this.state = {
             auth: true,
             open: false,
+            anchorEl: null,
         };
     }
 
@@ -60,9 +64,19 @@ class NavBar extends React.Component {
         this.setState({tab: props.tab});
     }
 
+    handleMenu = event =>{
+        this.setState({anchorEl: event.currentTarget });
+    };
+
+    handleClose = () => {
+        console.log("Enter Handle Close");
+        this.setState({ anchorEl: null });
+        this.props.offAuth();
+    };
+
     render(){
         const {auth, open, onDrawerOpen, classes, theme} = this.props
-          
+        const meunOpen = Boolean(this.state.anchorEl);
         return(
         <div className={classes.root}>
             <AppBar 
@@ -95,6 +109,22 @@ class NavBar extends React.Component {
                             >
                               <AccountCircle />
                             </IconButton>
+                            <Menu2
+                                id="menu-appbar"
+                                anchorEl= {this.state.anchorEl}
+                                anchorOrigin={{
+                                    vertical: 'top',
+                                    horizontal: 'right',
+                                }}
+                                transformOrigin={{
+                                    vertical: 'top',
+                                    horizontal: 'right',
+                                }}
+                                open={meunOpen}
+                                onClose={this.handleClose}
+                            >
+                            <MenuItem onClick={this.handleClose}>Logout</MenuItem>
+                            </Menu2>
                         </div>
                         )
                     }

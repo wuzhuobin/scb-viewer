@@ -89,6 +89,10 @@ class App extends Component {
     this.setState({auth:true})
   }
 
+  handleAuthOff = event =>{
+    this.setState({auth:false, open:false})
+  }
+
   handleDrawerOpen = () =>{
     this.setState({open:true});
     }
@@ -105,7 +109,7 @@ class App extends Component {
       <MuiThemeProvider theme={MyTheme}>
       <div className={classes.root}>
         <div className={classes.navBar}>
-          <NavBar auth={auth} open={open} onDrawerOpen={this.handleDrawerOpen}/>
+          <NavBar auth={auth} open={open} onDrawerOpen={this.handleDrawerOpen} offAuth={this.handleAuthOff} />
         </div>
         <div>
           {this.handleLogin(this.state.auth)}
