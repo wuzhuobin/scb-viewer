@@ -7,7 +7,6 @@ import {Collections, Portrait, Visibility} from '@material-ui/icons'
 import classNames from 'classnames';
 import DrawerMenu from "./DrawerMenu";
 
-
 const drawerWidth = 240;
 
 const styles = theme=> ({
@@ -21,7 +20,7 @@ const styles = theme=> ({
   },
   content: {
     position: 'relative',
-    height: 'calc(100vh-64px)',
+    height: 'calc(100% - 64px)',
     width: '100%',
     backgroundColor: theme.palette.background.default,
     transition: theme.transitions.create('margin', {
@@ -41,7 +40,7 @@ class Content extends React.Component {
     constructor(props){
         super(props);
         this.state = {
-            page: 0,
+            page: 2,
         };
     }
 
@@ -55,6 +54,7 @@ class Content extends React.Component {
 
         return(
         <div className={classes.root}>
+
           <DrawerMenu open={open} onDrawerClose={onDrawerClose} onChangePage={this.handleChangePage}/>
           <main 
               className={classNames(classes.content,{
