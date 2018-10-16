@@ -1,7 +1,8 @@
 import React from "react";
 
-import {Button, Divider, Typography, TextField, Grid, Table, TableBody, TableCell, TableHead, TableRow} from '@material-ui/core';
-import {CloudUpload} from '@material-ui/icons'
+import {Button, Divider, Typography, TextField, Grid, Table, TableBody, TableCell, TableHead, TableRow,
+  Collapse} from '@material-ui/core';
+import {CloudUpload, ExpandMore} from '@material-ui/icons'
 
 import { withStyles } from '@material-ui/core/styles';
 import Upload from './Upload';
@@ -114,8 +115,6 @@ class PACS {
   }
 }
 
-      // createData('A123456', 'Chan Tai Man', getToday(),'M'),
-      // createData('B234567', 'Wong Siu Ming', getToday(), 'F'),
 class Images extends React.Component {
   constructor(props){
     super(props);
@@ -225,20 +224,28 @@ class Images extends React.Component {
               <TableCell>Patient Name</TableCell>
               <TableCell>Birth Date</TableCell>
               <TableCell>Gender</TableCell>
+              <TableCell></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {this.state.rows.map( row => {
               console.log(row)
               return (
+                <React.Fragment>
                 <TableRow id={row.id}>
                   <TableCell>{row.name}</TableCell>
                   <TableCell>{row.patientId}</TableCell>
                   <TableCell>{row.birthDate}</TableCell>
                   <TableCell>{row.gender}</TableCell>
+                  <TableCell > 
+                     <ExpandMore />
+                  </TableCell>
                 </TableRow>
+                  hello
+                </React.Fragment>
                 )
-            })
+            }
+            )
             }
           </TableBody>
         </Table>
