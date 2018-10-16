@@ -43,26 +43,29 @@ const styles = theme=> ({
         width: '100%',
         // flexGrow: 1,
     },
-
+    
     appBar:{
           flexGrow: 1,    
           zIndex: 1,
           overflow: 'hidden',
           position: 'static',
           display: 'flex',
-          height: '64px'
-     },
+          height: '64px',
+          justifyContent: 'center',
+          background: theme.palette.secondary.main
+        },
 
      paper:{
       padding: 0,
-      borderColor: "blue",
+      borderColor: theme.palette.primary.main,
       borderStyle: "solid",
+      borderRadius:"0px",
      },
 
-    // label: {
-    // // Aligns the content of the button vertically.
-    //   flexDirection: 'column',
-    // },
+    label: {
+    // Aligns the content of the button vertically.
+      flexDirection: 'column',
+    },
 })
 
 class DicomViewer extends React.Component {
@@ -183,10 +186,10 @@ class DicomViewer extends React.Component {
 
 
   render() {
-    const {classes} = this.props
+    const {classes, theme} = this.props
 
-    const viewerHeight = window.innerHeight-128-6 //4 is border
-    const viewerWidth = window.viewerWidth-128-6 //4 is border
+    var viewerHeight = window.innerHeight-128-6 //4 is border
+    var viewerWidth = window.viewerWidth-128-6 //4 is border
     return (
       <div className={classes.root}>
           <AppBar className={classes.appBar}>
