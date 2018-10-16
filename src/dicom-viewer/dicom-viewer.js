@@ -118,12 +118,13 @@ class DicomViewer extends React.Component {
     // })
 
     return new Promise(function(resolve,reject){
-      var queryResult =   fetch("http://223.255.146.2:8042/orthanc/series/" + GET).
+      var queryResult =   fetch("http://223.255.146.2:8042/orthanc/series/" + GET + "/ordered-slices").
       then((res)=>{return res.json();}).
       then((json)=>{ 
+        console.log(json);
         let cacheImagePathArray = [];
-        for(let i = 0; i < json.Instances.length; ++i){
-          let path = "http://192.168.1.126:3000/orthanc/instances/" + json.Instances[i] + "/file"; 
+        for(let i = 0; i < json.Dicom.length; ++i){
+          let path = "http://192.168.1.126:3000/orthanc/" + json.Dicom[i]; 
           cacheImagePathArray.push(path);
         }
         // console.log(cacheImagePathArray);
