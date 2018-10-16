@@ -66,22 +66,107 @@ const styles = theme=> ({
 })
 
 class DicomViewer extends React.Component {
-  
+
+
+  constructor(props){
+    super(props);
+    this.state={
+      username: '',
+      imageId: 0,
+      imagePathArray:[],
+      imageLoaderHintsArray:[],
+      hardCodeNumDcm:1,
+      currentInteractionMode: 1
+    }
+  }
+
+
   componentWillMount() {
     cornerstoneTools.external.cornerstone = cornerstone;
     cornerstoneTools.external.cornerstoneMath = cornerstoneMath;
     cornerstoneTools.external.Hammer = Hammer;
-    dicomLoader(cornerstone);
   }
-  
+
   componentDidMount() {
-    this.loadImage();
+    this.readImage(this.state, cornerstone).then(res=>this.displayImage());
   }
+
+  getImagePathList(IP,Port,GET){//sync request for now
+    // return ['./assets/Test1/0000.dcm'];
+    // return ['http://192.168.1.126:3000/orthanc/instances/2d3e243d-8b918a6f-b3456d3e-0546d044-dab91ee0/file'];
+    // return ['http://127.0.0.1:8080/0100.dcm'];
+    
+    // return new Promise(function(resolve,reject){
+    //   resolve(['http://127.0.0.1:8080/0100.dcm','http://127.0.0.1:8080/0010.dcm','http://127.0.0.1:8080/0400.dcm','http://127.0.0.1:8080/0250.dcm','http://127.0.0.1:8080/0410.dcm']);
+    // })
+
+    return new Promise(function(resolve,reject){
+      var queryResult =   fetch("http://223.255.146.2:8042/orthanc/series/" + GET).
+      then((res)=>{return res.json();}).
+      then((json)=>{ 
+        let cacheImagePathArray = [];
+        for(let i = 0; i < json.Instances.length; ++i){
+          let path = "http://192.168.1.126:3000/orthanc/instances/" + json.Instances[i] + "/file"; 
+          cacheImagePathArray.push(path);
+        }
+        // console.log(cacheImagePathArray);
+        return cacheImagePathArray;
+      });
+      resolve(queryResult);
+
+    });
+  }
+
+  seriesImages(id){
+  fetch("http://223.255.146.2:8042/orthanc/series/" + id)
+  .then((res)=>{return res.json();})
+  .then((json)=>{ 
+    let cacheImagePathArray = [];
+    for(let i = 0; i < json.Instances.length; ++i){
+      let path = "http://192.168.1.126:3000/orthanc/instances/" + json.Instances[i] + "/file"; 
+      cacheImagePathArray.push(path);
+    }
+    // console.log(cacheImagePathArray);
+    return cacheImagePathArray;
+   });
+} 
+
+
+  readImage(state, cornerstoneInstance){
+      //Get image path Array first
+      const loadingResult = this.getImagePathList(1,1,"cf8192f8-50e817d9-2aae4764-3c85d142-dc59a8d0")
+      .then((queryList)=>{
+        var cacheimagePathArray = [];
+        const cacheimageLoaderHintsArray = [...Array(queryList.length).keys()].map(function(number){
+          return "example://" + String(number);
+        });
+        for (var i=0;i<queryList.length;i++){
+          cacheimagePathArray.push(queryList[i]);
+        // cacheArray.push("assets/Test1/0"+String((i-i%100)/100)+String((i-(i-i%100)-i%10)/10)+String(i%10)+".dcm");
+      }
+      // console.log('abcd');
+      console.log(cacheimagePathArray);
+      console.log(cacheimageLoaderHintsArray);
+      // console.log('abcd');
+      this.setState(state => ({
+        imagePathArray:cacheimagePathArray,
+        imageLoaderHintsArray:cacheimageLoaderHintsArray,
+        hardCodeNumDcm:cacheimagePathArray.length
+      }));
+      dicomLoader(cornerstoneInstance,cacheimagePathArray);
+    });
+
+  return loadingResult;
+
+
+  }
+
+
 
   dicomImage = null;
 
-  loadImage = () => {
-    
+  displayImage = () => {
+
     const element = this.dicomImage;
     // Listen for changes to the viewport so we can update the text overlays in the corner
     
@@ -94,6 +179,7 @@ class DicomViewer extends React.Component {
     element.addEventListener("cornerstoneimagerendered", onImageRendered);
     
     const config = {
+
       // invert: true,
       minScale: 0.25,
       maxScale: 20.0,
@@ -102,48 +188,137 @@ class DicomViewer extends React.Component {
 
     cornerstoneTools.zoom.setConfiguration(config);
 
-    const imageId = "example://1";
+    // const wheelEvents = ['mousewheel', 'DOMMouseScroll'];
+    // for (var i=0;i<wheelEvents.length;i++){
+    //   element.addEventListener(wheelEvents[i],this.wheelEventsHandler);
+    // }
+
+    var stack = {
+        currentImageIdIndex : 0,
+        imageIds: this.state.imageLoaderHintsArray
+    };
+
+
+
+    // console.log(this.currentstate);
     cornerstone.enable(element);
-    cornerstone.loadImage(imageId).then(image => {
-    cornerstone.displayImage(element, image);
-    cornerstoneTools.mouseInput.enable(element);
-    cornerstoneTools.mouseWheelInput.enable(element);
-    // // Enable all tools we want to use with this element
-    cornerstoneTools.wwwc.activate(element, 1); // ww/wc is the default tool for left mouse button
-    cornerstoneTools.pan.activate(element, 2); // pan is the default tool for middle mouse button
-    cornerstoneTools.zoom.activate(element, 4); // zoom is the default tool for right mouse button
-    cornerstoneTools.zoomWheel.activate(element); // zoom is the default tool for middle mouse wheel
-    cornerstoneTools.probe.enable(element);
-    cornerstoneTools.length.enable(element);
-    cornerstoneTools.ellipticalRoi.enable(element);
-    cornerstoneTools.rectangleRoi.enable(element);
-    cornerstoneTools.angle.enable(element);
-    cornerstoneTools.highlight.enable(element);
+    cornerstone.loadImage(this.state.imageLoaderHintsArray[stack.currentImageIdIndex]).then(image => {
+      cornerstone.displayImage(element, image);
+      cornerstoneTools.mouseInput.enable(element);
+      cornerstoneTools.mouseWheelInput.enable(element);
+      // // Enable all tools we want to use with this element
+      // cornerstoneTools.wwwc.activate(element, 1); // ww/wc is the default tool for left mouse button
+      cornerstoneTools.pan.activate(element, 2); // pan is the default tool for middle mouse button
+      cornerstoneTools.zoom.activate(element, 4); // zoom is the default tool for right mouse button
+      // cornerstoneTools.zoomWheel.activate(element); // zoom is the default tool for middle mouse wheel
+      cornerstoneTools.probe.enable(element);
+      cornerstoneTools.length.enable(element);
+      cornerstoneTools.ellipticalRoi.enable(element);
+      cornerstoneTools.rectangleRoi.enable(element);
+      cornerstoneTools.angle.enable(element);
+      cornerstoneTools.highlight.enable(element);
+
+      cornerstoneTools.addStackStateManager(element, ['stack']);
+      cornerstoneTools.addToolState(element, 'stack', stack);
 
       cornerstoneTools.length.setConfiguration({ shadow: this.checked });
       cornerstoneTools.angle.setConfiguration({ shadow: this.checked });
       cornerstone.updateImage(element);
+
+      // Enable all tools we want to use with this element
+      cornerstoneTools.stackScroll.activate(element, 1);//<--------------ui button of enablt scrolling through left button
+
+      cornerstoneTools.stackScrollWheel.activate(element);
+
+      // Uncomment below to enable stack prefetching
+      // With the example images the loading will be extremely quick, though
+      // cornerstoneTools.stackPrefetch.enable(element, 3);
     });
   };
 
   enableTool = (toolName, mouseButtonNumber) => {
     this.disableAllTools();
+    console.log(toolName+" "+this.state.currentInteractionMode);
+    // cornerstone.enable(this.dicomImage);
+    if (["pan", "zoom", "stackScroll"].includes(toolName)){
+      if (this.state.currentInteractionMode!= 1){
+        cornerstoneTools.wwwc.disable(this.dicomImage,1);
+        cornerstoneTools.probe.disable(this.dicomImage, 1);
+        cornerstoneTools.length.disable(this.dicomImage, 1);
+        cornerstoneTools.ellipticalRoi.disable(this.dicomImage, 1);
+        cornerstoneTools.rectangleRoi.disable(this.dicomImage, 1);
+        cornerstoneTools.angle.disable(this.dicomImage, 1);
+        cornerstoneTools.highlight.disable(this.dicomImage, 1);
+        cornerstoneTools.freehand.disable(this.dicomImage, 1);
+        this.setState(state=>({currentInteractionMode:1}));
+      }
+      else {
+          cornerstoneTools.stackScroll.deactivate(this.dicomImage, 1);
+          console.log("Abc");
+      }
+
+    }
+    else if (["probe", "length","ellipticalRoi", "rectangleRoi", "angle"].includes(toolName)){
+      cornerstoneTools.probe.enable(this.dicomImage);     
+      cornerstoneTools.length.enable(this.dicomImage);
+      cornerstoneTools.ellipticalRoi.enable(this.dicomImage);
+      cornerstoneTools.rectangleRoi.enable(this.dicomImage);
+      cornerstoneTools.angle.enable(this.dicomImage);
+      cornerstoneTools.highlight.enable(this.dicomImage);
+      if (this.state.currentInteractionMode!= 2){
+          cornerstoneTools.wwwc.disable(this.dicomImage,1);
+          cornerstoneTools.stackScroll.deactivate(this.dicomImage, 1);
+          cornerstoneTools.pan.activate(this.dicomImage, 2); // 2 is middle mouse button
+          cornerstoneTools.zoom.activate(this.dicomImage, 4); // 4 is right mouse button
+          this.setState(state=>({currentInteractionMode:2}));
+
+      }
+      else {
+        //No disable
+      }
+    }
+    else if (["wwwc"].includes(toolName)){
+        cornerstoneTools.wwwc.disable(this.dicomImage,1);
+        cornerstoneTools.zoom.deactivate(this.dicomImage,1);
+        cornerstoneTools.pan.deactivate(this.dicomImage,1);
+
+        cornerstoneTools.wwwc.disable(this.dicomImage,1);
+        cornerstoneTools.probe.disable(this.dicomImage, 1);
+        cornerstoneTools.length.disable(this.dicomImage, 1);
+        cornerstoneTools.ellipticalRoi.disable(this.dicomImage, 1);
+        cornerstoneTools.rectangleRoi.disable(this.dicomImage, 1);
+        cornerstoneTools.angle.disable(this.dicomImage, 1);
+        cornerstoneTools.highlight.disable(this.dicomImage, 1);
+        cornerstoneTools.freehand.disable(this.dicomImage, 1);
+
+
+
+        cornerstoneTools.stackScroll.deactivate(this.dicomImage, 1);
+        cornerstoneTools.pan.activate(this.dicomImage, 2); // 2 is middle mouse button
+        cornerstoneTools.zoom.activate(this.dicomImage, 4); // 4 is right mouse button
+        this.setState(state=>({currentInteractionMode:3}));
+    }
+
+
     cornerstoneTools[toolName].activate(this.dicomImage, mouseButtonNumber);
   };
 
   // helper function used by the tool button handlers to disable the active tool
   // before making a new tool active
   disableAllTools = () => {
-    cornerstoneTools.wwwc.disable(this.dicomImage);
-    cornerstoneTools.pan.activate(this.dicomImage, 2); // 2 is middle mouse button
-    cornerstoneTools.zoom.activate(this.dicomImage, 4); // 4 is right mouse button
-    cornerstoneTools.probe.deactivate(this.dicomImage, 1);
-    cornerstoneTools.length.deactivate(this.dicomImage, 1);
-    cornerstoneTools.ellipticalRoi.deactivate(this.dicomImage, 1);
-    cornerstoneTools.rectangleRoi.deactivate(this.dicomImage, 1);
-    cornerstoneTools.angle.deactivate(this.dicomImage, 1);
-    cornerstoneTools.highlight.deactivate(this.dicomImage, 1);
-    cornerstoneTools.freehand.deactivate(this.dicomImage, 1);
+    // cornerstoneTools.wwwc.disable(this.dicomImage,1);
+    // cornerstoneTools.probe.disable(this.dicomImage, 1);
+    // cornerstoneTools.length.disable(this.dicomImage, 1);
+    // cornerstoneTools.ellipticalRoi.disable(this.dicomImage, 1);
+    // cornerstoneTools.rectangleRoi.disable(this.dicomImage, 1);
+    // cornerstoneTools.angle.disable(this.dicomImage, 1);
+    // cornerstoneTools.highlight.disable(this.dicomImage, 1);
+    // cornerstoneTools.freehand.disable(this.dicomImage, 1);
+
+    // cornerstoneTools.stackScroll.deactivate(this.dicomImage, 1);
+    // cornerstoneTools.pan.activate(this.dicomImage, 2); // 2 is middle mouse button
+    // cornerstoneTools.zoom.activate(this.dicomImage, 4); // 4 is right mouse button
+
   };
 
   dicomImageRef = el => {
@@ -160,7 +335,7 @@ class DicomViewer extends React.Component {
               <AppBar position="static" className={classes.appBar}>
                 <ToggleButtonGroup exclusive >
 
-                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => { this.enableTool("wwwc", 1); }}>
+                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => { this.enableTool("stackScroll", 1); }}>
                       <NavigationIcon />
                       Navigate
                     </Button>
@@ -276,8 +451,12 @@ class DicomViewer extends React.Component {
                     <Button classes={{label: classes.label}} color="inherit" size="small" 
                         onClick={() => {
                           const element = this.dicomImage;
-                          var toolStateManager = cornerstoneTools.getElementToolStateManager(element);
-                          toolStateManager.clear(element)
+                          cornerstoneTools.clearToolState(element, "length");
+                          cornerstoneTools.clearToolState(element, "angle");
+                          cornerstoneTools.clearToolState(element, "probe");
+                          cornerstoneTools.clearToolState(element, "ellipticalRoi");
+                          cornerstoneTools.clearToolState(element, "rectangleRoi");
+                          cornerstoneTools.clearToolState(element, "freehand");
                           cornerstone.updateImage(element);}}
                         >
                       <ClearIcon />
@@ -337,7 +516,6 @@ class DicomViewer extends React.Component {
               <div id="mrbottomleft" style={{ position: "absolute", bottom: 3, left: 3 }}>
                 WW/WC:
               </div>
-
 
           </div>
         </div>
