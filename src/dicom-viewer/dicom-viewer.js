@@ -237,24 +237,27 @@ class DicomViewer extends React.Component {
 
   enableTool = (toolName, mouseButtonNumber) => {
     this.disableAllTools();
+    cornerstone.enable(this.dicomImage);
+
     cornerstoneTools[toolName].activate(this.dicomImage, mouseButtonNumber);
   };
 
   // helper function used by the tool button handlers to disable the active tool
   // before making a new tool active
   disableAllTools = () => {
-    console.log("AAA");
-    cornerstoneTools.wwwc.disable(this.dicomImage);
+    cornerstoneTools.wwwc.disable(this.dicomImage,1);
+    cornerstoneTools.probe.disable(this.dicomImage, 1);
+    cornerstoneTools.length.disable(this.dicomImage, 1);
+    cornerstoneTools.ellipticalRoi.disable(this.dicomImage, 1);
+    cornerstoneTools.rectangleRoi.disable(this.dicomImage, 1);
+    cornerstoneTools.angle.disable(this.dicomImage, 1);
+    cornerstoneTools.highlight.disable(this.dicomImage, 1);
+    cornerstoneTools.freehand.disable(this.dicomImage, 1);
+
     cornerstoneTools.stackScroll.deactivate(this.dicomImage, 1);
-    cornerstoneTools.probe.deactivate(this.dicomImage, 1);
-    cornerstoneTools.length.deactivate(this.dicomImage, 1);
-    cornerstoneTools.ellipticalRoi.deactivate(this.dicomImage, 1);
-    cornerstoneTools.rectangleRoi.deactivate(this.dicomImage, 1);
-    cornerstoneTools.angle.deactivate(this.dicomImage, 1);
-    cornerstoneTools.highlight.deactivate(this.dicomImage, 1);
-    cornerstoneTools.freehand.deactivate(this.dicomImage, 1);
     cornerstoneTools.pan.activate(this.dicomImage, 2); // 2 is middle mouse button
     cornerstoneTools.zoom.activate(this.dicomImage, 4); // 4 is right mouse button
+
   };
 
   dicomImageRef = el => {
