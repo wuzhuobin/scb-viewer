@@ -226,6 +226,7 @@ class DicomViewer extends React.Component {
 
       // Enable all tools we want to use with this element
       cornerstoneTools.stackScroll.activate(element, 1);//<--------------ui button of enablt scrolling through left button
+
       cornerstoneTools.stackScrollWheel.activate(element);
 
       // Uncomment below to enable stack prefetching
@@ -386,8 +387,12 @@ class DicomViewer extends React.Component {
                     <Button classes={{label: classes.label}} color="inherit" size="small" 
                         onClick={() => {
                           const element = this.dicomImage;
-                          var toolStateManager = cornerstoneTools.getElementToolStateManager(element);
-                          toolStateManager.clear(element)
+                          cornerstoneTools.clearToolState(element, "length");
+                          cornerstoneTools.clearToolState(element, "angle");
+                          cornerstoneTools.clearToolState(element, "probe");
+                          cornerstoneTools.clearToolState(element, "ellipticalRoi");
+                          cornerstoneTools.clearToolState(element, "rectangleRoi");
+                          cornerstoneTools.clearToolState(element, "freehand");
                           cornerstone.updateImage(element);}}
                         >
                       <ClearIcon />
