@@ -45,14 +45,7 @@ const dicomLoader = (cs,imageArray) => {
   var imageSeries = new Array(num_dcm);
   // var validSeries = new Array(num_dcm);
 
-  function GetNullImage(){
-    // return [0,0,0,0,0,0];
-    return null;
-  }
 
-  function HttpPathRead2Promise(resolve,reject){
-
-  }
 
 
   for (var ctr in imageArray){

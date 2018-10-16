@@ -101,9 +101,8 @@ class DicomViewer extends React.Component {
     // })
 
     return new Promise(function(resolve,reject){
-      var queryResult =   fetch("http://223.255.146.2:8042/orthanc/series/" + GET).
-      then((res)=>{return res.json();}).
-      then((json)=>{ 
+      var queryResult =   fetch("http://223.255.146.2:8042/orthanc/series/" + GET).then(
+        (res)=>{return res.json();}).then((json)=>{ 
         let cacheImagePathArray = [];
         for(let i = 0; i < json.Instances.length; ++i){
           let path = "http://192.168.1.126:3000/orthanc/instances/" + json.Instances[i] + "/file"; 
@@ -240,8 +239,11 @@ class DicomViewer extends React.Component {
     this.disableAllTools();
     console.log(toolName+" "+this.state.currentInteractionMode);
     // cornerstone.enable(this.dicomImage);
+    cornerstoneTools.highlight.disable(this.dicomImage);
+    cornerstoneTools.highlight.deactivate(this.dicomImage,1);
+
     if (["pan", "zoom", "stackScroll"].includes(toolName)){
-      if (this.state.currentInteractionMode!= 1){
+      if (this.state.currentInteractionMode!== 1){
         cornerstoneTools.wwwc.disable(this.dicomImage,1);
         cornerstoneTools.probe.disable(this.dicomImage, 1);
         cornerstoneTools.length.disable(this.dicomImage, 1);
@@ -258,14 +260,14 @@ class DicomViewer extends React.Component {
       }
 
     }
-    else if (["probe", "length","ellipticalRoi", "rectangleRoi", "angle"].includes(toolName)){
+    else if (["probe", "length","ellipticalRoi", "rectangleRoi", "angle", "freehand","highlight"].includes(toolName)){
       cornerstoneTools.probe.enable(this.dicomImage);     
       cornerstoneTools.length.enable(this.dicomImage);
       cornerstoneTools.ellipticalRoi.enable(this.dicomImage);
       cornerstoneTools.rectangleRoi.enable(this.dicomImage);
       cornerstoneTools.angle.enable(this.dicomImage);
       cornerstoneTools.highlight.enable(this.dicomImage);
-      if (this.state.currentInteractionMode!= 2){
+      if (this.state.currentInteractionMode!== 2){
           cornerstoneTools.wwwc.disable(this.dicomImage,1);
           cornerstoneTools.stackScroll.deactivate(this.dicomImage, 1);
           cornerstoneTools.pan.activate(this.dicomImage, 2); // 2 is middle mouse button
@@ -275,21 +277,26 @@ class DicomViewer extends React.Component {
       }
       else {
         //No disable
+        cornerstoneTools.length.deactivate(this.dicomImage, 1);
+        cornerstoneTools.ellipticalRoi.deactivate(this.dicomImage, 1);
+        cornerstoneTools.rectangleRoi.deactivate(this.dicomImage, 1);
+        cornerstoneTools.angle.deactivate(this.dicomImage, 1);
+        cornerstoneTools.highlight.deactivate(this.dicomImage, 1);
+        cornerstoneTools.freehand.deactivate(this.dicomImage, 1);
       }
     }
     else if (["wwwc"].includes(toolName)){
-        cornerstoneTools.wwwc.disable(this.dicomImage,1);
         cornerstoneTools.zoom.deactivate(this.dicomImage,1);
         cornerstoneTools.pan.deactivate(this.dicomImage,1);
 
-        cornerstoneTools.wwwc.disable(this.dicomImage,1);
-        cornerstoneTools.probe.disable(this.dicomImage, 1);
-        cornerstoneTools.length.disable(this.dicomImage, 1);
-        cornerstoneTools.ellipticalRoi.disable(this.dicomImage, 1);
-        cornerstoneTools.rectangleRoi.disable(this.dicomImage, 1);
-        cornerstoneTools.angle.disable(this.dicomImage, 1);
-        cornerstoneTools.highlight.disable(this.dicomImage, 1);
-        cornerstoneTools.freehand.disable(this.dicomImage, 1);
+        // cornerstoneTools.wwwc.disable(this.dicomImage,1);
+        // cornerstoneTools.probe.disable(this.dicomImage, 1);
+        // cornerstoneTools.length.disable(this.dicomImage, 1);
+        // cornerstoneTools.ellipticalRoi.disable(this.dicomImage, 1);
+        // cornerstoneTools.rectangleRoi.disable(this.dicomImage, 1);
+        // cornerstoneTools.angle.disable(this.dicomImage, 1);
+        // cornerstoneTools.highlight.disable(this.dicomImage, 1);
+        // cornerstoneTools.freehand.disable(this.dicomImage, 1);
 
 
 
