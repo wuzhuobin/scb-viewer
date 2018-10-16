@@ -28,6 +28,7 @@ const styles = theme=> ({
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.leavingScreen,
         }),
+        background:theme.palette.secondary.dark,
     },
     appBarShift: {
         width: `calc(100% - ${drawerWidth}px)`,
