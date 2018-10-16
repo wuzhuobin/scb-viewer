@@ -76,6 +76,7 @@ class DicomViewer extends React.Component {
       imagePathArray:[],
       imageLoaderHintsArray:[],
       hardCodeNumDcm:1,
+      currentInteractionMode: 1
     }
   }
 
@@ -237,7 +238,67 @@ class DicomViewer extends React.Component {
 
   enableTool = (toolName, mouseButtonNumber) => {
     this.disableAllTools();
-    cornerstone.enable(this.dicomImage);
+    console.log(toolName+" "+this.state.currentInteractionMode);
+    // cornerstone.enable(this.dicomImage);
+    if (["pan", "zoom", "stackScroll"].includes(toolName)){
+      if (this.state.currentInteractionMode!= 1){
+        cornerstoneTools.wwwc.disable(this.dicomImage,1);
+        cornerstoneTools.probe.disable(this.dicomImage, 1);
+        cornerstoneTools.length.disable(this.dicomImage, 1);
+        cornerstoneTools.ellipticalRoi.disable(this.dicomImage, 1);
+        cornerstoneTools.rectangleRoi.disable(this.dicomImage, 1);
+        cornerstoneTools.angle.disable(this.dicomImage, 1);
+        cornerstoneTools.highlight.disable(this.dicomImage, 1);
+        cornerstoneTools.freehand.disable(this.dicomImage, 1);
+        this.setState(state=>({currentInteractionMode:1}));
+      }
+      else {
+          cornerstoneTools.stackScroll.deactivate(this.dicomImage, 1);
+          console.log("Abc");
+      }
+
+    }
+    else if (["probe", "length","ellipticalRoi", "rectangleRoi", "angle"].includes(toolName)){
+      cornerstoneTools.probe.enable(this.dicomImage);     
+      cornerstoneTools.length.enable(this.dicomImage);
+      cornerstoneTools.ellipticalRoi.enable(this.dicomImage);
+      cornerstoneTools.rectangleRoi.enable(this.dicomImage);
+      cornerstoneTools.angle.enable(this.dicomImage);
+      cornerstoneTools.highlight.enable(this.dicomImage);
+      if (this.state.currentInteractionMode!= 2){
+          cornerstoneTools.wwwc.disable(this.dicomImage,1);
+          cornerstoneTools.stackScroll.deactivate(this.dicomImage, 1);
+          cornerstoneTools.pan.activate(this.dicomImage, 2); // 2 is middle mouse button
+          cornerstoneTools.zoom.activate(this.dicomImage, 4); // 4 is right mouse button
+          this.setState(state=>({currentInteractionMode:2}));
+
+      }
+      else {
+        //No disable
+      }
+    }
+    else if (["wwwc"].includes(toolName)){
+        cornerstoneTools.wwwc.disable(this.dicomImage,1);
+        cornerstoneTools.zoom.deactivate(this.dicomImage,1);
+        cornerstoneTools.pan.deactivate(this.dicomImage,1);
+
+        cornerstoneTools.wwwc.disable(this.dicomImage,1);
+        cornerstoneTools.probe.disable(this.dicomImage, 1);
+        cornerstoneTools.length.disable(this.dicomImage, 1);
+        cornerstoneTools.ellipticalRoi.disable(this.dicomImage, 1);
+        cornerstoneTools.rectangleRoi.disable(this.dicomImage, 1);
+        cornerstoneTools.angle.disable(this.dicomImage, 1);
+        cornerstoneTools.highlight.disable(this.dicomImage, 1);
+        cornerstoneTools.freehand.disable(this.dicomImage, 1);
+
+
+
+        cornerstoneTools.stackScroll.deactivate(this.dicomImage, 1);
+        cornerstoneTools.pan.activate(this.dicomImage, 2); // 2 is middle mouse button
+        cornerstoneTools.zoom.activate(this.dicomImage, 4); // 4 is right mouse button
+        this.setState(state=>({currentInteractionMode:3}));
+    }
+
 
     cornerstoneTools[toolName].activate(this.dicomImage, mouseButtonNumber);
   };
@@ -245,18 +306,18 @@ class DicomViewer extends React.Component {
   // helper function used by the tool button handlers to disable the active tool
   // before making a new tool active
   disableAllTools = () => {
-    cornerstoneTools.wwwc.disable(this.dicomImage,1);
-    cornerstoneTools.probe.disable(this.dicomImage, 1);
-    cornerstoneTools.length.disable(this.dicomImage, 1);
-    cornerstoneTools.ellipticalRoi.disable(this.dicomImage, 1);
-    cornerstoneTools.rectangleRoi.disable(this.dicomImage, 1);
-    cornerstoneTools.angle.disable(this.dicomImage, 1);
-    cornerstoneTools.highlight.disable(this.dicomImage, 1);
-    cornerstoneTools.freehand.disable(this.dicomImage, 1);
+    // cornerstoneTools.wwwc.disable(this.dicomImage,1);
+    // cornerstoneTools.probe.disable(this.dicomImage, 1);
+    // cornerstoneTools.length.disable(this.dicomImage, 1);
+    // cornerstoneTools.ellipticalRoi.disable(this.dicomImage, 1);
+    // cornerstoneTools.rectangleRoi.disable(this.dicomImage, 1);
+    // cornerstoneTools.angle.disable(this.dicomImage, 1);
+    // cornerstoneTools.highlight.disable(this.dicomImage, 1);
+    // cornerstoneTools.freehand.disable(this.dicomImage, 1);
 
-    cornerstoneTools.stackScroll.deactivate(this.dicomImage, 1);
-    cornerstoneTools.pan.activate(this.dicomImage, 2); // 2 is middle mouse button
-    cornerstoneTools.zoom.activate(this.dicomImage, 4); // 4 is right mouse button
+    // cornerstoneTools.stackScroll.deactivate(this.dicomImage, 1);
+    // cornerstoneTools.pan.activate(this.dicomImage, 2); // 2 is middle mouse button
+    // cornerstoneTools.zoom.activate(this.dicomImage, 4); // 4 is right mouse button
 
   };
 
