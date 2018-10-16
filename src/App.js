@@ -15,14 +15,16 @@ import './App.css';
 const MyTheme = createMuiTheme({
     palette: {
         primary: {
-          light: blue[300],
-          main: blue[500],
-          dark: blue[800],
+          light: '#6fcbff',
+          main: '#1d9bff',
+          dark: '#006dcb',
+          contrastText: "white",
         },
-        secondary: {
-          light: grey[300],
-          main: grey[800],
-          dark: grey[900],
+        secondary: {      
+          light: '#6d6d6d',
+          main: '#424242',
+          dark: '#1b1b1b',
+          contrastText: "white",
         },
         error: {
           light: red[400],

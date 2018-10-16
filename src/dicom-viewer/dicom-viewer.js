@@ -19,7 +19,7 @@ import AdjustIcon from '@material-ui/icons/Adjust';
 import PanoramaFishEyeIcon from '@material-ui/icons/PanoramaFishEye';
 import CropDinIcon from '@material-ui/icons/CropDin';
 import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
-import EditIcon from '@material-ui/icons/Edit';
+import AnnotateIcon from '@material-ui/icons/Edit';
 import CropFreeIcon from '@material-ui/icons/CropFree';
 import NavigationIcon from '@material-ui/icons/NavigationOutlined';
 import MoreIcon from '@material-ui/icons/AddCircleOutline';
@@ -31,6 +31,7 @@ import RotateRightIcon from '@material-ui/icons/RotateRight';
 import ReplayIcon from '@material-ui/icons/Replay';
 import SaveIcon from '@material-ui/icons/SaveAlt';
 import TextIcon from '@material-ui/icons/Title';
+import FreeFormIcon from '@material-ui/icons/RoundedCorner';
 
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
@@ -402,12 +403,12 @@ class DicomViewer extends React.Component {
                     </Button>
                    
                     <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {this.enableTool("freehand", 1);}}>
-                      <EditIcon />
+                      <FreeFormIcon />
                       Freeform
                     </Button>
 
                     <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {this.enableTool("arrowAnnotate", 1);}}>
-                      <EditIcon />
+                      <AnnotateIcon />
                       Annotate
                     </Button>
 
