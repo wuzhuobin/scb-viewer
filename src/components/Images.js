@@ -1,11 +1,13 @@
 import React from "react";
 
 import {Button, Divider, Typography, TextField, Grid, Table, TableBody, TableCell, TableHead, TableRow,
-  Collapse} from '@material-ui/core';
+  Collapse, TableRowColumn} from '@material-ui/core';
 import {CloudUpload, ExpandMore} from '@material-ui/icons'
 
 import { withStyles } from '@material-ui/core/styles';
 import Upload from './Upload';
+import Patients from './Patients';
+
 
 function getToday(){
   var today = new Date();
@@ -64,17 +66,19 @@ const styles = theme => ({
       width: 'auto',
     },
   },
+  images:{
+    width: '100%'
+  }
 
 });
 
 
 let id = 0;
-function createData(name, patientId, birthDate, gender) {
+function createPatientData(name, patientId, birthDate, gender) {
   id += 1;
   return { id, name, patientId, birthDate, gender};
 }
 
-// const rows = ;
 class PACS {
   static URL() {
     return "http://223.255.146.2:8042/orthanc/";
@@ -125,22 +129,22 @@ class Images extends React.Component {
       startDate: '',
       endDate: '',
       modality: 'all',
-      rows: [],
+      patients: [],
     }
     PACS.allPatients((json) => {
       for (let i = 0; i < json.length; ++i) {
         PACS.patientInfo(json[i], (json) => {
-          let row = createData(json.MainDicomTags.PatientID, json.MainDicomTags.PatientName, json.MainDicomTags.PatientBirthDate, json.MainDicomTags.PatientSex);
-          const rows = this.state.rows.slice();
-          rows.push(row);
-          this.setState({rows: rows});
+          let patient = createPatientData(json.MainDicomTags.PatientID, json.MainDicomTags.PatientName, json.MainDicomTags.PatientBirthDate, json.MainDicomTags.PatientSex);
+          const patients = this.state.patients.slice();
+          patients.push(patient);
+          this.setState({patients: patients});
         });
       }
     });
   }
 
   handleUploadOpen = () => {
-  this.setState({ upload: true });
+    this.setState({ upload: true });
   };
 
   handleUploadClose = () =>{
@@ -228,25 +232,7 @@ class Images extends React.Component {
             </TableRow>
           </TableHead>
           <TableBody>
-            {this.state.rows.map( row => {
-              console.log(row)
-              return (
-                <React.Fragment>
-                <TableRow id={row.id}>
-                  <TableCell>{row.name}</TableCell>
-                  <TableCell>{row.patientId}</TableCell>
-                  <TableCell>{row.birthDate}</TableCell>
-                  <TableCell>{row.gender}</TableCell>
-                  <TableCell > 
-                     <ExpandMore />
-                  </TableCell>
-                </TableRow>
-                  hello
-                </React.Fragment>
-                )
-            }
-            )
-            }
+            {this.state.patients.map( patient => {return (<Patients patient={patient}/>)})}
           </TableBody>
         </Table>
 
@@ -257,11 +243,31 @@ class Images extends React.Component {
         
         <Upload open={this.state.upload} onClose={this.handleUploadClose}/>
       </div>
-
-
-
     );
   }
 }
 
 export default withStyles(styles)(Images);
+
+
+
+                    //   {this.state.images.map(images=>{
+                    // console.log(images)
+                    // return(
+                    //   null
+                    // )
+
+                //                     <Table>
+                //   <TableHead>
+                //     <TableRow>
+                //       <TableCell>Institution</TableCell>
+                //       <TableCell></TableCell>
+                //       <TableCell>Study Date</TableCell>
+                //       <TableCell>Study ID</TableCell>
+                //       <TableCell>Modality</TableCell>
+                //       <TableCell>Modality</TableCell>
+                //       <TableCell>Series Number</TableCell>
+                //       <TableCell>Station Name</TableCell>
+                //   </TableRow>
+                //   </TableHead>
+                // </Table>
