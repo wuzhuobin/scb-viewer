@@ -1,5 +1,5 @@
 import {Avatar, Button, CssBaseline, Paper, Typography, FormControl, InputLabel, 
-	Input, FormControlLabel, Checkbox} from '@material-ui/core';
+	Input, FormControlLabel, Checkbox, Snackbar} from '@material-ui/core';
 import React, { Component } from 'react';
 import {withStyles} from '@material-ui/core/styles'
 import PropTypes from 'prop-types';
@@ -47,6 +47,8 @@ class Login extends Component {
 		this.state={
 			username: '',
 			password: '',
+			showWrong: false,
+			showLoginMsg: false,
 		}
 	}
 
@@ -60,6 +62,7 @@ class Login extends Component {
 	  	formData.append('headers', {'Access-Control-Allow-Origin': '*'});
 	  	formData.append('body',{'username': this.state.username});
 	  	//formData.append({'password': 'sucabot'});
+	  	this.setState({showLoginMsg: true});
 	  	axios({
   				method: 'post',
   				url: 'http://192.168.1.112:5000/handleLogin',
@@ -70,7 +73,6 @@ class Login extends Component {
 			  	headers:  {'Access-Control-Allow-Origin': '*'},
 			})
 	      .then(res => {
-	      	// console.log(this.state.uploadTasks[numOfTasks-1].info)
 	         console.log(res);
 	        if (res.data.Status == 'Success' )
 	        {
@@ -80,29 +82,28 @@ class Login extends Component {
 	        else
 	        {
 	        	console.log("wrong");	
+	        	this.setState({showLoginMsg: false});
+	        	this.setState({showWrong: true});
 	        }
-
 	      }).catch((error)=>{
 	      	console.log(error)
 	      })
-
-
-		//if (this.state.username === "user" && this.state.password === "sucabot"){
-		//	console.log("correct");
-		//	this.props.onAuth();
-			// this.setState({foo: !this.state.foo});
-		//}
-		//else{
-		//	
-		//}
 	}
 
 	handleChange = e =>{
 		this.setState({[e.target.name]:e.target.value});
 	}
 
+	handleCloseWrongMsg = () => {
+    	this.setState({ showWrong: false });
+  	};
+
+  	handleCloseLoginMsg = () => {
+    	this.setState({ showLoginMsg: false });
+  	};
+
 	render(){
-		const {username, password} = this.state
+		const {username, password, showWrong, showLoginMsg} = this.state
 		const {classes} = this.props
 
 		return(
@@ -154,6 +155,19 @@ class Login extends Component {
 				            </Button>
 			          	</form>
 					</Paper>
+
+					<Snackbar
+						anchorOrigin={{vertical:'bottom',horizontal:'right'}}
+						open={showWrong}
+						onClose={this.handleCloseWrongMsg}
+						message={<span id="message-id">Invalid Username/Password</span>}
+					/>	
+					<Snackbar
+						anchorOrigin={{vertical:'bottom',horizontal:'right'}}
+						open={showLoginMsg}
+						onClose={this.handleCloseLoginMsg}
+						message={<span id="message-id">Logging In...</span>}
+					/>	
 				</main>
 			</React.Fragment>	
 		)
