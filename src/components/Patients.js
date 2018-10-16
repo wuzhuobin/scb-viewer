@@ -4,7 +4,8 @@ import {Button, Divider, Typography, TextField, Grid, Table, TableBody, TableCel
   Collapse, TableRowColumn} from '@material-ui/core';
 import {ExpandMore} from '@material-ui/icons'
 import { withStyles } from '@material-ui/core/styles';
-
+import PACS from "./PACS"
+console.log(PACS.URL());
 const styles = theme => ({
 	root:{
 
