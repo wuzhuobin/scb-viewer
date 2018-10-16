@@ -51,7 +51,7 @@ class App extends Component {
   }
 
   handleAuthOff = event =>{
-    this.setState({auth:false})
+    this.setState({auth:false, open:false})
   }
 
   handleDrawerOpen = () =>{
