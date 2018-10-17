@@ -7,40 +7,41 @@ var PACS = {
             (res) => { return res.json(); }).then((json) => { action(json); })
     },
     patientInfo: function (id, action) {
-        fetch(this.URL() + "/patients/" + id).then(
-            (res) => { return res.json(); }).then(
-                (json) => { action(json); });
+        let ret = fetch(this.URL() + "/patients/" + id).then(
+            function (res)  { return res.json(); });
+        if(action == undefined){
+            return ret;
+        }
+        ret.then(function(json) { action(json); });
     },
     studyInfo: function (id, action) {
-        fetch(this.URL() + "/studies/" + id).then(
-            (res) => { return res.json(); }).then(
-                (json) => { action(json); });
+        let ret = fetch(this.URL() + "/studies/" + id).then(
+            function (res) { return res.json(); });
+        if(action == undefined){
+            return ret;
+        }
+        ret.then(function (json){ action(json); });
     },
     serieInfo: function (id, action) {
-        fetch(this.URL() + "/series/" + id).then(
-            (res) => { return res.json(); }).then(
-                (json) => { action(json); });
-    },
-    serieImages: function (id, action) {
-        fetch(this.URL() + "/series/" + id).then(
-            (res) => { return res.json(); }).then(
-                (json) => {
-                    let paths = [];
-                    json.Instances.forEach(element => {
-                        paths.push(this.URL() + "/instances/" + element + "/file");
-                    });
-                    action(paths);
-            });
+        let ret = fetch(this.URL() + "/series/" + id).then(
+           function (res) { return res.json(); });
+           if(action == undefined){
+               return ret;
+           }
+        ret.then(function(json) { action(json); });
     },
     orderedSlice: function (id, action) {
-        fetch(this.URL() + "/series/" + id + "/ordered-slices").then(
-            (res) => { return res.json(); }).then(
-                (json) => {
+        let ret = fetch(this.URL() + "/series/" + id + "/ordered-slices").then(
+            function(res) { return res.json(); }).then(
+                function (json) {
                     let paths = [];
-                    json.Dicom.forEach((element) => {
-                        paths.push(this.URL() + element);
-                    })
+                    json.Dicom.forEach(function (element) { paths.push(PACS.URL() + element); })
+                    return paths;
                 });
+        if(action == undefined){
+            return ret;
+        }
+        ret.then(function (paths) { action(paths); })
     }
 }
 module.exports = PACS;
