@@ -42,38 +42,33 @@ function computeImageMinMax(a){
 
 const dicomLoader = (cs,imageArray) => {
   const num_dcm = imageArray.length;
-  var imageSeries = new Array(num_dcm);
+  var imageSeries = [];
+  var numCompleted = 0;
+  for (var i=0;i<num_dcm;i++){
+    imageSeries.push(null);
+  }
   var failedSeries = [];
-  var test = 0;
 
   function BatchLoadImage(InputArray){
-    for (var ctr in InputArray){
-        if (failedSeries.includes(ctr)){ 
-            var index = failedSeries.indexOf(ctr);
-            if (index>-1){
-              failedSeries.splice(index,1);
-            }
-        };
-        console.log(imageSeries[2]);
-
-
-
-
-        imageSeries[ctr] = new Promise(function(resolve,reject){
-      const imageId = parseInt(ctr);
-    httpGetAsync(imageArray[ctr], response => {
-      if(response===null){
-        console.log('Load image failed');
-        failedSeries.push(imageId);
-        test++;
-        reject("Get image failed"+test);
+    for (var i=0;i<InputArray.length;i++){
+      const imageId = InputArray[i];
+      failedSeries = failedSeries.filter(item => item !== imageId);
+      if (imageSeries[imageId]!==null){
+        console.log("rewritng "+imageId+" -th image to null");
+        imageSeries[imageId] = null;
       }
-      else {
-        const data = new DataView(response);
-        const image = daikon.Series.parseImage(data);
-        const spacing = image.getPixelSpacing();
-        if (image.getImageMin()){
-          // console.log("Type1");
+      imageSeries[imageId] = new Promise(function(resolve,reject){
+        httpGetAsync(imageArray[imageId], response => {
+          if(response===null){
+            failedSeries.push(imageId);
+            reject("Get image failed");
+          }
+          else {
+            numCompleted++;
+            const data = new DataView(response);
+            const image = daikon.Series.parseImage(data);
+            const spacing = image.getPixelSpacing();
+            if (image.getImageMin()){
           resolve({
             minPixelValue: image.getImageMin(),
             maxPixelValue: image.getImageMax(),
@@ -115,8 +110,8 @@ const dicomLoader = (cs,imageArray) => {
         }
       } //else(response null) end
     });
-           
-    });
+
+      });
     }
 
   }
@@ -132,9 +127,7 @@ const dicomLoader = (cs,imageArray) => {
         console.log(failedSeries[i]);
       }
     }
-    console.log("trying reload");
-    BatchLoadImage([failedSeries]);
-
+    BatchLoadImage(failedSeries);
   }
  
   
@@ -144,13 +137,14 @@ const dicomLoader = (cs,imageArray) => {
 
     function getPixelData() {
       if (String(imageId).substring(0,10) === "example://"){
-        GetImcompletePromiseID();
-
         const id = parseInt(String(imageId).substring(10,String(imageId).length));
         console.log("Accessing " + id + "-th image out of " + imageSeries.length + " images");
 
         if (failedSeries.includes(id)){
           alert("The " + id + "-th image is not loaded");
+        }
+        if (numCompleted){
+          GetImcompletePromiseID();
         }
 
         return imageSeries[id];
