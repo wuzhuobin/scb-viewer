@@ -4,7 +4,8 @@ import {Button, Divider, Typography, TextField, Grid, Table, TableBody, TableCel
   Collapse, TableRowColumn} from '@material-ui/core';
 import {ExpandMore} from '@material-ui/icons'
 import { withStyles } from '@material-ui/core/styles';
-
+import PACS from "./PACS"
+console.log(PACS.URL());
 const styles = theme => ({
 	root:{
 
@@ -17,17 +18,19 @@ function createData(Institution, StudyDate, StudyID, Modality, SeriesNumber) {
   return { id, Institution, StudyDate, StudyID, Modality, SeriesNumber};
 }
 
-const series = [
-	createData('Sucabot', '2018-01-01', 'A1234567', 'CT', 'SeriesNumbbbbbbb'),
-	createData('Sucabot(Int)', '2018-01-02', 'B123451234', 'MR', 'SeriesNumbbbbbbbb')
-]
+// const series = [
+// ]
 
 class Patients extends React.Component {
 	constructor(props){
     	super(props);
     	this.state={
-	      open:false,
-    	}
+        open:false,
+        series: [
+          // createData('Sucabot', '2018-01-01', 'A1234567', 'CT', 'SeriesNumbbbbbbb'),
+          // createData('Sucabot(Int)', '2018-01-02', 'B123451234', 'MR', 'SeriesNumbbbbbbbb')
+        ]
+      }
 	}
 
 	 handleSeriesOpen = (event)  => {
@@ -35,7 +38,52 @@ class Patients extends React.Component {
 	    console.log(event)
 	    console.log(event.target.getAttribute('patientId'))
 	    console.log(event.target.getAttribute('openSeries'))
-	    this.setState({open: !this.state.open})
+      this.setState({open: !this.state.open})
+      console.log(this.props.patient.patientId);
+      // if(!this.state.open){
+      //   return;
+      // }
+     PACS.patientInfo(this.props.patient.id,
+        (json) =>{
+         let studiesPromises = [];
+         for (let i = 0; i < json.Studies.length; ++i) {
+           studiesPromises.push(PACS.studyInfo(json.Studies[i]));
+         }
+         // console.log(studiesPromises);
+         Promise.all(studiesPromises).then(
+            (studiesJsons) => {
+             let seriesPromises = [];
+             for (let i = 0; i < studiesJsons.length; ++i) {
+               for (let j = 0; j < studiesJsons[i].Series.length; ++j) {
+                 seriesPromises.push(PACS.serieInfo(studiesJsons[i].Series[j]));
+               }
+             }
+             Promise.all(seriesPromises).then(
+               (seriesJsons)=> {
+                 let series = [];
+                 for (let i in seriesJsons) {
+                   series.push(createData(
+                     seriesJsons[i].MainDicomTags.StationName,
+                     seriesJsons[i].MainDicomTags.SeriesDate,
+                     seriesJsons[i].ParentStudy,
+                     seriesJsons[i].MainDicomTags.Modality,
+                     seriesJsons[i].MainDicomTags.SeriesNumber
+                   ));
+                   this.setState({series:series});
+                  //  console.log("SeriesID: " + );
+                  //  console.log("StationName: " + );
+                  //  console.log("SeriesDate: " + );
+                  //  console.log("StudyID: " + );
+                  //  console.log("SeriesModality: " + );
+                  //  console.log("SeriesNumber: " + );
+                 }
+               }
+             );
+           }
+         )
+       }
+     );
+   
 	  }
 
     render() {
@@ -68,7 +116,7 @@ class Patients extends React.Component {
                           </TableRow>
                         </TableHead>
                         <TableBody>
-                        	{series.map( series => {
+                        	{this.state.series.map( series => {
                         		return (
                         			<React.Fragment>
                         			<TableRow id={series.id}>

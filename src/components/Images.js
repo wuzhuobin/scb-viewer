@@ -7,7 +7,7 @@ import {CloudUpload, ExpandMore} from '@material-ui/icons'
 import { withStyles } from '@material-ui/core/styles';
 import Upload from './Upload';
 import Patients from './Patients';
-
+import PACS from './PACS';
 
 function getToday(){
   var today = new Date();
@@ -79,45 +79,6 @@ function createPatientData(name, patientId, birthDate, gender) {
   return { id, name, patientId, birthDate, gender};
 }
 
-class PACS {
-  static URL() {
-    return "http://223.255.146.2:8042/orthanc/";
-  }
-  static allPatients(action){
-    fetch(PACS.URL() + "patients/").
-      then((res) => { return res.json(); }).
-      then((json) => { action(json); });
-  }
-  static patientInfo(id, action) {
-    fetch(PACS.URL() + "patients/" + id).
-      then((res) => { return res.json(); }).
-      then((json) => { action(json); });
-  }
-
-  static studyInfo(id, action) {
-    fetch(PACS.URL() + "studies/" + id).
-      then((res) => { return res.json(); }).
-      then((json) => { action(json); });
-  }
-
-  static serieInfo(id, action) {
-    fetch(PACS.URL() + "series/" + id).
-      then((res) => { return res.json(); }).
-      then((json) => { action(json); });
-  }
-
-  static serieImages(id, action) {
-    fetch(PACS.URL() + "series/" + id).
-      then((res) => { return res.json(); }).
-      then((json) => {
-        let paths = [];
-        json.Instances.forEach(element => {
-          paths.push(URL() + "instances/" + element + "/file");
-        });
-        action(paths);
-      });
-  }
-}
 
 class Images extends React.Component {
   constructor(props){
@@ -129,18 +90,29 @@ class Images extends React.Component {
       startDate: '',
       endDate: '',
       modality: 'all',
-      patients: [],
+      patients: []
     }
-    PACS.allPatients((json) => {
-      for (let i = 0; i < json.length; ++i) {
-        PACS.patientInfo(json[i], (json) => {
-          let patient = createPatientData(json.MainDicomTags.PatientID, json.MainDicomTags.PatientName, json.MainDicomTags.PatientBirthDate, json.MainDicomTags.PatientSex);
-          const patients = this.state.patients.slice();
-          patients.push(patient);
-          this.setState({patients: patients});
-        });
+    PACS.allPatients((patientIdjsons) => {
+      let promises = [];
+      for (let i = 0; i < patientIdjsons.length; ++i) {
+        promises.push(PACS.patientInfo(patientIdjsons[i]));
+        // PACS.patientInfo(json[i], (json) => {
+        //   let patient = createPatientData(json.MainDicomTags.PatientID, json.MainDicomTags.PatientName, json.MainDicomTags.PatientBirthDate, json.MainDicomTags.PatientSex);
+        //   const patients = this.state.patients.slice();
+        //   patients.push(patient);
+        //   this.setState({patients: patients});
       }
+      Promise.all(promises).then((patientInfoJsons)=>{
+        let patients = [];
+        for(let i in patientInfoJsons){
+          let patient = createPatientData(patientInfoJsons[i].MainDicomTags.PatientID, patientInfoJsons[i].MainDicomTags.PatientName, patientInfoJsons[i].MainDicomTags.PatientBirthDate, patientInfoJsons[i].MainDicomTags.PatientSex);
+          patient.id = patientIdjsons[i];
+          patients.push(patient);
+        }
+        this.setState({patients: patients});
+      });
     });
+
   }
 
   handleUploadOpen = () => {
