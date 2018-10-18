@@ -64,8 +64,8 @@ const dicomLoader = (cs,imageArray) => {
   }
   var failedSeries = [];
   var onceReadSeries = [];
-  const BatchReadSize = 30;
-  const cacheBuffer = 10
+  const BatchReadSize = 100;
+  const CacheBuffer = 50;//Must be smaller than BatchReadSize
 
   function BatchLoadImage(InputArray){
     console.log("Reading id of ");
@@ -137,7 +137,8 @@ const dicomLoader = (cs,imageArray) => {
 
   }
 
-  BatchLoadImage([...Array(maxQueryedId+BatchReadSize).keys()]);
+
+  BatchLoadImage([...Array(Math.min(num_dcm, BatchReadSize)).keys()]);
 
 
   function UpdateImagesData(){
@@ -153,7 +154,7 @@ const dicomLoader = (cs,imageArray) => {
     // console.log(maxQueryedId);
     if (onceReadSeries.length){
       var minMax = getArrayMinMax(onceReadSeries);
-      if (maxQueryedId >= minMax[1]-cacheBuffer){
+      if (maxQueryedId >= minMax[1]-CacheBuffer){
         const currentMaxRead = minMax[1];
         // console.log(currentMaxRead);
         const numAdditionalRead = Math.min(num_dcm-1-currentMaxRead, BatchReadSize);
@@ -218,8 +219,6 @@ const dicomLoader = (cs,imageArray) => {
             ...pixelData
           })
           )
-
-
 
         ),
       cancelFn: undefined
