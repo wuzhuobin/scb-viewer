@@ -115,17 +115,19 @@ class DicomViewer extends React.Component {
     // return ['http://127.0.0.1:8080/0100.dcm'];
     
     // return new Promise(function(resolve,reject){
-    //   resolve(['http://127.0.0.1:8080/0100.dcm','http://127.0.0.1:8080/0010.dcm','http://127.0.0.1:8080/0400.dcm','http://127.0.0.1:8080/0250.dcm','http://127.0.0.1:8080/0410.dcm']);
+    //   resolve(['http://127.0.0.1:8080/0100.dcm','http://127.0.0.1:8080/0010.dcm','http://127.0.0.1:8080/1400.dcm','http://127.0.0.1:8080/0250.dcm','http://127.0.0.1:8080/0410.dcm']);
+    // })
+
+    // return new Promise(function(resolve,reject){
+    //   resolve(['http://192.168.1.108:8080/0100.dcm','http://192.168.1.108:8080/0010.dcm','http://192.168.1.108:8080/1400.dcm','http://192.168.1.108:8080/0250.dcm','http://192.168.1.108:8080/0410.dcm']);
     // })
 
     return new Promise(function(resolve,reject){
-      var queryResult =   fetch("http://223.255.146.2:8042/orthanc/series/" + GET + "/ordered-slices").
-      then((res)=>{return res.json();}).
-      then((json)=>{ 
-        console.log(json);
+      var queryResult =   fetch("http://223.255.146.2:8042/orthanc/series/" + GET+ "/ordered-slices").then(
+        (res)=>{return res.json();}).then((json)=>{ 
         let cacheImagePathArray = [];
         for(let i = 0; i < json.Dicom.length; ++i){
-          let path = "http://192.168.1.126:3000/orthanc/" + json.Dicom[i]; 
+          let path = "http://223.255.146.2:8042/orthanc" + json.Dicom[i]; 
           cacheImagePathArray.push(path);
         }
         // console.log(cacheImagePathArray);
@@ -284,8 +286,11 @@ class DicomViewer extends React.Component {
     this.disableAllTools();
     console.log(toolName+" "+this.state.currentInteractionMode);
     // cornerstone.enable(this.dicomImage);
+    cornerstoneTools.highlight.disable(this.dicomImage);
+    cornerstoneTools.highlight.deactivate(this.dicomImage,1);
+
     if (["pan", "zoom", "stackScroll"].includes(toolName)){
-      if (this.state.currentInteractionMode!= 1){
+      if (this.state.currentInteractionMode!== 1){
         cornerstoneTools.wwwc.disable(this.dicomImage,1);
         cornerstoneTools.probe.disable(this.dicomImage, 1);
         cornerstoneTools.length.disable(this.dicomImage, 1);
@@ -322,10 +327,15 @@ class DicomViewer extends React.Component {
       }
       else {
         //No disable
+        cornerstoneTools.length.deactivate(this.dicomImage, 1);
+        cornerstoneTools.ellipticalRoi.deactivate(this.dicomImage, 1);
+        cornerstoneTools.rectangleRoi.deactivate(this.dicomImage, 1);
+        cornerstoneTools.angle.deactivate(this.dicomImage, 1);
+        cornerstoneTools.highlight.deactivate(this.dicomImage, 1);
+        cornerstoneTools.freehand.deactivate(this.dicomImage, 1);
       }
     }
     else if (["wwwc"].includes(toolName)){
-        cornerstoneTools.wwwc.disable(this.dicomImage,1);
         cornerstoneTools.zoom.deactivate(this.dicomImage,1);
         cornerstoneTools.pan.deactivate(this.dicomImage,1);
 
@@ -338,9 +348,6 @@ class DicomViewer extends React.Component {
         cornerstoneTools.arrowAnnotate.disable(this.dicomImage, 1);
         cornerstoneTools.highlight.disable(this.dicomImage, 1);
         cornerstoneTools.freehand.disable(this.dicomImage, 1);
-
-
-
         cornerstoneTools.stackScroll.deactivate(this.dicomImage, 1);
         cornerstoneTools.pan.activate(this.dicomImage, 2); // 2 is middle mouse button
         cornerstoneTools.zoom.activate(this.dicomImage, 4); // 4 is right mouse button
