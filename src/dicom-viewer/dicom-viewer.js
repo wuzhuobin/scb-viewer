@@ -84,6 +84,7 @@ class DicomViewer extends React.Component {
       currentInteractionode: 1,
       anonymized: false,
       anchorEl:null,
+      playingClip:false,
     }
   }
 
@@ -231,6 +232,7 @@ class DicomViewer extends React.Component {
       cornerstone.displayImage(element, image);
       cornerstoneTools.mouseInput.enable(element);
       cornerstoneTools.mouseWheelInput.enable(element);
+      cornerstoneTools.touchInput.enable(element);
       // // Enable all tools we want to use with this element
       // cornerstoneTools.wwwc.activate(element, 1); // ww/wc is the default tool for left mouse button
       cornerstoneTools.pan.activate(element, 2); // pan is the default tool for middle mouse button
@@ -461,9 +463,18 @@ class DicomViewer extends React.Component {
 
                     <Button classes={{label: classes.label}} color="inherit" size="small" 
                       onClick={() => {
-                        console.log(this.state.imageLoaderHintsArray);
-                        const element = this.dicomImage;
-                        cornerstoneTools.playClip(element, 31);
+                        if(this.state.playingClip==false)
+                        {
+                          const element = this.dicomImage;
+                          cornerstoneTools.playClip(element, 31);
+                          this.state.playingClip=true;
+                        }
+                        else
+                        {
+                          const element = this.dicomImage;
+                          cornerstoneTools.stopClip(element, 31);
+                          this.state.playingClip=false;
+                        }
                       }}
                       >
                       <PlayIcon />
