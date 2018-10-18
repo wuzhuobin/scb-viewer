@@ -2,10 +2,10 @@ import React from "react";
 
 import {Button, Divider, Typography, TextField, Grid, Table, TableBody, TableCell, TableHead, TableRow,
   Collapse, TableRowColumn} from '@material-ui/core';
-import {ExpandMore} from '@material-ui/icons'
+import {ExpandMore, ExpandLess} from '@material-ui/icons'
 import { withStyles } from '@material-ui/core/styles';
 import PACS from "./PACS"
-console.log(PACS.URL());
+// console.log(PACS.URL());
 const styles = theme => ({
 	root:{
 
@@ -34,15 +34,7 @@ class Patients extends React.Component {
 	}
 
 	 handleSeriesOpen = (event)  => {
-	    console.log("hello")
-	    console.log(event)
-	    console.log(event.target.getAttribute('patientId'))
-	    console.log(event.target.getAttribute('openSeries'))
-      this.setState({open: !this.state.open})
-      console.log(this.props.patient.patientId);
-      // if(!this.state.open){
-      //   return;
-      // }
+    this.setState({open: !this.state.open})
      PACS.patientInfo(this.props.patient.id,
         (json) =>{
          let studiesPromises = [];
@@ -98,7 +90,9 @@ class Patients extends React.Component {
                   <TableCell>{patient.birthDate}</TableCell>
                   <TableCell>{patient.gender}</TableCell>
                   <TableCell padding={'none'} colSpan={1} > 
-                     <ExpandMore onClick={this.handleSeriesOpen}/>
+                      {this.state.open ? <ExpandLess onClick={this.handleSeriesOpen}/> : <ExpandMore onClick={this.handleSeriesOpen}/>}
+
+                     
                   </TableCell>
                 </TableRow>
 
