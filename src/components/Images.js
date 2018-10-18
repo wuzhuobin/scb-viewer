@@ -1,13 +1,13 @@
 import React from "react";
 
-import {Button, Divider, Typography, TextField, Grid, Table, TableBody, TableCell, TableHead, TableRow,
-  Collapse, TableRowColumn} from '@material-ui/core';
+import {Button, Divider, Typography, TextField, Table, TableBody, TableCell, TableHead, TableRow, TablePagination,
+TableSortLabel} from '@material-ui/core';
 import {CloudUpload, ExpandMore} from '@material-ui/icons'
 
 import { withStyles } from '@material-ui/core/styles';
 import Upload from './Upload';
 import Patients from './Patients';
-
+import PACS from './PACS';
 
 function getToday(){
   var today = new Date();
@@ -35,7 +35,9 @@ const styles = theme => ({
     // zIndex: 1,
     // width: '100%',
     height: 'calc(100vh - 64px)',
-    // overflow: 'auto',
+    overflow: 'auto',
+    backgroundColor: theme.palette.secondary.dark,
+    color: theme.palette.secondary.contrastText
     // position: 'relative',
     // display: 'flex',
   },
@@ -43,6 +45,7 @@ const styles = theme => ({
     position: 'absolute',
     bottom: theme.spacing.unit * 5,
     right: theme.spacing.unit * 5,
+    backgroundColor: theme.palette.primary.dark
   },
   textField: {
     margin: theme.spacing.unit,
@@ -66,12 +69,36 @@ const styles = theme => ({
       width: 'auto',
     },
   },
-  images:{
-    width: '100%'
+  table: {
+    overflow: 'auto',
+    color: theme.palette.secondary.contrastText,
+  },
+  tableWrapper: {
+    overflow: 'auto',
+    color: theme.palette.secondary.contrastText,
+  },
+  // tablePagination: {
+  //   color: theme.palette.secondary.contrastText,
+  // }
+  tableRow:{
+    
   }
-
 });
 
+const tableHeadStyles = theme => ({
+  root: {
+
+    // flexGrow: 1,
+    // zIndex: 1,
+    // width: '100%',
+    height: 'calc(100vh - 64px)',
+    overflow: 'auto',
+    backgroundColor: theme.palette.secondary.dark,
+    color: theme.palette.secondary.contrastText
+    // position: 'relative',
+    // display: 'flex',
+  },
+});
 
 let id = 0;
 function createPatientData(name, patientId, birthDate, gender) {
@@ -79,45 +106,40 @@ function createPatientData(name, patientId, birthDate, gender) {
   return { id, name, patientId, birthDate, gender};
 }
 
-class PACS {
-  static URL() {
-    return "http://223.255.146.2:8042/orthanc/";
-  }
-  static allPatients(action){
-    fetch(PACS.URL() + "patients/").
-      then((res) => { return res.json(); }).
-      then((json) => { action(json); });
-  }
-  static patientInfo(id, action) {
-    fetch(PACS.URL() + "patients/" + id).
-      then((res) => { return res.json(); }).
-      then((json) => { action(json); });
-  }
 
-  static studyInfo(id, action) {
-    fetch(PACS.URL() + "studies/" + id).
-      then((res) => { return res.json(); }).
-      then((json) => { action(json); });
-  }
 
-  static serieInfo(id, action) {
-    fetch(PACS.URL() + "series/" + id).
-      then((res) => { return res.json(); }).
-      then((json) => { action(json); });
-  }
+class EnhancedTableHead extends React.Component{
+    constructor(props){
+      super(props);
+      this.state={
+      }
+    }
 
-  static serieImages(id, action) {
-    fetch(PACS.URL() + "series/" + id).
-      then((res) => { return res.json(); }).
-      then((json) => {
-        let paths = [];
-        json.Instances.forEach(element => {
-          paths.push(URL() + "instances/" + element + "/file");
-        });
-        action(paths);
-      });
-  }
+    render(){
+      const {} = this.state
+      const {classes} = this.props
+      
+      return(
+        <TableHead >
+            <TableRow>
+              <TableCell key='patientId' numeric={false} sortDirection='asc'>
+                <TableSortLabel
+                  active={true}
+                  style={{color: 'white'}}>
+                  Patient ID
+                </TableSortLabel>
+              </TableCell>
+              <TableCell style={{color: 'white'}}>Patient Name</TableCell>
+              <TableCell style={{color: 'white'}}>Birth Date</TableCell>
+              <TableCell style={{color: 'white'}}>Gender</TableCell>
+              <TableCell style={{color: 'white'}}></TableCell>
+            </TableRow>
+          </TableHead>
+          )
+    }
 }
+
+EnhancedTableHead = withStyles(tableHeadStyles)(EnhancedTableHead);
 
 class Images extends React.Component {
   constructor(props){
@@ -129,18 +151,29 @@ class Images extends React.Component {
       startDate: '',
       endDate: '',
       modality: 'all',
-      patients: [],
+      patients: []
     }
-    PACS.allPatients((json) => {
-      for (let i = 0; i < json.length; ++i) {
-        PACS.patientInfo(json[i], (json) => {
-          let patient = createPatientData(json.MainDicomTags.PatientID, json.MainDicomTags.PatientName, json.MainDicomTags.PatientBirthDate, json.MainDicomTags.PatientSex);
-          const patients = this.state.patients.slice();
-          patients.push(patient);
-          this.setState({patients: patients});
-        });
+    PACS.allPatients((patientIdjsons) => {
+      let promises = [];
+      for (let i = 0; i < patientIdjsons.length; ++i) {
+        promises.push(PACS.patientInfo(patientIdjsons[i]));
+        // PACS.patientInfo(json[i], (json) => {
+        //   let patient = createPatientData(json.MainDicomTags.PatientID, json.MainDicomTags.PatientName, json.MainDicomTags.PatientBirthDate, json.MainDicomTags.PatientSex);
+        //   const patients = this.state.patients.slice();
+        //   patients.push(patient);
+        //   this.setState({patients: patients});
       }
+      Promise.all(promises).then((patientInfoJsons)=>{
+        let patients = [];
+        for(let i in patientInfoJsons){
+          let patient = createPatientData(patientInfoJsons[i].MainDicomTags.PatientID, patientInfoJsons[i].MainDicomTags.PatientName, patientInfoJsons[i].MainDicomTags.PatientBirthDate, patientInfoJsons[i].MainDicomTags.PatientSex);
+          patient.id = patientIdjsons[i];
+          patients.push(patient);
+        }
+        this.setState({patients: patients});
+      });
     });
+
   }
 
   handleUploadOpen = () => {
@@ -157,85 +190,39 @@ class Images extends React.Component {
     });
   }
 
+  handleChangePage = (event, page) => {
+    // this.setState({ page });
+  };
+
+  handleChangeRowsPerPage = event => {
+    // this.setState({ rowsPerPage: event.target.value });
+  };
+
   render() {
     const {} = this.state
     const {classes} = this.props
 
     return (
       <div className={classes.root}>
-        <div className="text">
-        <TextField
-          id="patient-name"
-          label="Patient Name"
-          className={classes.textField}
-          value={this.state.name}
-          onChange={this.handleQueryChange('patientName')}
-        />
-        <TextField
-          id="patient-id"
-          label="Patient ID"
-          className={classes.textField}
-          value={this.state.name}
-          onChange={this.handleQueryChange('patientId')}
-        />
-        <TextField
-          id="start-date"
-          label="Start Date"
-          className={classes.textField}
-          type="date"
-          defaultValue='1900-01-01'
-          onChange={this.handleQueryChange('startDate')}
-        />
-        <TextField
-          id="end-date"
-          label="End Date"
-          className={classes.textField}
-          type="date"
-          defaultValue={getToday()}
-          onChange={this.handleQueryChange('startDate')}
-        />
+        <TablePagination
+            component="div"
+            colSpan={20}
+            count={this.state.patients.length}
+            rowsPerPage={5}
+            page={0}
+            onChangePage={this.handleChangePage}
+            onChangeRowsPerPage={this.handleChangeRowsPerPage}
+                    // ActionsComponent={TablePaginationActionsWrapped}
+          />
+        <div className={classes.tableWrapper}>
 
-
-          <div>
-            <Button variant='outlined' color="primary" className={classes.button}>
-              All
-            </Button>
-            <Button variant='outlined' color="primary" className={classes.button}>
-              1y
-            </Button>
-             <Button variant='outlined' color="primary" className={classes.button}>
-              1m
-            </Button>
-             <Button variant='outlined' color="primary" className={classes.button}>
-              1w
-            </Button>
-             <Button variant='outlined' color="primary" className={classes.button}>
-              3d
-            </Button>
-            <Button variant='outlined' color="primary" className={classes.button}>
-              1d
-            </Button>
-          </div>    
-        </div>
-
-
-        <Divider />
-        
         <Table className={classes.table}>
-          <TableHead>
-            <TableRow>
-              <TableCell>Patient ID</TableCell>
-              <TableCell>Patient Name</TableCell>
-              <TableCell>Birth Date</TableCell>
-              <TableCell>Gender</TableCell>
-              <TableCell></TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
+          <EnhancedTableHead />
+          <TableBody >
             {this.state.patients.map( patient => {return (<Patients patient={patient}/>)})}
           </TableBody>
         </Table>
-
+        </div>
 
         <Button variant="fab" color="secondary" className={classes.fab} onClick={this.handleUploadOpen}>
           <CloudUpload />
@@ -250,24 +237,59 @@ class Images extends React.Component {
 export default withStyles(styles)(Images);
 
 
+        // <div className="text">
+        //   <TextField
+        //     id="patient-name"
+        //     label="Patient Name"
+        //     className={classes.textField}
+        //     value={this.state.name}
+        //     onChange={this.handleQueryChange('patientName')}
+        //   />
+        //   <TextField
+        //     id="patient-id"
+        //     label="Patient ID"
+        //     className={classes.textField}
+        //     value={this.state.name}
+        //     onChange={this.handleQueryChange('patientId')}
+        //   />
+        //   <TextField
+        //     id="start-date"
+        //     label="Start Date"
+        //     className={classes.textField}
+        //     type="date"
+        //     defaultValue='1900-01-01'
+        //     onChange={this.handleQueryChange('startDate')}
+        //   />
+        //   <TextField
+        //     id="end-date"
+        //     label="End Date"
+        //     className={classes.textField}
+        //     type="date"
+        //     defaultValue={getToday()}
+        //     onChange={this.handleQueryChange('startDate')}
+        //   />
 
-                    //   {this.state.images.map(images=>{
-                    // console.log(images)
-                    // return(
-                    //   null
-                    // )
 
-                //                     <Table>
-                //   <TableHead>
-                //     <TableRow>
-                //       <TableCell>Institution</TableCell>
-                //       <TableCell></TableCell>
-                //       <TableCell>Study Date</TableCell>
-                //       <TableCell>Study ID</TableCell>
-                //       <TableCell>Modality</TableCell>
-                //       <TableCell>Modality</TableCell>
-                //       <TableCell>Series Number</TableCell>
-                //       <TableCell>Station Name</TableCell>
-                //   </TableRow>
-                //   </TableHead>
-                // </Table>
+        //     <div>
+        //       <Button variant='outlined' color="primary" className={classes.button}>
+        //         All
+        //       </Button>
+        //       <Button variant='outlined' color="primary" className={classes.button}>
+        //         1y
+        //       </Button>
+        //        <Button variant='outlined' color="primary" className={classes.button}>
+        //         1m
+        //       </Button>
+        //        <Button variant='outlined' color="primary" className={classes.button}>
+        //         1w
+        //       </Button>
+        //        <Button variant='outlined' color="primary" className={classes.button}>
+        //         3d
+        //       </Button>
+        //       <Button variant='outlined' color="primary" className={classes.button}>
+        //         1d
+        //       </Button>
+        //     </div>    
+        // </div>
+
+        // <Divider />

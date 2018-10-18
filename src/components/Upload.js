@@ -1,4 +1,5 @@
 import React from "react";
+
 import { withStyles } from '@material-ui/core/styles';
 import axios from 'axios';
 
@@ -16,6 +17,7 @@ const styles = theme => ({
   },
   button:{
   	margin: theme.spacing.unit,
+    backgroundColor: theme.palette.secondary.main
   },
   dialogActions:{
   	justifyContent: 'center'
@@ -45,23 +47,22 @@ class Upload extends React.Component {
   		uploadTasks: [...prevState.uploadTasks,
   			{
   				id: Date.now(),
-  				info: {seriesName: 'new series', progress: 0},
-  				files: output
+  				seriesName: 'new series',
+  				files: output,
+          progress: 0
   			}]
   		}
-  	),	()=>{this.handleUpload()}
+  	),	()=>{this.handleUpload(this.state.uploadTasks.length-1)}
   	)
   }
 
 
-  handleUpload = () =>{
-  	var numOfTasks = this.state.uploadTasks.length
-  	const uploadTasks = this.state.uploadTasks
-  	const uploadTask = this.state.uploadTasks[numOfTasks-1]
-  	var successCount = 0;
-  	var failCount = 0;
+  handleUpload = (taskId) =>{
+  	const uploadTask = this.state.uploadTasks[taskId]
+  	let successCount = 0;
+  	let failCount = 0;
 
-  	for (var i =0;i< uploadTask.files.length;i++)
+  	for (let i =0;i< uploadTask.files.length;i++)
   	{
   		const formData = new FormData();
 	  	formData.append('file', uploadTask.files[i])
@@ -69,8 +70,6 @@ class Upload extends React.Component {
 
 	  	axios.post('http://192.168.1.126:3000/orthanc/instances', formData)
 	      .then(res => {
-	      	// console.log(this.state.uploadTasks[numOfTasks-1].info)
-	        // console.log(res.data);
 	        if (res.data.Status == "Success" || res.data.Status == "AlreadyStored")
 	        {
 	        	successCount++;
@@ -82,10 +81,10 @@ class Upload extends React.Component {
 
 	        var progress = (successCount + failCount)/uploadTask.files.length*100;
 
-	        uploadTasks[numOfTasks-1].info.progress = progress;
+	        uploadTask.progress = progress.toFixed(2);
 
-	        this.setState({uploadTasks,})
-
+          this.state.uploadTasks[taskId] = uploadTask;
+          this.forceUpdate();
 	      }).catch((error)=>{
 	      	console.log(error)
 	      })
@@ -108,10 +107,10 @@ class Upload extends React.Component {
         >
         	<DialogTitle id="form-dialog-title" >Upload DICOM</DialogTitle>
         	<List>
-          		{uploadTasks.map(({id,info})=>
+          		{uploadTasks.map(({id,seriesName,progress})=>
             		<ListItem key={id}>
-              		<ListItemText primary={info.seriesName} secondary={info.progress + "%"}/>
-               			<CircularProgress className={classes.progress} variant="static" value={info.progress} />
+              		<ListItemText primary={seriesName} secondary={progress + "%"}/>
+               			<CircularProgress className={classes.progress} variant="static" value={progress} />
                		</ListItem>
             	)}
        	 	</List>

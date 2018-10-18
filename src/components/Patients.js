@@ -2,89 +2,106 @@ import React from "react";
 
 import {Button, Divider, Typography, TextField, Grid, Table, TableBody, TableCell, TableHead, TableRow,
   Collapse, TableRowColumn} from '@material-ui/core';
-import {ExpandMore} from '@material-ui/icons'
+import {ExpandMore, ExpandLess} from '@material-ui/icons'
 import { withStyles } from '@material-ui/core/styles';
+import PACS from "./PACS"
+import Studies from "./Studies"
+import classNames from 'classnames';
 
 const styles = theme => ({
 	root:{
 
-	}
+	},
+  tableRow:{
+    '&:hover': {backgroundColor: theme.palette.secondary.main,},
+  },
+  tableCell:{
+    color: 'white',
+  },
+  seriesHeader:{
+    backgroundColor: theme.palette.secondary.main
+  },
+  tableRowOpen:{
+    backgroundColor: theme.palette.secondary.main,
+  }
 })
 
 let id = 0;
-function createData(Institution, StudyDate, StudyID, Modality, SeriesNumber) {
+function createData(Institution, Description, RequestedProcedure, StudyDate, StudyID) {
   id += 1;
-  return { id, Institution, StudyDate, StudyID, Modality, SeriesNumber};
+  return { id, Institution, Description, RequestedProcedure, StudyDate, StudyID};
 }
-
-const series = [
-	createData('Sucabot', '2018-01-01', 'A1234567', 'CT', 'SeriesNumbbbbbbb'),
-	createData('Sucabot(Int)', '2018-01-02', 'B123451234', 'MR', 'SeriesNumbbbbbbbb')
-]
 
 class Patients extends React.Component {
 	constructor(props){
     	super(props);
     	this.state={
-	      open:false,
-    	}
+        open:false,
+        studies: []
+      }
 	}
 
-	 handleSeriesOpen = (event)  => {
-	    console.log("hello")
-	    console.log(event)
-	    console.log(event.target.getAttribute('patientId'))
-	    console.log(event.target.getAttribute('openSeries'))
-	    this.setState({open: !this.state.open})
-	  }
+  handleStudyOpen = (event) => {
+    this.setState({ open: !this.state.open });
+    PACS.patientInfo(this.props.patient.id,
+      function (json) {
+        let studiesPromises = [];
+        for (let i = 0; i < json.Studies.length; ++i) {
+          studiesPromises.push(PACS.studyInfo(json.Studies[i]));
+        }
+        Promise.all(studiesPromises).then(
+          function (studiesJsons) {
+            let studies = [];
+            for (let i = 0; i < studiesJsons.length; ++i) {
+              let study = createData(
+                studiesJsons[i].MainDicomTags.InstitutionName,
+                studiesJsons[i].MainDicomTags.StudyDescription,
+                "",
+                studiesJsons[i].MainDicomTags.StudyDate,
+                studiesJsons[i].MainDicomTags.StudyID
+              );
+              study.id = json.Studies[i];
+              studies.push(study);
+            }
+            this.setState({ studies: studies });
+          }.bind(this)
+        );
+      }.bind(this)
+    )
+  }
 
     render() {
-    	const {} = this.state
+    	const {open} = this.state
     	const {patient, classes} = this.props
 
     	return(
-    	    <React.Fragment>
-                <TableRow id={patient.id}>
-                  <TableCell>{patient.name}</TableCell>
-                  <TableCell>{patient.patientId}</TableCell>
-                  <TableCell>{patient.birthDate}</TableCell>
-                  <TableCell>{patient.gender}</TableCell>
-                  <TableCell padding={'none'} colSpan={1} > 
-                     <ExpandMore onClick={this.handleSeriesOpen}/>
-                  </TableCell>
-                </TableRow>
+        <React.Fragment>
+            <TableRow 
+              className={classNames(classes.tableRow, {[classes.tableRowOpen]: open,})}
+              id={patient.id} 
+              onClick={this.handleStudyOpen}
+              >
+              <TableCell className={classes.tableCell}>{patient.name}</TableCell>
+              <TableCell className={classes.tableCell}>{patient.patientId}</TableCell>
+              <TableCell className={classes.tableCell}>{patient.birthDate}</TableCell>
+              <TableCell className={classes.tableCell}>{patient.gender}</TableCell>
+              <TableCell padding={'none'} colSpan={0} > 
+                  {this.state.open ? <ExpandLess style={{color: 'white'}} /> : <ExpandMore style={{color: 'white'}} />}    
+              </TableCell>
+            </TableRow>
 
-                {this.state.open && (
-                <TableRow>
-                  <TableCell padding={'none'} colSpan={12}> 
-                      <Table>
-                        <TableHead>
-                          <TableRow>
-                            <TableCell>Institution</TableCell>
-                            <TableCell>Study Date</TableCell>
-                            <TableCell>Study ID</TableCell>
-                            <TableCell>Modality</TableCell>
-                            <TableCell>Series Number</TableCell>
-                          </TableRow>
-                        </TableHead>
-                        <TableBody>
-                        	{series.map( series => {
-                        		return (
-                        			<React.Fragment>
-                        			<TableRow id={series.id}>
-                        				<TableCell>{series.Institution}</TableCell> 
-                        				<TableCell>{series.StudyDate}</TableCell> 
-                        				<TableCell>{series.StudyID}</TableCell> 
-                        				<TableCell>{series.Modality}</TableCell> 
-                        				<TableCell>{series.SeriesNumber}</TableCell> 
-                        			</TableRow>
-                        			</React.Fragment>)})}
-                        </TableBody>
-                      </Table>
-                  </TableCell>
-                </TableRow>
-              )}
-                </React.Fragment>
+              {this.state.open && (
+              <TableRow className={classes.tableRowOpen}>
+                <TableCell padding={'none'} colSpan={12}> 
+                    <Table>
+                      <TableBody>
+                      	{this.state.studies.map(study => {return (<Studies study={study}/>)})}
+                      </TableBody>
+                    </Table>
+                </TableCell>
+              </TableRow>
+            )}
+        </React.Fragment>
 
     	)
     }
@@ -93,3 +110,15 @@ class Patients extends React.Component {
 
 
 export default withStyles(styles)(Patients);
+
+                      // <TableHead>
+                      //   <TableRow className={classes.seriesHeader}>
+                      //     <TableCell></TableCell>
+                      //     <TableCell style={{color: 'white'}}>Institution</TableCell>
+                      //     <TableCell style={{color: 'white'}}>Description</TableCell>
+                      //     <TableCell style={{color: 'white'}}>Requested Procedure</TableCell>
+                      //     <TableCell style={{color: 'white'}}>Study Date</TableCell>
+                      //     <TableCell style={{color: 'white'}}>Study ID</TableCell>
+                      //     <TableCell></TableCell>
+                      //   </TableRow>
+                      // </TableHead>

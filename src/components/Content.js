@@ -20,7 +20,7 @@ const styles = theme=> ({
   },
   content: {
     position: 'relative',
-    height: 'calc(100% - 64px)',
+    height: 'calc(100vh - 64px)',
     width: '100%',
     backgroundColor: theme.palette.background.default,
     transition: theme.transitions.create('margin', {
@@ -40,7 +40,7 @@ class Content extends React.Component {
     constructor(props){
         super(props);
         this.state = {
-            page: 2,
+            page: 0,
         };
     }
 

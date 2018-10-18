@@ -1,5 +1,5 @@
 import React from 'react'
-import {List, ListItem, ListItemIcon, ListItemText, Drawer, Divider, IconButton} from '@material-ui/core'
+import {List, ListItem, ListItemIcon, ListItemText, Drawer, Divider, IconButton, Typography} from '@material-ui/core'
 import {withStyles} from '@material-ui/core/styles'
 import {Collections, Portrait, Visibility, ChevronLeft} from '@material-ui/icons'
 
@@ -12,6 +12,7 @@ const styles = theme=> ({
   },
   drawerPaper: {
     width: drawerWidth,
+    backgroundColor: theme.palette.secondary.main,
   },
   drawerHeader: {
         display: 'flex',
@@ -19,6 +20,15 @@ const styles = theme=> ({
         justifyContent: 'flex-end',
         padding: '0 8px',
         ...theme.mixins.toolbar,
+    },
+   button:{
+   		color: theme.palette.secondary.contrastText,
+   		'&:hover': {
+      		backgroundColor: theme.palette.secondary.light,
+    },
+   },
+   divider:{
+   		backgroundColor: theme.palette.secondary.light,
     },
 })
 class DrawerMenu extends React.Component {
@@ -40,32 +50,32 @@ class DrawerMenu extends React.Component {
             }}
           >
             <div className={classes.drawerHeader}>
-              <IconButton onClick={onDrawerClose}>
+              <IconButton onClick={onDrawerClose} className={classes.button}>
                 <ChevronLeft /> 
               </IconButton>
             </div>
-            <Divider />
+            <Divider className={classes.divider} />
             <List>
-              <ListItem button onClick={() => {onChangePage(0)}}>
-                <ListItemIcon>
+              <ListItem button onClick={() => {onChangePage(0)}} className={classes.button}>
+                <ListItemIcon className={classes.button}>
                   <Collections />
                 </ListItemIcon>
-                <ListItemText primary="Images" />
+                <ListItemText primary={<Typography variant="h6" style={{ color: 'white' }}>Images</Typography>} />
               </ListItem>
-              <ListItem button onClick={() => {onChangePage(1);}}>
-                <ListItemIcon>
+              <ListItem button onClick={() => {onChangePage(1);}} className={classes.button}>
+                <ListItemIcon className={classes.button}>
                   <Portrait />
                 </ListItemIcon>
-                <ListItemText primary="Projects" />
+                <ListItemText primary={<Typography variant="h6" style={{ color: 'white' }}>Project</Typography>} />
               </ListItem>
             </List>
-            <Divider />
+            <Divider className={classes.divider} />
             <List>
-                <ListItem button onClick={() => {onChangePage(2);}}>
+                <ListItem button onClick={() => {onChangePage(2);}} className={classes.button}>
                 <ListItemIcon>
-                  <Visibility />
+                  <Visibility className={classes.button} />
                 </ListItemIcon>
-                <ListItemText primary="2D Viewer" />
+                <ListItemText primary={<Typography variant="h6" style={{ color: 'white' }}>2D Viewer</Typography>} />
                 </ListItem>
             </List>
           </Drawer>
