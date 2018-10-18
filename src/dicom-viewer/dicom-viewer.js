@@ -113,24 +113,24 @@ class DicomViewer extends React.Component {
     // return ['http://192.168.1.126:3000/orthanc/instances/2d3e243d-8b918a6f-b3456d3e-0546d044-dab91ee0/file'];
     // return ['http://127.0.0.1:8080/0100.dcm'];
     
-    return new Promise(function(resolve,reject){
-      resolve(['http://127.0.0.1:8080/0100.dcm','http://127.0.0.1:8080/0010.dcm','http://127.0.0.1:8080/1400.dcm','http://127.0.0.1:8080/0250.dcm','http://127.0.0.1:8080/0410.dcm']);
-    })
-
     // return new Promise(function(resolve,reject){
-    //   var queryResult =   fetch("http://223.255.146.2:8042/orthanc/series/" + GET+ "/ordered-slices").then(
-    //     (res)=>{return res.json();}).then((json)=>{ 
-    //     let cacheImagePathArray = [];
-    //     for(let i = 0; i < json.Instances.length; ++i){
-    //       let path = "http://192.168.1.126:3000/orthanc/instances/" + json.Instances[i] + "/file"; 
-    //       cacheImagePathArray.push(path);
-    //     }
-    //     // console.log(cacheImagePathArray);
-    //     return cacheImagePathArray;
-    //   });
-    //   resolve(queryResult);
+    //   resolve(['http://127.0.0.1:8080/0100.dcm','http://127.0.0.1:8080/0010.dcm','http://127.0.0.1:8080/1400.dcm','http://127.0.0.1:8080/0250.dcm','http://127.0.0.1:8080/0410.dcm']);
+    // })
 
-    // });
+    return new Promise(function(resolve,reject){
+      var queryResult =   fetch("http://223.255.146.2:8042/orthanc/series/" + GET+ "/ordered-slices").then(
+        (res)=>{return res.json();}).then((json)=>{ 
+        let cacheImagePathArray = [];
+        for(let i = 0; i < json.Dicom.length; ++i){
+          let path = "http://223.255.146.2:8042/orthanc" + json.Dicom[i]; 
+          cacheImagePathArray.push(path);
+        }
+        // console.log(cacheImagePathArray);
+        return cacheImagePathArray;
+      });
+      resolve(queryResult);
+
+    });
   }
 
   seriesImages(id){

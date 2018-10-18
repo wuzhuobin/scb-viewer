@@ -37,6 +37,20 @@ function computeImageMinMax(a){
   return [min,max];
 };
 
+function getArrayMinMax(a){
+  const dataArray = a;
+  var min = dataArray[0];
+  var max = dataArray[0];
+  for (var i=0;i<dataArray.length;i++){
+    if (min>dataArray[i]){
+      min = dataArray[i];
+    }
+    if (max<dataArray[i]){
+      max = dataArray[i];
+    }
+  }
+  return [min,max];
+};
 
 
 
@@ -44,14 +58,22 @@ const dicomLoader = (cs,imageArray) => {
   const num_dcm = imageArray.length;
   var imageSeries = [];
   var numCompleted = 0;
+  var maxQueryedId = 0;
   for (var i=0;i<num_dcm;i++){
     imageSeries.push(null);
   }
   var failedSeries = [];
+  var onceReadSeries = [];
+  const BatchReadSize = 30;
+  const cacheBuffer = 10
 
   function BatchLoadImage(InputArray){
+    console.log("Reading id of ");
+    console.log(InputArray);
     for (var i=0;i<InputArray.length;i++){
       const imageId = InputArray[i];
+      onceReadSeries.push(imageId);
+
       failedSeries = failedSeries.filter(item => item !== imageId);
       if (imageSeries[imageId]!==null){
         console.log("rewritng "+imageId+" -th image to null");
@@ -64,7 +86,6 @@ const dicomLoader = (cs,imageArray) => {
             reject("Get image failed");
           }
           else {
-            numCompleted++;
             const data = new DataView(response);
             const image = daikon.Series.parseImage(data);
             const spacing = image.getPixelSpacing();
@@ -116,18 +137,36 @@ const dicomLoader = (cs,imageArray) => {
 
   }
 
-  BatchLoadImage([...Array(num_dcm).keys()]);
+  BatchLoadImage([...Array(maxQueryedId+BatchReadSize).keys()]);
 
 
-  function GetImcompletePromiseID(){
+  function UpdateImagesData(){
     const numFailed = failedSeries.length;
     if (numFailed){
       console.log(numFailed + " image(s) is not loaded properly, namely ");
       for (var i=0;i<numFailed;i++){
         console.log(failedSeries[i]);
       }
+      BatchLoadImage(failedSeries);
     }
-    BatchLoadImage(failedSeries);
+    // console.log(onceReadSeries.length);
+    // console.log(maxQueryedId);
+    if (onceReadSeries.length){
+      var minMax = getArrayMinMax(onceReadSeries);
+      if (maxQueryedId >= minMax[1]-cacheBuffer){
+        const currentMaxRead = minMax[1];
+        // console.log(currentMaxRead);
+        const numAdditionalRead = Math.min(num_dcm-1-currentMaxRead, BatchReadSize);
+        // console.log(numAdditionalRead);
+        var toReadArray = [];
+        for (var i=0;i<numAdditionalRead;i++){
+          toReadArray.push(currentMaxRead+i+1);
+        }
+        BatchLoadImage(toReadArray);
+      }
+
+    }
+
   }
  
   
@@ -139,13 +178,14 @@ const dicomLoader = (cs,imageArray) => {
       if (String(imageId).substring(0,10) === "example://"){
         const id = parseInt(String(imageId).substring(10,String(imageId).length));
         console.log("Accessing " + id + "-th image out of " + imageSeries.length + " images");
+        if (id>maxQueryedId){
+          maxQueryedId = id;
+        }
 
         if (failedSeries.includes(id)){
           alert("The " + id + "-th image is not loaded");
         }
-        if (numCompleted){
-          GetImcompletePromiseID();
-        }
+        UpdateImagesData();
 
         return imageSeries[id];
       }
