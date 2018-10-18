@@ -60,10 +60,6 @@ class NavBar extends React.Component {
         };
     }
 
-    componentWillRecieveProps(props){
-        this.setState({tab: props.tab});
-    }
-
     handleMenu = event =>{
         this.setState({anchorEl: event.currentTarget });
     };

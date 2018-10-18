@@ -38,6 +38,7 @@ import Grid from '@material-ui/core/Grid';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
+import Popover from "@material-ui/core/Popover";
 
 const styles = theme=> ({
     root:{    
@@ -81,8 +82,21 @@ class DicomViewer extends React.Component {
       hardCodeNumDcm:1,
       currentInteractionode: 1,
       anonymized: false,
+      anchorEl:null,
     }
   }
+
+  handleClick = event => {
+    this.setState({
+      anchorEl: event.currentTarget
+    });
+  };
+
+  handleClose = () => {
+    this.setState({
+      anchorEl: null
+    });
+  };
 
   componentWillMount() {
     cornerstoneTools.external.cornerstone = cornerstone;
@@ -104,7 +118,7 @@ class DicomViewer extends React.Component {
     })
 
     // return new Promise(function(resolve,reject){
-    //   var queryResult =   fetch("http://223.255.146.2:8042/orthanc/series/" + GET).then(
+    //   var queryResult =   fetch("http://223.255.146.2:8042/orthanc/series/" + GET+ "/ordered-slices").then(
     //     (res)=>{return res.json();}).then((json)=>{ 
     //     let cacheImagePathArray = [];
     //     for(let i = 0; i < json.Instances.length; ++i){
@@ -349,6 +363,8 @@ class DicomViewer extends React.Component {
 
   render() {
     const {classes, theme} = this.props
+    const { anchorEl } = this.state;
+    const open = Boolean(anchorEl)
 
     var viewerHeight = window.innerHeight-128-6 //4 is border
     var viewerWidth = window.viewerWidth-128-6 //4 is border
@@ -386,7 +402,7 @@ class DicomViewer extends React.Component {
                       <ArrowBackIosIcon />
                       Angle
                     </Button>
-   
+
                     <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {this.enableTool("probe", 1);}}>
                       <AdjustIcon />
                       Probe
@@ -396,7 +412,7 @@ class DicomViewer extends React.Component {
                       <PanoramaFishEyeIcon />
                       Elliptical
                     </Button>
-                  
+
                     <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {this.enableTool("rectangleRoi", 1);}}>
                       <CropDinIcon />
                       Rectangle
@@ -407,132 +423,140 @@ class DicomViewer extends React.Component {
                       Freeform
                     </Button>
 
-                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {this.enableTool("arrowAnnotate", 1);}}>
-                      <AnnotateIcon />
-                      Annotate
-                    </Button>
-
-                    <Button classes={{label: classes.label}} color="inherit" size="small" 
-                      onClick={() => {
-                        const element = this.dicomImage;
-                        const viewport = cornerstone.getViewport(element);
-                        viewport.rotation+=90;
-                        cornerstone.setViewport(element, viewport);}}
-                        >
-                      <RotateRightIcon />
-                      Rotate
-                    </Button>
-
-                    <Button classes={{label: classes.label}} color="inherit" size="small" 
-                      onClick={() => {
-                        const element = this.dicomImage;
-                        const viewport = cornerstone.getViewport(element);
-                        viewport.vflip = !viewport.vflip;
-                        cornerstone.setViewport(element, viewport);}}
-                        >
-                      <VFlipIcon />
-                      Flip V
-                    </Button>
-
-                    <Button classes={{label: classes.label}} color="inherit" size="small" 
-                      onClick={() => {
-                        const element = this.dicomImage;
-                        const viewport = cornerstone.getViewport(element);
-                        viewport.hflip = !viewport.hflip;
-                        cornerstone.setViewport(element, viewport);}}
-                        >
-                      <HFlipIcon />
-                      Flip H
-                    </Button>
-
-                    <Button classes={{label: classes.label}} color="inherit" size="small" 
-                      onClick={() => {
-                        const element = this.dicomImage;
-                        cornerstone.reset(element);
-                        }}
-                        >
-                      <ReplayIcon />
-                      Reset
-                    </Button>
-
-
-                    <Button classes={{label: classes.label}} color="inherit" size="small" 
-                        onClick={() => {
-                          const element = this.dicomImage;
-                          var viewport = cornerstone.getViewport(element);
-                          if (viewport.invert === true) {
-                              viewport.invert = false;
-                          } else {
-                              viewport.invert = true;
-                          }
-                          cornerstone.setViewport(element, viewport);}}
-                          >
-                      <InvertIcon />
-                      Invert
-                    </Button>
-
                     <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {this.enableTool("highlight", 1);}}>
                       <CropFreeIcon />
                       Highlight
                     </Button>
 
-                    <Button classes={{label: classes.label}} color="inherit" size="small" 
-                      onClick={() => {
-
-                        this.anonymized=!this.anonymized;
-
-                        const element = this.dicomImage;
-                        var viewport = cornerstone.getViewport(element);
-
-                        if(this.anonymized != true)
-                        {
-                          document.getElementById("mrbottomleft").style.visibility = "visible";
-                          document.getElementById("mrbottomright").style.visibility = "visible";
-                          document.getElementById("mrtopleft").style.visibility = "visible";
-                          document.getElementById("mrtopright").style.visibility = "visible";
-                        }
-                        else
-                        {
-                          document.getElementById("mrbottomleft").style.visibility = "hidden";
-                          document.getElementById("mrbottomright").style.visibility = "hidden";;
-                          document.getElementById("mrtopleft").style.visibility = "hidden";
-                          document.getElementById("mrtopright").style.visibility = "hidden";
-                        }
-                      }}>
-                      <TextIcon />
-                      Text
+                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {this.enableTool("arrowAnnotate", 1);}}>
+                      <AnnotateIcon />
+                      Annotate
                     </Button>
 
-                    <Button classes={{label: classes.label}} color="inherit" size="small" 
-                        onClick={() => {
-                          const element = this.dicomImage;
-                          cornerstoneTools.clearToolState(element, "length");
-                          cornerstoneTools.clearToolState(element, "simpleAngle");
-                          cornerstoneTools.clearToolState(element, "probe");
-                          cornerstoneTools.clearToolState(element, "ellipticalRoi");
-                          cornerstoneTools.clearToolState(element, "rectangleRoi");
-                          cornerstoneTools.clearToolState(element, "freehand");
-                          cornerstoneTools.clearToolState(element, "arrowAnnotate");
-                          cornerstoneTools.clearToolState(element, "highlight");
-                          cornerstone.updateImage(element);}}
-                        >
-                      <ClearIcon />
-                      Clear
-                    </Button>
-
-                    <Button classes={{label: classes.label}} color="inherit" size="small" 
-                        onClick={() => {
-                          const element = this.dicomImage;
-                          cornerstoneTools.saveAs(element, "image.png");}}
-                          >
-                      <SaveIcon />
-                      Save
-                    </Button>
-
-                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {}}>
+                    <Button classes={{label: classes.label}} color="inherit" size="small" aria-owns={open ? "simple-popper" : null} aria-haspopup="true" variant="contained"
+                      onClick={this.handleClick}>
                       <MoreIcon />
                       More
                     </Button>
+
+                    <Popover id="simple-popper" open={open} anchorEl={anchorEl}
+                        anchorOrigin={{ vertical: "bottom", horizontal: "center"}}
+                        transformOrigin={{vertical: "top", horizontal: "center"}}
+                        onClose={this.handleClose}
+                    >
+
+                      <Button classes={{label: classes.label}} color="inherit" size="small" 
+                          onClick={() => {
+                            const element = this.dicomImage;
+                            var viewport = cornerstone.getViewport(element);
+                            if (viewport.invert === true) {
+                                viewport.invert = false;
+                            } else {
+                                viewport.invert = true;
+                            }
+                            cornerstone.setViewport(element, viewport);}}
+                            >
+                        <InvertIcon />
+                        Invert
+                      </Button>
+
+                      <Button classes={{label: classes.label}} color="inherit" size="small" 
+                        onClick={() => {
+
+                          this.anonymized=!this.anonymized;
+
+                          const element = this.dicomImage;
+                          var viewport = cornerstone.getViewport(element);
+
+                          if(this.anonymized != true)
+                          {
+                            document.getElementById("mrbottomleft").style.visibility = "visible";
+                            document.getElementById("mrbottomright").style.visibility = "visible";
+                            document.getElementById("mrtopleft").style.visibility = "visible";
+                            document.getElementById("mrtopright").style.visibility = "visible";
+                          }
+                          else
+                          {
+                            document.getElementById("mrbottomleft").style.visibility = "hidden";
+                            document.getElementById("mrbottomright").style.visibility = "hidden";;
+                            document.getElementById("mrtopleft").style.visibility = "hidden";
+                            document.getElementById("mrtopright").style.visibility = "hidden";
+                          }
+                        }}>
+                        <TextIcon />
+                        Text
+                      </Button>
+
+                      <Button classes={{label: classes.label}} color="inherit" size="small" 
+                        onClick={() => {
+                          const element = this.dicomImage;
+                          const viewport = cornerstone.getViewport(element);
+                          viewport.rotation+=90;
+                          cornerstone.setViewport(element, viewport);}}
+                          >
+                        <RotateRightIcon />
+                        Rotate
+                      </Button>
+
+                      <Button classes={{label: classes.label}} color="inherit" size="small" 
+                        onClick={() => {
+                          const element = this.dicomImage;
+                          const viewport = cornerstone.getViewport(element);
+                          viewport.vflip = !viewport.vflip;
+                          cornerstone.setViewport(element, viewport);}}
+                          >
+                        <VFlipIcon />
+                        Flip V
+                      </Button>
+
+                      <Button classes={{label: classes.label}} color="inherit" size="small" 
+                        onClick={() => {
+                          const element = this.dicomImage;
+                          const viewport = cornerstone.getViewport(element);
+                          viewport.hflip = !viewport.hflip;
+                          cornerstone.setViewport(element, viewport);}}
+                          >
+                        <HFlipIcon />
+                        Flip H
+                      </Button>
+
+                      <Button classes={{label: classes.label}} color="inherit" size="small" 
+                        onClick={() => {
+                            const element = this.dicomImage;
+                            cornerstoneTools.saveAs(element, "image.png");}}
+                            >
+                        <SaveIcon />
+                        Save
+                      </Button>
+
+                      <Button classes={{label: classes.label}} color="inherit" size="small" 
+                          onClick={() => {
+                            const element = this.dicomImage;
+                            cornerstoneTools.clearToolState(element, "length");
+                            cornerstoneTools.clearToolState(element, "simpleAngle");
+                            cornerstoneTools.clearToolState(element, "probe");
+                            cornerstoneTools.clearToolState(element, "ellipticalRoi");
+                            cornerstoneTools.clearToolState(element, "rectangleRoi");
+                            cornerstoneTools.clearToolState(element, "freehand");
+                            cornerstoneTools.clearToolState(element, "arrowAnnotate");
+                            cornerstoneTools.clearToolState(element, "highlight");
+                            cornerstone.updateImage(element);}}
+                          >
+                        <ClearIcon />
+                        Clear
+                      </Button>
+
+                      <Button classes={{label: classes.label}} color="inherit" size="small" 
+                        onClick={() => {
+                          const element = this.dicomImage;
+                          cornerstone.reset(element);
+                          }}
+                          >
+                        <ReplayIcon />
+                        Reset
+                      </Button>
+
+                    </Popover>             
 
             </ToggleButtonGroup>
           </AppBar>
