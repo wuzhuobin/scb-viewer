@@ -43,20 +43,30 @@ function computeImageMinMax(a){
 const dicomLoader = (cs,imageArray) => {
   const num_dcm = imageArray.length;
   var imageSeries = new Array(num_dcm);
-  // var validSeries = new Array(num_dcm);
+  var failedSeries = [];
+  var test = 0;
+
+  function BatchLoadImage(InputArray){
+    for (var ctr in InputArray){
+        if (failedSeries.includes(ctr)){ 
+            var index = failedSeries.indexOf(ctr);
+            if (index>-1){
+              failedSeries.splice(index,1);
+            }
+        };
+        console.log(imageSeries[2]);
 
 
 
 
-  for (var ctr in imageArray){
-    imageSeries[ctr] = new Promise(function(resolve,reject){
-      console.log(imageArray[ctr]);
+        imageSeries[ctr] = new Promise(function(resolve,reject){
+      const imageId = parseInt(ctr);
     httpGetAsync(imageArray[ctr], response => {
       if(response===null){
         console.log('Load image failed');
-        // reject(Error("null1"));
-        // return "null1";
-        reject("Get image failed");
+        failedSeries.push(imageId);
+        test++;
+        reject("Get image failed"+test);
       }
       else {
         const data = new DataView(response);
@@ -105,25 +115,26 @@ const dicomLoader = (cs,imageArray) => {
         }
       } //else(response null) end
     });
-
-    // })
-    // .catch(function(error){
-    //   alert("Refresh!!!");
-    //       return {
-    //         getPixelData: GetNullImage()
-    //       }
            
     });
+    }
+
   }
 
-  function GetImcompletePromiseID(PromiseSeries){
-    // console.log("abc");
-    // const cacheSeries=[];
-    // for (var i=0;i<PromiseSeries.length;i++){
-    //   cacheSeries.push([PromiseSeries[i],i]);
-    // }
-    // console.log(cacheSeries);
-    // console.log("abc");
+  BatchLoadImage([...Array(num_dcm).keys()]);
+
+
+  function GetImcompletePromiseID(){
+    const numFailed = failedSeries.length;
+    if (numFailed){
+      console.log(numFailed + " image(s) is not loaded properly, namely ");
+      for (var i=0;i<numFailed;i++){
+        console.log(failedSeries[i]);
+      }
+    }
+    console.log("trying reload");
+    BatchLoadImage([failedSeries]);
+
   }
  
   
@@ -133,28 +144,15 @@ const dicomLoader = (cs,imageArray) => {
 
     function getPixelData() {
       if (String(imageId).substring(0,10) === "example://"){
-        GetImcompletePromiseID(imageSeries);
-
-
+        GetImcompletePromiseID();
 
         const id = parseInt(String(imageId).substring(10,String(imageId).length));
         console.log("Accessing " + id + "-th image out of " + imageSeries.length + " images");
-        // try{
-        //   console.log(imageSeries);
-        //   console.log(id);
-        //   console.log(imageSeries[id].minPixelValue+1);
-        // }
-        // catch(error){
-        //   alert("Wrong!!!!!!!!!!");
-        // }
-        if (imageSeries[id]===null){
+
+        if (failedSeries.includes(id)){
           alert("The " + id + "-th image is not loaded");
-          console.log(imageSeries[id]);
-          return null;
         }
-        console.log(id);
-        console.log(imageSeries[id]);
-        console.log(id);
+
         return imageSeries[id];
       }
       else {
