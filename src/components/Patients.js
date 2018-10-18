@@ -42,7 +42,7 @@ class Patients extends React.Component {
             for (let i = 0; i < studiesJsons.length; ++i) {
               let study = createData(
                 studiesJsons[i].MainDicomTags.InstitutionName,
-                "",
+                studiesJsons[i].MainDicomTags.StudyDescription,
                 "",
                 studiesJsons[i].MainDicomTags.StudyDate,
                 studiesJsons[i].MainDicomTags.StudyID
