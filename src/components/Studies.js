@@ -67,9 +67,10 @@ class Studies extends React.Component {
    
 	}
 
-	handleSeriesDoubleClick = (event)=>{
+	handleSeriesDoubleClick = (event,id)=>{
 		console.log('double click')
 		console.log(event)
+		console.log(id)
 	}
 
     render() {
@@ -108,7 +109,7 @@ class Studies extends React.Component {
                         <TableBody>
                         	{this.state.series.map(series => {
                         		return (
-                        			<TableRow id={series.id} hover onDoubleClick={this.handleSeriesDoubleClick}>
+                        			<TableRow id={series.id} hover onDoubleClick={event => this.handleSeriesDoubleClick(event, series.id)}>
 			                          <TableCell>{series.BodyPart}</TableCell>
 			                          <TableCell>{series.Modality}</TableCell>
 			                          <TableCell>{series.ProtcolName}</TableCell>
