@@ -108,13 +108,14 @@ class Studies extends React.Component {
                 	hover
                 	id={study.id} 
                 	onClick={this.handleSeriesOpen}>
-                  <TableCell>{study.Institution}</TableCell>
-                  <TableCell>{study.Description}</TableCell>
-                  <TableCell>{study.RequestedProcedure}</TableCell>
-                  <TableCell>{study.StudyDate}</TableCell>
-                  <TableCell>{study.StudyID}</TableCell>
+
+                  <TableCell style={{color: 'white'}}>{study.Institution}</TableCell>
+                  <TableCell style={{color: 'white'}}>{study.Description}</TableCell>
+                  <TableCell style={{color: 'white'}}>{study.RequestedProcedure}</TableCell>
+                  <TableCell style={{color: 'white'}}>{study.StudyDate}</TableCell>
+                  <TableCell style={{color: 'white'}}>{study.StudyID}</TableCell>
                   <TableCell padding={'none'} colSpan={1} > 
-                      {this.state.open ? <ExpandLess /> : <ExpandMore />}    
+                      {this.state.open ? <ExpandLess style={{color: 'white'}} /> : <ExpandMore style={{color: 'white'}}/>}    
                   </TableCell>
                 </TableRow>
 
@@ -124,11 +125,11 @@ class Studies extends React.Component {
                       <Table>
                         <TableHead>
                           <TableRow>
-                            <TableCell>Body Part</TableCell>
-                            <TableCell>Modality</TableCell>
-                            <TableCell>Protcol Name</TableCell>
-                            <TableCell>Series Number</TableCell>
-                            <TableCell>Station Name</TableCell>
+                            <TableCell style={{color: 'white'}}>Body Part</TableCell>
+                            <TableCell style={{color: 'white'}}>Modality</TableCell>
+                            <TableCell style={{color: 'white'}}>Protcol Name</TableCell>
+                            <TableCell style={{color: 'white'}}>Series Number</TableCell>
+                            <TableCell style={{color: 'white'}}>Station Name</TableCell>
                           </TableRow>
                         </TableHead>
                         <TableBody>
