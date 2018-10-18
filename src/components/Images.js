@@ -220,26 +220,3 @@ class Images extends React.Component {
 }
 
 export default withStyles(styles)(Images);
-
-
-
-                    //   {this.state.images.map(images=>{
-                    // console.log(images)
-                    // return(
-                    //   null
-                    // )
-
-                //                     <Table>
-                //   <TableHead>
-                //     <TableRow>
-                //       <TableCell>Institution</TableCell>
-                //       <TableCell></TableCell>
-                //       <TableCell>Study Date</TableCell>
-                //       <TableCell>Study ID</TableCell>
-                //       <TableCell>Modality</TableCell>
-                //       <TableCell>Modality</TableCell>
-                //       <TableCell>Series Number</TableCell>
-                //       <TableCell>Station Name</TableCell>
-                //   </TableRow>
-                //   </TableHead>
-                // </Table>
