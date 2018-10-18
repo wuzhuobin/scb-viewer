@@ -23,13 +23,38 @@ class Studies extends React.Component {
     	super(props);
     	this.state={
         open:false,
-        series: [ createData("HEAD", "CT", "1HEADSeq", "1", "CT80879")
-        ]
+        series: [ ]
       }
 	}
 
 	handleSeriesOpen = (event)  => {
     this.setState({open: !this.state.open})
+    PACS.studyInfo(this.props.study.id,
+      function (json) {
+        let seriesPromises = [];
+        for (let i = 0; i < json.Series.length; ++i) {
+          seriesPromises.push(PACS.serieInfo(json.Series[i]));
+        }
+        console.log(json);
+        Promise.all(seriesPromises).then(
+          function (seriesJsons) {
+            let series = [];
+            for (let i = 0; i < seriesJsons.length; ++i) {
+              let serie = createData(
+                "",
+                seriesJsons[i].MainDicomTags.Modality,
+                "",
+                seriesJsons[i].MainDicomTags.SeriesNumber,
+                seriesJsons[i].MainDicomTags.StationName
+              );
+              serie.id = json.Series[i];
+              series.push(serie);
+            }
+            this.setState({ series: series });
+          }.bind(this)
+        );
+      }.bind(this)
+    )
      // PACS.patientInfo(this.props.patient.id,
      //    (json) =>{
      //     let studiesPromises = [];

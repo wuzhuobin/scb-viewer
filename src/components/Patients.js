@@ -37,54 +37,38 @@ class Patients extends React.Component {
     	super(props);
     	this.state={
         open:false,
-        studies: [createData(
-          "The Affiliated Hospital of Hangzhou Normal University", 
-          "", 
-          "Specials PolyTrauma (Adult)",
-          "Thursday, April 26, 2018",
-          "1")
-        ]
+        studies: []
       }
 	}
 
-	 handleStudyOpen = (event)  => {
-    this.setState({open: !this.state.open})
-     // PACS.patientInfo(this.props.patient.id,
-     //    (json) =>{
-     //     let studiesPromises = [];
-     //     for (let i = 0; i < json.Studies.length; ++i) {
-     //       studiesPromises.push(PACS.studyInfo(json.Studies[i]));
-     //     }
-     //     // console.log(studiesPromises);
-     //     Promise.all(studiesPromises).then(
-     //        (studiesJsons) => {
-     //         let seriesPromises = [];
-     //         for (let i = 0; i < studiesJsons.length; ++i) {
-     //           for (let j = 0; j < studiesJsons[i].Series.length; ++j) {
-     //             seriesPromises.push(PACS.serieInfo(studiesJsons[i].Series[j]));
-     //           }
-     //         }
-     //         Promise.all(seriesPromises).then(
-     //           (seriesJsons)=> {
-     //             let series = [];
-     //             for (let i in seriesJsons) {
-     //               series.push(createData(
-     //                 seriesJsons[i].MainDicomTags.StationName,
-     //                 seriesJsons[i].MainDicomTags.SeriesDate,
-     //                 seriesJsons[i].ParentStudy,
-     //                 seriesJsons[i].MainDicomTags.Modality,
-     //                 seriesJsons[i].MainDicomTags.SeriesNumber
-     //               ));
-     //               this.setState({series:series});
-     //             }
-     //           }
-     //         );
-     //       }
-     //     )
-     //   }
-     // );
-   
-	  }
+  handleStudyOpen = (event) => {
+    this.setState({ open: !this.state.open });
+    PACS.patientInfo(this.props.patient.id,
+      function (json) {
+        let studiesPromises = [];
+        for (let i = 0; i < json.Studies.length; ++i) {
+          studiesPromises.push(PACS.studyInfo(json.Studies[i]));
+        }
+        Promise.all(studiesPromises).then(
+          function (studiesJsons) {
+            let studies = [];
+            for (let i = 0; i < studiesJsons.length; ++i) {
+              let study = createData(
+                studiesJsons[i].MainDicomTags.InstitutionName,
+                studiesJsons[i].MainDicomTags.StudyDescription,
+                "",
+                studiesJsons[i].MainDicomTags.StudyDate,
+                studiesJsons[i].MainDicomTags.StudyID
+              );
+              study.id = json.Studies[i];
+              studies.push(study);
+            }
+            this.setState({ studies: studies });
+          }.bind(this)
+        );
+      }.bind(this)
+    )
+  }
 
     render() {
     	const {open} = this.state
