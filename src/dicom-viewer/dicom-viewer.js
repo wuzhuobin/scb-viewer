@@ -32,6 +32,7 @@ import ReplayIcon from '@material-ui/icons/Replay';
 import SaveIcon from '@material-ui/icons/SaveAlt';
 import TextIcon from '@material-ui/icons/Title';
 import FreeFormIcon from '@material-ui/icons/RoundedCorner';
+import PlayIcon from '@material-ui/icons/PlayArrowOutlined';
 
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
@@ -241,8 +242,28 @@ class DicomViewer extends React.Component {
       cornerstoneTools.highlight.enable(element);
       cornerstoneTools.arrowAnnotate.enable(element);
 
-      cornerstoneTools.addStackStateManager(element, ['stack']);
+      //*****Added Play clip
+
+      cornerstoneTools.addStackStateManager(element, ['stack', 'playClip']);
       cornerstoneTools.addToolState(element, 'stack', stack);
+      cornerstoneTools.scrollIndicator.enable(element)
+
+      var playClipToolData = cornerstoneTools.getToolState(element, 'playClip');
+      if (!playClipToolData.data.length) {
+      playClipToolData.data.push({
+        intervalId: undefined,
+        framesPerSecond: 30,
+        lastFrameTimeStamp: undefined,
+        frameRate: 0,
+        frameTimeVector: undefined,
+        ignoreFrameTimeVector: false,
+        usingFrameTimeVector: false,
+        speed: 1,
+        reverse: false,
+        loop: true,
+      });
+    };
+      //*************
 
       cornerstoneTools.length.setConfiguration({ shadow: this.checked });
       cornerstoneTools.simpleAngle.setConfiguration({ shadow: this.checked });
@@ -251,6 +272,7 @@ class DicomViewer extends React.Component {
       // Enable all tools we want to use with this element
       cornerstoneTools.stackScroll.activate(element, 1);//<--------------ui button of enablt scrolling through left button
       cornerstoneTools.stackScrollWheel.activate(element);
+      cornerstoneTools.scrollIndicator.enable(element);
 
       // Uncomment below to enable stack prefetching
       // With the example images the loading will be extremely quick, though
@@ -430,6 +452,17 @@ class DicomViewer extends React.Component {
                       Annotate
                     </Button>
 
+                    <Button classes={{label: classes.label}} color="inherit" size="small" 
+                      onClick={() => {
+                        console.log(this.state.imageLoaderHintsArray);
+                        const element = this.dicomImage;
+                        cornerstoneTools.playClip(element, 31);
+                      }}
+                      >
+                      <PlayIcon />
+                      Play
+                    </Button>
+
                     <Button classes={{label: classes.label}} color="inherit" size="small" aria-owns={open ? "simple-popper" : null} aria-haspopup="true" variant="contained"
                       onClick={this.handleClick}>
                       <MoreIcon />
@@ -523,7 +556,7 @@ class DicomViewer extends React.Component {
                             cornerstoneTools.saveAs(element, "image.png");}}
                             >
                         <SaveIcon />
-                        Save
+                        Export
                       </Button>
 
                       <Button classes={{label: classes.label}} color="inherit" size="small" 
