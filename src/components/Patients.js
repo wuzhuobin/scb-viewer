@@ -79,13 +79,16 @@ class Patients extends React.Component {
 
     	return(
         <React.Fragment>
-            <TableRow id={patient.id}>
+            <TableRow 
+              hover
+              id={patient.id} 
+              onClick={this.handleStudyOpen}>
               <TableCell>{patient.name}</TableCell>
               <TableCell>{patient.patientId}</TableCell>
               <TableCell>{patient.birthDate}</TableCell>
               <TableCell>{patient.gender}</TableCell>
               <TableCell padding={'none'} colSpan={0} > 
-                  {this.state.open ? <ExpandLess onClick={this.handleStudyOpen}/> : <ExpandMore onClick={this.handleStudyOpen}/>}    
+                  {this.state.open ? <ExpandLess /> : <ExpandMore />}    
               </TableCell>
             </TableRow>
 

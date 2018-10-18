@@ -66,10 +66,8 @@ const styles = theme => ({
       width: 'auto',
     },
   },
-  images:{
-    width: '100%'
+  table: {
   }
-
 });
 
 

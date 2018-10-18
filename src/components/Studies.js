@@ -67,20 +67,28 @@ class Studies extends React.Component {
    
 	}
 
+	handleSeriesDoubleClick = (event)=>{
+		console.log('double click')
+		console.log(event)
+	}
+
     render() {
     	const {} = this.state
     	const {study, classes} = this.props
 
     	return(
     	    <React.Fragment>
-                <TableRow id={study.id}>
+                <TableRow 
+                	hover
+                	id={study.id} 
+                	onClick={this.handleSeriesOpen}>
                   <TableCell>{study.Institution}</TableCell>
                   <TableCell>{study.Description}</TableCell>
                   <TableCell>{study.RequestedProcedure}</TableCell>
                   <TableCell>{study.StudyDate}</TableCell>
                   <TableCell>{study.StudyID}</TableCell>
                   <TableCell padding={'none'} colSpan={1} > 
-                      {this.state.open ? <ExpandLess onClick={this.handleSeriesOpen}/> : <ExpandMore onClick={this.handleSeriesOpen}/>}    
+                      {this.state.open ? <ExpandLess /> : <ExpandMore />}    
                   </TableCell>
                 </TableRow>
 
@@ -100,7 +108,7 @@ class Studies extends React.Component {
                         <TableBody>
                         	{this.state.series.map(series => {
                         		return (
-                        			<TableRow id={series.id}>
+                        			<TableRow id={series.id} hover onDoubleClick={this.handleSeriesDoubleClick}>
 			                          <TableCell>{series.BodyPart}</TableCell>
 			                          <TableCell>{series.Modality}</TableCell>
 			                          <TableCell>{series.ProtcolName}</TableCell>
