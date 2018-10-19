@@ -3,7 +3,7 @@ import React from "react";
 import {Grid, Card, CardContent} from '@material-ui/core';
 import {ExpandMore, ExpandLess} from '@material-ui/icons'
 import { withStyles } from '@material-ui/core/styles';
-import PACS from "./PACS"
+import PACS from "orthanc/src/pacs";
 
 const styles = theme => ({
 	root:{

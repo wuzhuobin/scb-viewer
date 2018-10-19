@@ -32,6 +32,7 @@ import ReplayIcon from '@material-ui/icons/Replay';
 import SaveIcon from '@material-ui/icons/SaveAlt';
 import TextIcon from '@material-ui/icons/Title';
 import FreeFormIcon from '@material-ui/icons/RoundedCorner';
+import PlayIcon from '@material-ui/icons/PlayArrowOutlined';
 
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
@@ -83,6 +84,7 @@ class DicomViewer extends React.Component {
       currentInteractionode: 1,
       anonymized: false,
       anchorEl:null,
+      playingClip:false,
     }
   }
 
@@ -97,6 +99,8 @@ class DicomViewer extends React.Component {
       anchorEl: null
     });
   };
+
+
 
   componentWillMount() {
     cornerstoneTools.external.cornerstone = cornerstone;
@@ -114,17 +118,19 @@ class DicomViewer extends React.Component {
     // return ['http://127.0.0.1:8080/0100.dcm'];
     
     // return new Promise(function(resolve,reject){
-    //   resolve(['http://127.0.0.1:8080/0100.dcm','http://127.0.0.1:8080/0010.dcm','http://127.0.0.1:8080/0400.dcm','http://127.0.0.1:8080/0250.dcm','http://127.0.0.1:8080/0410.dcm']);
+    //   resolve(['http://127.0.0.1:8080/0100.dcm','http://127.0.0.1:8080/0010.dcm','http://127.0.0.1:8080/1400.dcm','http://127.0.0.1:8080/0250.dcm','http://127.0.0.1:8080/0410.dcm']);
+    // })
+
+    // return new Promise(function(resolve,reject){
+    //   resolve(['http://192.168.1.108:8080/0100.dcm','http://192.168.1.108:8080/0010.dcm','http://192.168.1.108:8080/1400.dcm','http://192.168.1.108:8080/0250.dcm','http://192.168.1.108:8080/0410.dcm']);
     // })
 
     return new Promise(function(resolve,reject){
-      var queryResult =   fetch("http://223.255.146.2:8042/orthanc/series/" + GET + "/ordered-slices").
-      then((res)=>{return res.json();}).
-      then((json)=>{ 
-        console.log(json);
+      var queryResult =   fetch("http://223.255.146.2:8042/orthanc/series/" + GET+ "/ordered-slices").then(
+        (res)=>{return res.json();}).then((json)=>{ 
         let cacheImagePathArray = [];
         for(let i = 0; i < json.Dicom.length; ++i){
-          let path = "http://192.168.1.126:3000/orthanc/" + json.Dicom[i]; 
+          let path = "http://223.255.146.2:8042/orthanc" + json.Dicom[i]; 
           cacheImagePathArray.push(path);
         }
         // console.log(cacheImagePathArray);
@@ -228,6 +234,7 @@ class DicomViewer extends React.Component {
       cornerstone.displayImage(element, image);
       cornerstoneTools.mouseInput.enable(element);
       cornerstoneTools.mouseWheelInput.enable(element);
+      //cornerstoneTools.touchInput.enable(element);
       // // Enable all tools we want to use with this element
       // cornerstoneTools.wwwc.activate(element, 1); // ww/wc is the default tool for left mouse button
       cornerstoneTools.pan.activate(element, 2); // pan is the default tool for middle mouse button
@@ -241,8 +248,28 @@ class DicomViewer extends React.Component {
       cornerstoneTools.highlight.enable(element);
       cornerstoneTools.arrowAnnotate.enable(element);
 
-      cornerstoneTools.addStackStateManager(element, ['stack']);
+      //*****Added Play clip
+
+      cornerstoneTools.addStackStateManager(element, ['stack', 'playClip']);
       cornerstoneTools.addToolState(element, 'stack', stack);
+      //cornerstoneTools.scrollIndicator.enable(element)
+
+      var playClipToolData = cornerstoneTools.getToolState(element, 'playClip');
+      if (!playClipToolData.data.length) {
+      playClipToolData.data.push({
+        intervalId: undefined,
+        framesPerSecond: 30,
+        lastFrameTimeStamp: undefined,
+        frameRate: 0,
+        frameTimeVector: undefined,
+        ignoreFrameTimeVector: false,
+        usingFrameTimeVector: false,
+        speed: 1,
+        reverse: false,
+        loop: true,
+      });
+    };
+      //*************
 
       cornerstoneTools.length.setConfiguration({ shadow: this.checked });
       cornerstoneTools.simpleAngle.setConfiguration({ shadow: this.checked });
@@ -262,8 +289,11 @@ class DicomViewer extends React.Component {
     this.disableAllTools();
     console.log(toolName+" "+this.state.currentInteractionMode);
     // cornerstone.enable(this.dicomImage);
+    cornerstoneTools.highlight.disable(this.dicomImage);
+    cornerstoneTools.highlight.deactivate(this.dicomImage,1);
+
     if (["pan", "zoom", "stackScroll"].includes(toolName)){
-      if (this.state.currentInteractionMode!= 1){
+      if (this.state.currentInteractionMode!== 1){
         cornerstoneTools.wwwc.disable(this.dicomImage,1);
         cornerstoneTools.probe.disable(this.dicomImage, 1);
         cornerstoneTools.length.disable(this.dicomImage, 1);
@@ -300,10 +330,15 @@ class DicomViewer extends React.Component {
       }
       else {
         //No disable
+        cornerstoneTools.length.deactivate(this.dicomImage, 1);
+        cornerstoneTools.ellipticalRoi.deactivate(this.dicomImage, 1);
+        cornerstoneTools.rectangleRoi.deactivate(this.dicomImage, 1);
+        cornerstoneTools.angle.deactivate(this.dicomImage, 1);
+        cornerstoneTools.highlight.deactivate(this.dicomImage, 1);
+        cornerstoneTools.freehand.deactivate(this.dicomImage, 1);
       }
     }
     else if (["wwwc"].includes(toolName)){
-        cornerstoneTools.wwwc.disable(this.dicomImage,1);
         cornerstoneTools.zoom.deactivate(this.dicomImage,1);
         cornerstoneTools.pan.deactivate(this.dicomImage,1);
 
@@ -316,9 +351,6 @@ class DicomViewer extends React.Component {
         cornerstoneTools.arrowAnnotate.disable(this.dicomImage, 1);
         cornerstoneTools.highlight.disable(this.dicomImage, 1);
         cornerstoneTools.freehand.disable(this.dicomImage, 1);
-
-
-
         cornerstoneTools.stackScroll.deactivate(this.dicomImage, 1);
         cornerstoneTools.pan.activate(this.dicomImage, 2); // 2 is middle mouse button
         cornerstoneTools.zoom.activate(this.dicomImage, 4); // 4 is right mouse button
@@ -430,6 +462,26 @@ class DicomViewer extends React.Component {
                       Annotate
                     </Button>
 
+                    <Button classes={{label: classes.label}} color="inherit" size="small" 
+                      onClick={() => {
+                        if(this.state.playingClip==false)
+                        {
+                          const element = this.dicomImage;
+                          cornerstoneTools.playClip(element, 31);
+                          this.state.playingClip=true;
+                        }
+                        else
+                        {
+                          const element = this.dicomImage;
+                          cornerstoneTools.stopClip(element, 31);
+                          this.state.playingClip=false;
+                        }
+                      }}
+                      >
+                      <PlayIcon />
+                      Play
+                    </Button>
+
                     <Button classes={{label: classes.label}} color="inherit" size="small" aria-owns={open ? "simple-popper" : null} aria-haspopup="true" variant="contained"
                       onClick={this.handleClick}>
                       <MoreIcon />
@@ -523,7 +575,7 @@ class DicomViewer extends React.Component {
                             cornerstoneTools.saveAs(element, "image.png");}}
                             >
                         <SaveIcon />
-                        Save
+                        Export
                       </Button>
 
                       <Button classes={{label: classes.label}} color="inherit" size="small" 
@@ -591,21 +643,22 @@ class DicomViewer extends React.Component {
                 }}
               />
 
-              <div id="mrtopleft" style={{ position: "absolute", top: 3, left: 3 }}>
+              <div id="mrtopleft" style={{ position: "absolute", top: "0.5%", left: "0.5%" }}>
                 Patient Name: Chan Tai Man
               </div>
               
-              <div id="mrtopright" style={{ position: "absolute", top: 3, right: 3 }}>
+              <div id="mrtopright" style={{ position: "absolute", top: "0.5%", right: "0.5%" }}>
                 Hospital: PWH
               </div>
               
-              <div id="mrbottomright" style={{ position: "absolute", bottom: 3, right: 3 }}>
+              <div id="mrbottomright" style={{ position: "absolute", bottom: "0.5%", right: "0.5%" }}>
                 Zoom:
               </div>
 
-              <div id="mrbottomleft" style={{ position: "absolute", bottom: 3, left: 3 }}>
+              <div id="mrbottomleft" style={{ position: "absolute", bottom: "0.5%", left: "0.5%" }}>
                 WW/WC:
               </div>
+
             </div>
         </Paper>
 
@@ -616,3 +669,19 @@ class DicomViewer extends React.Component {
 }
 
 export default withStyles(styles)(DicomViewer);
+
+              // <div class="mrbottommiddle orientationMarkerDiv" style={{ position: "absolute", bottom: "0.5%", left: "50%" }}>
+              //   <span class="orientationMarker">I</span>
+              // </div>
+
+              // <div class="mrleftmiddle orientationMarkerDiv" style={{ position: "absolute", bottom: "50%", left: "0.5%" }}>
+              //   <span class="orientationMarker">A</span>
+              // </div>
+
+              // <div class="mrbottommiddle orientationMarkerDiv" style={{ position: "absolute", top: "0.5%", left: "50%" }}>
+              //   <span class="orientationMarker">I</span>
+              // </div>
+
+              // <div  class="mrrightmiddle orientationMarkerDiv" style={{ position: "absolute", bottom: "50%", right: "0.5%" }}>
+              //   <span class="orientationMarker">P</span>
+              // </div>
