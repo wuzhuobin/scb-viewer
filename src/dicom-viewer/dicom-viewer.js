@@ -119,24 +119,24 @@ class DicomViewer extends React.Component {
     //   resolve(['http://127.0.0.1:8080/0100.dcm','http://127.0.0.1:8080/0010.dcm','http://127.0.0.1:8080/1400.dcm','http://127.0.0.1:8080/0250.dcm','http://127.0.0.1:8080/0410.dcm']);
     // })
 
-    // return new Promise(function(resolve,reject){
-    //   resolve(['http://192.168.1.108:8080/0100.dcm','http://192.168.1.108:8080/0010.dcm','http://192.168.1.108:8080/1400.dcm','http://192.168.1.108:8080/0250.dcm','http://192.168.1.108:8080/0410.dcm']);
-    // })
-
     return new Promise(function(resolve,reject){
-      var queryResult =   fetch("http://223.255.146.2:8042/orthanc/series/" + GET+ "/ordered-slices").then(
-        (res)=>{return res.json();}).then((json)=>{ 
-        let cacheImagePathArray = [];
-        for(let i = 0; i < json.Dicom.length; ++i){
-          let path = "http://223.255.146.2:8042/orthanc" + json.Dicom[i]; 
-          cacheImagePathArray.push(path);
-        }
-        // console.log(cacheImagePathArray);
-        return cacheImagePathArray;
-      });
-      resolve(queryResult);
+      resolve(['http://192.168.1.108:8080/0100.dcm','http://192.168.1.108:8080/0010.dcm','http://192.168.1.108:8080/1400.dcm','http://192.168.1.108:8080/0250.dcm','http://192.168.1.108:8080/0410.dcm']);
+    })
 
-    });
+    // return new Promise(function(resolve,reject){
+    //   var queryResult =   fetch("http://223.255.146.2:8042/orthanc/series/" + GET+ "/ordered-slices").then(
+    //     (res)=>{return res.json();}).then((json)=>{ 
+    //     let cacheImagePathArray = [];
+    //     for(let i = 0; i < json.Dicom.length; ++i){
+    //       let path = "http://223.255.146.2:8042/orthanc" + json.Dicom[i]; 
+    //       cacheImagePathArray.push(path);
+    //     }
+    //     // console.log(cacheImagePathArray);
+    //     return cacheImagePathArray;
+    //   });
+    //   resolve(queryResult);
+
+    // });
   }
 
   seriesImages(id){
@@ -246,7 +246,7 @@ class DicomViewer extends React.Component {
       cornerstoneTools.highlight.enable(element);
       cornerstoneTools.arrowAnnotate.enable(element);
 
-      console.log(image.patientOri);
+      console.log(image.columnPixelSpacing);//<----
 
       cornerstoneTools.touchInput.enable(element);
       cornerstoneTools.zoomTouchPinch.activate(element);

@@ -206,20 +206,20 @@ const dicomLoader = (cs,imageArray) => {
         .then(pixelData =>
           resolve({
             imageId,
-            minPixelValue: 0,
-            maxPixelValue: 257,
+            minPixelValue: pixelData.minPixelValue,
+            maxPixelValue: pixelData.maxPixelValue,
             slope: 1.0,
             intercept: 0,
             windowCenter: 127,
             windowWidth: 256,
-            rows: height,
-            columns: width,
-            height,
-            width,
+            rows: pixelData.height,
+            columns: pixelData.width,
+            // height,
+            // width,
             color: false,
-            columnPixelSpacing: 0.8984375,
-            rowPixelSpacing: 0.8984375,
-            sizeInBytes: width * height * 2,
+            // columnPixelSpacing: 0.8984375,
+            // rowPixelSpacing: 0.8984375,
+            // sizeInBytes: width * height * 2,
             ...pixelData
           })
           )
