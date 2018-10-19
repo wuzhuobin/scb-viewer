@@ -95,6 +95,8 @@ const dicomLoader = (cs,imageArray) => {
             maxPixelValue: image.getImageMax(),
             // slope: image.getDataScaleSlope(),
             // intercept: image.getDataScaleIntercept(),
+            patientPos: image.getImagePosition(),
+            patientOri: image.getImageDirections(),
             windowCenter: image.getWindowCenter(),
             windowWidth: image.getWindowWidth(),
             getPixelData: () => image.getInterpretedData(),
@@ -110,23 +112,25 @@ const dicomLoader = (cs,imageArray) => {
         }
         else {
           const range = computeImageMinMax(image);
-          // console.log("Type2");
+          // console.log(image.getImagePosition());
           resolve({
             minPixelValue: range[0],
             maxPixelValue: range[1],
-              // slope: image.getDataScaleSlope(),
-              // intercept: image.getDataScaleIntercept(),
-              windowCenter: image.getWindowCenter(),
-              windowWidth: image.getWindowWidth(),
-              getPixelData: () => image.getInterpretedData(),
-              rows: image.getRows(),
-              columns: image.getCols(),
-              height: image.getCols(),
-              width: image.getRows(),
-              color: false,
-              columnPixelSpacing: spacing[1],
-              rowPixelSpacing: spacing[0],
-              sizeInBytes: image.getRows() * image.getCols() * 2,
+            // slope: image.getDataScaleSlope(),
+            // intercept: image.getDataScaleIntercept(),
+            patientPos: image.getImagePosition(),
+            patientOri: image.getImageDirections(),
+            windowCenter: image.getWindowCenter(),
+            windowWidth: image.getWindowWidth(),
+            getPixelData: () => image.getInterpretedData(),
+            rows: image.getRows(),
+            columns: image.getCols(),
+            height: image.getCols(),
+            width: image.getRows(),
+            color: false,
+            columnPixelSpacing: spacing[1],
+            rowPixelSpacing: spacing[0],
+            sizeInBytes: image.getRows() * image.getCols() * 2,
             });
         }
       } //else(response null) end
@@ -202,20 +206,20 @@ const dicomLoader = (cs,imageArray) => {
         .then(pixelData =>
           resolve({
             imageId,
-            minPixelValue: 0,
-            maxPixelValue: 257,
+            minPixelValue: pixelData.minPixelValue,
+            maxPixelValue: pixelData.maxPixelValue,
             slope: 1.0,
             intercept: 0,
             windowCenter: 127,
             windowWidth: 256,
-            rows: height,
-            columns: width,
-            height,
-            width,
+            rows: pixelData.height,
+            columns: pixelData.width,
+            // height,
+            // width,
             color: false,
-            columnPixelSpacing: 0.8984375,
-            rowPixelSpacing: 0.8984375,
-            sizeInBytes: width * height * 2,
+            // columnPixelSpacing: 0.8984375,
+            // rowPixelSpacing: 0.8984375,
+            // sizeInBytes: width * height * 2,
             ...pixelData
           })
           )
