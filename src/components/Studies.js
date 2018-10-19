@@ -41,9 +41,9 @@ class Studies extends React.Component {
             let series = [];
             for (let i = 0; i < seriesJsons.length; ++i) {
               let serie = createData(
-                "",
+                seriesJsons[i].MainDicomTags.BodyPartExamined,
                 seriesJsons[i].MainDicomTags.Modality,
-                "",
+                seriesJsons[i].MainDicomTags.ProtocolName,
                 seriesJsons[i].MainDicomTags.SeriesNumber,
                 seriesJsons[i].MainDicomTags.StationName
               );
