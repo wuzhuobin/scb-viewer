@@ -8,7 +8,7 @@ import { withStyles } from '@material-ui/core/styles';
 import Upload from './Upload';
 import Patients from './Patients';
 import SeriesPreview from './SeriesPreview';
-import PACS from 'orthanc/src/pacs';
+import PACS from 'orthanc';
 
 function getToday(){
   var today = new Date();
