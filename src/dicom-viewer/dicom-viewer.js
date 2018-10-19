@@ -85,6 +85,9 @@ class DicomViewer extends React.Component {
       anonymized: false,
       anchorEl:null,
       playingClip:false,
+      rowCosine:[1,0,0],
+      columnCosine:[0,1,0],
+      initialized:false,
     }
   }
 
@@ -100,7 +103,14 @@ class DicomViewer extends React.Component {
     });
   };
 
-  rotateMarker(div, rotation) {
+    updateOrientationMarkers(element, viewport) {
+    // Apply rotations
+    var orientationMarkers = document.querySelector('.orientationMarkers');
+    console.log(orientationMarkers);
+    this.rotateMarker(orientationMarkers, viewport.rotation);
+  };
+
+    rotateMarker(div, rotation) {
     var rotationCSS = {
         "-webkit-transform-origin": "center center",
         "-moz-transform-origin": "center center",
@@ -129,17 +139,18 @@ class DicomViewer extends React.Component {
     });
   }
 
+   calculateOrientationMarkers(element, viewport, state) {
+    // var enabledElement = cornerstone.getEnabledElement(element);
+    // var imagePlaneMetaData = cornerstone.metaData.get('imagePlaneModule', enabledElement.image.imageId);
+    // console.log(imagePlaneMetaData);
 
-  calculateOrientationMarkers(element) {
-    var enabledElement = cornerstone.getEnabledElement(element);
-    var imagePlaneMetaData = cornerstone.metaData.get('imagePlaneModule', enabledElement.image.imageId);
-    console.log(imagePlaneMetaData);
-    
-    var rowString = cornerstoneTools.orientation.getOrientationString(imagePlaneMetaData.rowCosines);
-    var columnString = cornerstoneTools.orientation.getOrientationString(imagePlaneMetaData.columnCosines);
+    var rowString = cornerstoneTools.orientation.getOrientationString(state.rowCosine);
+    var columnString = cornerstoneTools.orientation.getOrientationString(state.columnCosine);
+
 
     var oppositeRowString = cornerstoneTools.orientation.invertOrientationString(rowString);
     var oppositeColumnString = cornerstoneTools.orientation.invertOrientationString(columnString);
+    
 
     var markers = {
         top: oppositeColumnString,
@@ -147,11 +158,12 @@ class DicomViewer extends React.Component {
         left: oppositeRowString,
         right: rowString
     }
+    console.log(element);
+    var topMid = document.querySelector('.mrtopmiddle .orientationMarker');
+    var bottomMid = document.querySelector('.mrbottommiddle .orientationMarker');
+    var rightMid = document.querySelector('.mrrightmiddle .orientationMarker');
+    var leftMid = document.querySelector('.mrleftmiddle .orientationMarker');
 
-    var topMid = element.querySelector('.mrtopmiddle .orientationMarker');
-    var bottomMid = element.querySelector('.mrbottommiddle .orientationMarker');
-    var rightMid = element.querySelector('.mrrightmiddle .orientationMarker');
-    var leftMid = element.querySelector('.mrleftmiddle .orientationMarker');
 
     topMid.textContent = markers.top;
     bottomMid.textContent = markers.bottom;
@@ -159,11 +171,9 @@ class DicomViewer extends React.Component {
     leftMid.textContent = markers.left;
   }
 
-  updateOrientationMarkers(element, viewport) {
-    // Apply rotations
-    var orientationMarkers = element.querySelector('.orientationMarkers');
-    this.rotateMarker(orientationMarkers, viewport.rotation);
-  }
+
+
+
 
   componentWillMount() {
     cornerstoneTools.external.cornerstone = cornerstone;
@@ -254,6 +264,8 @@ class DicomViewer extends React.Component {
 
   displayImage = () => {
 
+
+
     const element = this.dicomImage;
     // Listen for changes to the viewport so we can update the text overlays in the corner
     
@@ -262,7 +274,7 @@ class DicomViewer extends React.Component {
 
       document.getElementById("mrbottomleft").textContent = `WW/WC: ${Math.round(viewport.voi.windowWidth)}/${Math.round(viewport.voi.windowCenter)}`;
       document.getElementById("mrbottomright").textContent = `Zoom: ${viewport.scale.toFixed(2)}`;
-      this.updateOrientationMarkers(e.target, viewport);
+      //updateOrientationMarkers(e.target, viewport);
     }
 
     element.addEventListener("cornerstoneimagerendered", onImageRendered);
@@ -299,8 +311,20 @@ class DicomViewer extends React.Component {
 
       //Orientation Marker
       var viewport = cornerstone.getViewport(element);
-      this.calculateOrientationMarkers(element, viewport);
+
+        console.log(this.state.rowCosine);
+      if (stack.currentImageIdIndex===0){
+        this.setState({
+          rowCosine:image.patientOri.slice(0,3),
+          columnCosine:image.patientOri.slice(3,6),
+        });
+      }
+
+      this.calculateOrientationMarkers(element, viewport, this.state);
       this.updateOrientationMarkers(element, viewport);
+
+
+
 
       cornerstoneTools.mouseInput.enable(element);
       cornerstoneTools.mouseWheelInput.enable(element);
@@ -477,7 +501,7 @@ class DicomViewer extends React.Component {
     const open = Boolean(anchorEl)
 
     var viewerHeight = window.innerHeight-128-6 //4 is border
-    var viewerWidth = window.viewerWidth-128-6 //4 is border
+    var viewerWidth = window.innerWidth-128-6 //4 is border
     return (
       <div className={classes.root}>
           <AppBar className={classes.appBar}>
@@ -622,7 +646,18 @@ class DicomViewer extends React.Component {
                           const element = this.dicomImage;
                           const viewport = cornerstone.getViewport(element);
                           viewport.rotation+=90;
-                          cornerstone.setViewport(element, viewport);}}
+                          cornerstone.setViewport(element, viewport);
+
+                          var leftMid = document.querySelector('.mrleftmiddle .orientationMarker');
+                          var topMid = document.querySelector('.mrtopmiddle .orientationMarker');
+                          var rightMid = document.querySelector('.mrrightmiddle .orientationMarker');
+                          var bottomMid = document.querySelector('.mrbottommiddle .orientationMarker');
+                          
+                          var temp = bottomMid.textContent;
+                          bottomMid.textContent = rightMid.textContent;
+                          rightMid.textContent=topMid.textContent;
+                          topMid.textContent=leftMid.textContent;
+                          leftMid.textContent=temp;}}
                           >
                         <RotateRightIcon />
                         Rotate
@@ -635,8 +670,8 @@ class DicomViewer extends React.Component {
                           viewport.vflip = !viewport.vflip;
                           cornerstone.setViewport(element, viewport);
 
-                          var topMid = element.querySelector('.mrtopmiddle .orientationMarker');
-                          var bottomMid = element.querySelector('.mrbottommiddle .orientationMarker');
+                          var topMid = document.querySelector('.mrtopmiddle .orientationMarker');
+                          var bottomMid = document.querySelector('.mrbottommiddle .orientationMarker');
                           var temp = topMid.textContent;
                           topMid.textContent = bottomMid.textContent;
                           bottomMid.textContent = temp;}}
@@ -652,8 +687,8 @@ class DicomViewer extends React.Component {
                           viewport.hflip = !viewport.hflip;
                           cornerstone.setViewport(element, viewport);
 
-                          var rightMid = element.querySelector('.mrrightmiddle .orientationMarker');
-                          var leftMid = element.querySelector('.mrleftmiddle .orientationMarker');
+                          var rightMid = document.querySelector('.mrrightmiddle .orientationMarker');
+                          var leftMid = document.querySelector('.mrleftmiddle .orientationMarker');
                           var temp = rightMid.textContent;
                           rightMid.textContent = leftMid.textContent;
                           leftMid.textContent = temp;}}
@@ -698,7 +733,7 @@ class DicomViewer extends React.Component {
                           viewport.vflip = false;
                           viewport.rotation = 0;
                           cornerstone.setViewport(element, viewport);
-                          this.calculateOrientationMarkers(element, viewport);
+                          this.calculateOrientationMarkers(element, viewport,this.state);
                           }}
                           >
                         <ReplayIcon />
@@ -759,6 +794,24 @@ class DicomViewer extends React.Component {
                 WW/WC:
               </div>
 
+              <div class="orientationMarkers" style={{position: "absolute", top: "0%", left: "0%", width: viewerWidth, height: viewerHeight}}>
+                <div class="mrbottommiddle orientationMarkerDiv" style={{ position: "absolute", bottom: "0.5%", left: "50%" }}>
+                  <span class="orientationMarker">Q</span>
+                </div>
+
+                <div class="mrleftmiddle orientationMarkerDiv" style={{ position: "absolute", bottom: "50%", left: "0.5%" }}>
+                  <span class="orientationMarker">Q</span>
+                </div>
+
+                <div class="mrtopmiddle orientationMarkerDiv" style={{ position: "absolute", top: "0.5%", left: "50%" }}>
+                  <span class="orientationMarker">Q</span>
+                </div>
+
+                <div  class="mrrightmiddle orientationMarkerDiv" style={{ position: "absolute", bottom: "50%", right: "0.5%" }}>
+                  <span class="orientationMarker">Q</span>
+                </div>
+              </div>
+
             </div>
         </Paper>
 
@@ -770,18 +823,5 @@ class DicomViewer extends React.Component {
 
 export default withStyles(styles)(DicomViewer);
 
-              // <div class="mrbottommiddle orientationMarkerDiv" style={{ position: "absolute", bottom: "0.5%", left: "50%" }}>
-              //   <span class="orientationMarker">I</span>
-              // </div>
 
-              // <div class="mrleftmiddle orientationMarkerDiv" style={{ position: "absolute", bottom: "50%", left: "0.5%" }}>
-              //   <span class="orientationMarker">A</span>
-              // </div>
-
-              // <div class="mrbottommiddle orientationMarkerDiv" style={{ position: "absolute", top: "0.5%", left: "50%" }}>
-              //   <span class="orientationMarker">I</span>
-              // </div>
-
-              // <div  class="mrrightmiddle orientationMarkerDiv" style={{ position: "absolute", bottom: "50%", right: "0.5%" }}>
-              //   <span class="orientationMarker">P</span>
-              // </div>
+//<div class="orientationMarkers" style={{borderStyle:"solid", borderColor:"red",position: "absolute", top: "0%", left: "0%", width: viewerWidth, height: viewerHeight}}>
