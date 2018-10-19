@@ -91,6 +91,14 @@ class DicomViewer extends React.Component {
     }
   }
 
+  componentWillReceiveProps(nextProps) {
+      console.log("willrecieve")
+      if (this.props.series !== nextProps.series && nextProps.series!=null) {
+        
+        console.log(nextProps.series)
+      }
+    }
+
   handleClick = event => {
     this.setState({
       anchorEl: event.currentTarget
@@ -182,6 +190,8 @@ class DicomViewer extends React.Component {
   }
 
   componentDidMount() {
+    console.log("didmount")
+    console.log(this.props.series)
     this.readImage(this.state, cornerstone).then(res=>this.displayImage());
   }
 
@@ -496,9 +506,11 @@ class DicomViewer extends React.Component {
 
 
   render() {
-    const {classes, theme} = this.props
+    const {series, classes, theme} = this.props
     const { anchorEl } = this.state;
     const open = Boolean(anchorEl)
+
+    console.log(this.props.series)
 
     var viewerHeight = window.innerHeight-128-6 //4 is border
     var viewerWidth = window.innerWidth-128-6 //4 is border
