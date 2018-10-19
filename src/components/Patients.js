@@ -4,7 +4,7 @@ import {Button, Divider, Typography, TextField, Grid, Table, TableBody, TableCel
   Collapse, TableRowColumn} from '@material-ui/core';
 import {ExpandMore, ExpandLess} from '@material-ui/icons'
 import { withStyles } from '@material-ui/core/styles';
-import PACS from "./PACS"
+import PACS from "orthanc/src/pacs"
 import Studies from "./Studies"
 import classNames from 'classnames';
 
@@ -56,7 +56,7 @@ class Patients extends React.Component {
               let study = createData(
                 studiesJsons[i].MainDicomTags.InstitutionName,
                 studiesJsons[i].MainDicomTags.StudyDescription,
-                "",
+                studiesJsons[i].MainDicomTags.RequestedProcedureDescription,
                 studiesJsons[i].MainDicomTags.StudyDate,
                 studiesJsons[i].MainDicomTags.StudyID
               );

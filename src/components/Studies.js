@@ -4,7 +4,8 @@ import {Button, Divider, Typography, TextField, Grid, Table, TableBody, TableCel
   Collapse, TableRowColumn} from '@material-ui/core';
 import {ExpandMore, ExpandLess} from '@material-ui/icons'
 import { withStyles } from '@material-ui/core/styles';
-import PACS from "./PACS"
+import PACS from "orthanc/src/pacs"
+
 
 const styles = theme => ({
 	root:{
@@ -41,9 +42,9 @@ class Studies extends React.Component {
             let series = [];
             for (let i = 0; i < seriesJsons.length; ++i) {
               let serie = createData(
-                "",
+                seriesJsons[i].MainDicomTags.BodyPartExamined,
                 seriesJsons[i].MainDicomTags.Modality,
-                "",
+                seriesJsons[i].MainDicomTags.ProtocolName,
                 seriesJsons[i].MainDicomTags.SeriesNumber,
                 seriesJsons[i].MainDicomTags.StationName
               );

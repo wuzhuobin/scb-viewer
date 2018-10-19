@@ -100,6 +100,8 @@ class DicomViewer extends React.Component {
     });
   };
 
+
+
   componentWillMount() {
     cornerstoneTools.external.cornerstone = cornerstone;
     cornerstoneTools.external.cornerstoneMath = cornerstoneMath;
@@ -232,7 +234,7 @@ class DicomViewer extends React.Component {
       cornerstone.displayImage(element, image);
       cornerstoneTools.mouseInput.enable(element);
       cornerstoneTools.mouseWheelInput.enable(element);
-      cornerstoneTools.touchInput.enable(element);
+      //cornerstoneTools.touchInput.enable(element);
       // // Enable all tools we want to use with this element
       // cornerstoneTools.wwwc.activate(element, 1); // ww/wc is the default tool for left mouse button
       cornerstoneTools.pan.activate(element, 2); // pan is the default tool for middle mouse button
@@ -250,7 +252,7 @@ class DicomViewer extends React.Component {
 
       cornerstoneTools.addStackStateManager(element, ['stack', 'playClip']);
       cornerstoneTools.addToolState(element, 'stack', stack);
-      cornerstoneTools.scrollIndicator.enable(element)
+      //cornerstoneTools.scrollIndicator.enable(element)
 
       var playClipToolData = cornerstoneTools.getToolState(element, 'playClip');
       if (!playClipToolData.data.length) {
@@ -276,7 +278,6 @@ class DicomViewer extends React.Component {
       // Enable all tools we want to use with this element
       cornerstoneTools.stackScroll.activate(element, 1);//<--------------ui button of enablt scrolling through left button
       cornerstoneTools.stackScrollWheel.activate(element);
-      cornerstoneTools.scrollIndicator.enable(element);
 
       // Uncomment below to enable stack prefetching
       // With the example images the loading will be extremely quick, though
@@ -642,21 +643,22 @@ class DicomViewer extends React.Component {
                 }}
               />
 
-              <div id="mrtopleft" style={{ position: "absolute", top: 3, left: 3 }}>
+              <div id="mrtopleft" style={{ position: "absolute", top: "0.5%", left: "0.5%" }}>
                 Patient Name: Chan Tai Man
               </div>
               
-              <div id="mrtopright" style={{ position: "absolute", top: 3, right: 3 }}>
+              <div id="mrtopright" style={{ position: "absolute", top: "0.5%", right: "0.5%" }}>
                 Hospital: PWH
               </div>
               
-              <div id="mrbottomright" style={{ position: "absolute", bottom: 3, right: 3 }}>
+              <div id="mrbottomright" style={{ position: "absolute", bottom: "0.5%", right: "0.5%" }}>
                 Zoom:
               </div>
 
-              <div id="mrbottomleft" style={{ position: "absolute", bottom: 3, left: 3 }}>
+              <div id="mrbottomleft" style={{ position: "absolute", bottom: "0.5%", left: "0.5%" }}>
                 WW/WC:
               </div>
+
             </div>
         </Paper>
 
@@ -667,3 +669,19 @@ class DicomViewer extends React.Component {
 }
 
 export default withStyles(styles)(DicomViewer);
+
+              // <div class="mrbottommiddle orientationMarkerDiv" style={{ position: "absolute", bottom: "0.5%", left: "50%" }}>
+              //   <span class="orientationMarker">I</span>
+              // </div>
+
+              // <div class="mrleftmiddle orientationMarkerDiv" style={{ position: "absolute", bottom: "50%", left: "0.5%" }}>
+              //   <span class="orientationMarker">A</span>
+              // </div>
+
+              // <div class="mrbottommiddle orientationMarkerDiv" style={{ position: "absolute", top: "0.5%", left: "50%" }}>
+              //   <span class="orientationMarker">I</span>
+              // </div>
+
+              // <div  class="mrrightmiddle orientationMarkerDiv" style={{ position: "absolute", bottom: "50%", right: "0.5%" }}>
+              //   <span class="orientationMarker">P</span>
+              // </div>
