@@ -192,7 +192,7 @@ class DicomViewer extends React.Component {
   componentDidMount() {
     console.log("didmount")
     console.log(this.props.series)
-    this.readImage(this.state, cornerstone).then(res=>this.displayImage());
+    this.readImage(this.props, this.state, cornerstone).then(res=>this.displayImage());
   }
 
   getImagePathList(IP,Port,GET){//sync request for now
@@ -204,24 +204,24 @@ class DicomViewer extends React.Component {
     //   resolve(['http://127.0.0.1:8080/0100.dcm','http://127.0.0.1:8080/0010.dcm','http://127.0.0.1:8080/1400.dcm','http://127.0.0.1:8080/0250.dcm','http://127.0.0.1:8080/0410.dcm']);
     // })
 
-    return new Promise(function(resolve,reject){
-      resolve(['http://192.168.1.108:8080/0100.dcm','http://192.168.1.108:8080/0010.dcm','http://192.168.1.108:8080/1400.dcm','http://192.168.1.108:8080/0250.dcm','http://192.168.1.108:8080/0410.dcm']);
-    })
-
     // return new Promise(function(resolve,reject){
-    //   var queryResult =   fetch("http://223.255.146.2:8042/orthanc/series/" + GET+ "/ordered-slices").then(
-    //     (res)=>{return res.json();}).then((json)=>{ 
-    //     let cacheImagePathArray = [];
-    //     for(let i = 0; i < json.Dicom.length; ++i){
-    //       let path = "http://223.255.146.2:8042/orthanc" + json.Dicom[i]; 
-    //       cacheImagePathArray.push(path);
-    //     }
-    //     // console.log(cacheImagePathArray);
-    //     return cacheImagePathArray;
-    //   });
-    //   resolve(queryResult);
+    //   resolve(['http://192.168.1.108:8080/0100.dcm','http://192.168.1.108:8080/0010.dcm','http://192.168.1.108:8080/1400.dcm','http://192.168.1.108:8080/0250.dcm','http://192.168.1.108:8080/0410.dcm']);
+    // })
 
-    // });
+    return new Promise(function(resolve,reject){
+      var queryResult =   fetch("http://223.255.146.2:8042/orthanc/series/" + GET+ "/ordered-slices").then(
+        (res)=>{return res.json();}).then((json)=>{ 
+        let cacheImagePathArray = [];
+        for(let i = 0; i < json.Dicom.length; ++i){
+          let path = "http://223.255.146.2:8042/orthanc" + json.Dicom[i]; 
+          cacheImagePathArray.push(path);
+        }
+        // console.log(cacheImagePathArray);
+        return cacheImagePathArray;
+      });
+      resolve(queryResult);
+
+    });
   }
 
   seriesImages(id){
@@ -239,9 +239,10 @@ class DicomViewer extends React.Component {
 } 
 
 
-  readImage(state, cornerstoneInstance){
+  readImage(props, state, cornerstoneInstance){
       //Get image path Array first
-      const loadingResult = this.getImagePathList(1,1,"cf8192f8-50e817d9-2aae4764-3c85d142-dc59a8d0")
+      const loadingResult = this.getImagePathList(1,1,props.series)
+      // const loadingResult = this.getImagePathList(1,1,"cf8192f8-50e817d9-2aae4764-3c85d142-dc59a8d0")
       .then((queryList)=>{
         var cacheimagePathArray = [];
         const cacheimageLoaderHintsArray = [...Array(queryList.length).keys()].map(function(number){
@@ -352,17 +353,17 @@ class DicomViewer extends React.Component {
       cornerstoneTools.highlight.enable(element);
       cornerstoneTools.arrowAnnotate.enable(element);
 
-      console.log(image.columnPixelSpacing);//<----
+      // console.log(image.columnPixelSpacing);//<----
 
-      cornerstoneTools.touchInput.enable(element);
-      cornerstoneTools.zoomTouchPinch.activate(element);
-      cornerstoneTools.panMultiTouch.activate(element);
+      // cornerstoneTools.touchInput.enable(element);
+      // cornerstoneTools.zoomTouchPinch.activate(element);
+      // cornerstoneTools.panMultiTouch.activate(element);
 
       //*****Added Play clip
 
       cornerstoneTools.addStackStateManager(element, ['stack', 'playClip']);
       cornerstoneTools.addToolState(element, 'stack', stack);
-      //cornerstoneTools.scrollIndicator.enable(element)
+      // cornerstoneTools.scrollIndicator.enable(element)
 
       var playClipToolData = cornerstoneTools.getToolState(element, 'playClip');
       if (!playClipToolData.data.length) {
@@ -388,7 +389,7 @@ class DicomViewer extends React.Component {
       // Enable all tools we want to use with this element
       cornerstoneTools.stackScroll.activate(element, 1);//<--------------ui button of enablt scrolling through left button
       cornerstoneTools.stackScrollWheel.activate(element);
-      cornerstoneTools.scrollIndicator.enable(element);
+      // cornerstoneTools.scrollIndicator.enable(element);
       // Uncomment below to enable stack prefetching
       // With the example images the loading will be extremely quick, though
       // cornerstoneTools.stackPrefetch.enable(element, 3);
@@ -510,31 +511,29 @@ class DicomViewer extends React.Component {
     const { anchorEl } = this.state;
     const open = Boolean(anchorEl)
 
-    console.log(this.props.series)
-
     var viewerHeight = window.innerHeight-128-6 //4 is border
     var viewerWidth = window.innerWidth-128-6 //4 is border
     return (
       <div className={classes.root}>
           <AppBar className={classes.appBar}>
             <ToggleButtonGroup exclusive >
-                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => { this.enableTool("stackScroll", 1); cornerstoneTools.stackScrollTouchDrag.activate(this.dicomImage); }}>
+                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => { this.enableTool("stackScroll", 1);  }}>
 
                       <NavigationIcon />
                       Navigate
                     </Button>
 
-                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => { this.enableTool("wwwc", 1); cornerstoneTools.wwwcTouchDrag.activate(this.dicomImage); }}>
+                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => { this.enableTool("wwwc", 1); }}>
                       <Brightness6Icon />
                       Levels
                     </Button>
 
-                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {this.enableTool("pan", 3); cornerstoneTools.panTouchDrag.activate(this.dicomImage);}}>
+                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {this.enableTool("pan", 3); }}>
                       <OpenWithIcon />
                       Pan
                     </Button>
               
-                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {this.enableTool("zoom", 5); cornerstoneTools.zoomTouchDrag.activate(this.dicomImage);}}>
+                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {this.enableTool("zoom", 5); }}>
                       <SearchIcon />
                       Zoom
                     </Button>
@@ -806,7 +805,7 @@ class DicomViewer extends React.Component {
                 WW/WC:
               </div>
 
-              <div class="orientationMarkers" style={{position: "absolute", top: "0%", left: "0%", width: viewerWidth, height: viewerHeight}}>
+              <div class="orientationMarkers" style={{position: "absolute", top: "0%", left: "0%", width: 0, height: 0}}>
                 <div class="mrbottommiddle orientationMarkerDiv" style={{ position: "absolute", bottom: "0.5%", left: "50%" }}>
                   <span class="orientationMarker">Q</span>
                 </div>
