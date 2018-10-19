@@ -4,7 +4,8 @@ import {Button, Divider, Typography, TextField, Grid, Table, TableBody, TableCel
   Collapse, TableRowColumn} from '@material-ui/core';
 import {ExpandMore, ExpandLess} from '@material-ui/icons'
 import { withStyles } from '@material-ui/core/styles';
-import PACS from "./PACS"
+import PACS from "orthanc/src/pacs"
+
 
 const styles = theme => ({
 	root:{

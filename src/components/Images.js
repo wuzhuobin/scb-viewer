@@ -7,7 +7,7 @@ import {CloudUpload, ExpandMore} from '@material-ui/icons'
 import { withStyles } from '@material-ui/core/styles';
 import Upload from './Upload';
 import Patients from './Patients';
-import PACS from './PACS';
+import PACS from 'orthanc/src/pacs';
 
 function getToday(){
   var today = new Date();
