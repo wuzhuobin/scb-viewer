@@ -211,16 +211,12 @@ class Images extends React.Component {
   };
 
   handleStudyClick = (event, study) =>{
-    console.log("study click")
-    console.log(event)
-    console.log(study)
     this.setState({study: study})
-
   }
 
   render() {
     const {study} = this.state
-    const {classes} = this.props
+    const {onSelectSeries, classes} = this.props
 
     return (
       <div className={classes.root}>
@@ -246,7 +242,7 @@ class Images extends React.Component {
 
         <Divider className={classes.divider}/>
         <div className={classes.seriesPreview}>
-          <SeriesPreview study={study} />
+          <SeriesPreview study={study} onSelectSeries={onSelectSeries}/>
         </div>
 
         <Button variant="fab" color="secondary" className={classes.fab} onClick={this.handleUploadOpen}>

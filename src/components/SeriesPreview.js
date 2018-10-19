@@ -67,10 +67,9 @@ class SeriesPreview extends React.Component {
     
 	}
 
-	handleSeriesDoubleClick = (event,id)=>{
-		console.log('double click')
-		console.log(event)
-		console.log(id)
+	handleSeriesDoubleClick = (event,seriesId)=>{
+    this.props.onSelectSeries(event,seriesId)
+
 	}
 
 
@@ -81,7 +80,7 @@ class SeriesPreview extends React.Component {
             for (let i = 0; i < json.Series.length; ++i) {
               seriesPromises.push(PACS.serieInfo(json.Series[i]));
             }
-            console.log(json);
+            // console.log(json);
             Promise.all(seriesPromises).then(
               function (seriesJsons) {
                 let series = [];
@@ -96,7 +95,7 @@ class SeriesPreview extends React.Component {
                   serie.id = json.Series[i];
                   series.push(serie);
                 }
-                console.log(series)
+                // console.log(series)
                 this.setState({ series: series });
               }.bind(this)
             );
@@ -104,13 +103,9 @@ class SeriesPreview extends React.Component {
         )
   }
    
-  handleSeriesClick(event, seriesID){
-    console.log(seriesID)
-  }
-
     render() {
     	const {series} = this.state
-    	const {study, classes} = this.props
+    	const {onSelectSeries, study, classes} = this.props
 
     	return(
     	    <Grid container className={classes.root}>
@@ -123,7 +118,7 @@ class SeriesPreview extends React.Component {
               >
                 {series.map(serie => (
                   <Grid key={serie.id} item>
-                    <Paper className={classes.paper} onDoubleClick={event => this.handleSeriesClick(event, serie.id)}>
+                    <Paper className={classes.paper} onDoubleClick={event => this.handleSeriesDoubleClick(event, serie.id)}>
                       <div className={classes.seriesContent}>
                         <Typography className={classes.text}>
                           {serie.bodyPart}

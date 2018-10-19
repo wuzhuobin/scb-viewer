@@ -41,6 +41,7 @@ class Content extends React.Component {
         super(props);
         this.state = {
             page: 0,
+            series: []
         };
     }
 
@@ -48,8 +49,12 @@ class Content extends React.Component {
     	this.setState({page: value});
   	}
 
+    onSelectSeries = (event, series)=>{
+      this.setState({series: series})
+    }
+
     render(){
-        const {open, onDrawerClose, classes} = this.props
+        const {series, open, onDrawerClose, classes} = this.props
         const {page} = this.state
 
         return(
@@ -61,9 +66,9 @@ class Content extends React.Component {
                   [classes.contentShift]: open,
                 })}
             >
-              {page === 0 && <Images />}
+              {page === 0 && <Images onSelectSeries={this.onSelectSeries}/>}
               {page === 1 && <div>Projects</div>}
-              {page === 2 && <DicomViewer />}
+              {page === 2 && <DicomViewer series={series}/>}
           </main>
         </div>
     );
