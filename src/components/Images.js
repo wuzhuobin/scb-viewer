@@ -7,6 +7,7 @@ import {CloudUpload, ExpandMore} from '@material-ui/icons'
 import { withStyles } from '@material-ui/core/styles';
 import Upload from './Upload';
 import Patients from './Patients';
+import SeriesPreview from './SeriesPreview';
 import PACS from './PACS';
 
 function getToday(){
@@ -54,10 +55,6 @@ const styles = theme => ({
   button: {
     margin: theme.spacing.unit*0,
   },
-  Date: {
-
-  },
-
   search: {
     position: 'relative',
     borderRadius: theme.shape.borderRadius,
@@ -76,12 +73,22 @@ const styles = theme => ({
   tableWrapper: {
     overflow: 'auto',
     color: theme.palette.secondary.contrastText,
+    height: 'calc(100% - 151px)'
   },
   // tablePagination: {
   //   color: theme.palette.secondary.contrastText,
   // }
   tableRow:{
     
+  },
+  seriesPreview:{
+    height: '150px',
+    // width: ''
+    // overflow: 'auto',
+    // 
+  },
+  divider:{
+    backgroundColor: theme.palette.secondary.light,
   }
 });
 
@@ -122,7 +129,8 @@ class EnhancedTableHead extends React.Component{
       return(
         <TableHead >
             <TableRow>
-              <TableCell key='patientId' numeric={false} sortDirection='asc'>
+              <TableCell></TableCell>
+              <TableCell key='patientName' numeric={false} sortDirection='asc'>
                 <TableSortLabel
                   active={true}
                   style={{color: 'white'}}>
@@ -130,10 +138,13 @@ class EnhancedTableHead extends React.Component{
                 </TableSortLabel>
               </TableCell>
               <TableCell style={{color: 'white'}}>Patient Name</TableCell>
-              <TableCell style={{color: 'white'}}>Birth Date</TableCell>
+              <TableCell style={{color: 'white'}}>Date of Birth</TableCell>
               <TableCell style={{color: 'white'}}>Gender</TableCell>
-              <TableCell style={{color: 'white'}}></TableCell>
-            </TableRow>
+              <TableCell style={{color: 'white'}}>Study</TableCell>
+              <TableCell style={{color: 'white'}}>Institution</TableCell>
+              <TableCell style={{color: 'white'}}>Requested Procedure</TableCell>
+              <TableCell style={{color: 'white'}}>Study Date</TableCell>
+            </TableRow>       
           </TableHead>
           )
     }
@@ -204,24 +215,29 @@ class Images extends React.Component {
 
     return (
       <div className={classes.root}>
-        <TablePagination
-            component="div"
-            colSpan={20}
-            count={this.state.patients.length}
-            rowsPerPage={5}
-            page={0}
-            onChangePage={this.handleChangePage}
-            onChangeRowsPerPage={this.handleChangeRowsPerPage}
-                    // ActionsComponent={TablePaginationActionsWrapped}
-          />
         <div className={classes.tableWrapper}>
+          <TablePagination
+              component="div"
+              colSpan={20}
+              count={this.state.patients.length}
+              rowsPerPage={5}
+              page={0}
+              onChangePage={this.handleChangePage}
+              onChangeRowsPerPage={this.handleChangeRowsPerPage}
+                      // ActionsComponent={TablePaginationActionsWrapped}
+            />
 
-        <Table className={classes.table}>
-          <EnhancedTableHead />
-          <TableBody >
-            {this.state.patients.map( patient => {return (<Patients patient={patient}/>)})}
-          </TableBody>
-        </Table>
+          <Table className={classes.table}>
+            <EnhancedTableHead />
+            <TableBody >
+              {this.state.patients.map( patient => {return (<Patients patient={patient}/>)})}
+            </TableBody>
+          </Table>
+        </div>
+
+        <Divider className={classes.divider}/>
+        <div className={classes.seriesPreview}>
+          <SeriesPreview />
         </div>
 
         <Button variant="fab" color="secondary" className={classes.fab} onClick={this.handleUploadOpen}>
