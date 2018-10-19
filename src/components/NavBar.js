@@ -64,7 +64,11 @@ class NavBar extends React.Component {
         this.setState({anchorEl: event.currentTarget });
     };
 
-    handleClose = () => {
+    handleClose = () =>{
+        this.setState({ anchorEl: null });
+    }
+
+    handleLogout = () => {
         console.log("Enter Handle Close");
         this.setState({ anchorEl: null });
         this.props.offAuth();
@@ -119,7 +123,7 @@ class NavBar extends React.Component {
                                 open={meunOpen}
                                 onClose={this.handleClose}
                             >
-                            <MenuItem onClick={this.handleClose}>Logout</MenuItem>
+                            <MenuItem onClick={this.handleLogout}>Logout</MenuItem>
                             </Menu2>
                         </div>
                         )
