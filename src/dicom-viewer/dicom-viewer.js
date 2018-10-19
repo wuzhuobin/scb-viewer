@@ -100,7 +100,70 @@ class DicomViewer extends React.Component {
     });
   };
 
+  rotateMarker(div, rotation) {
+    var rotationCSS = {
+        "-webkit-transform-origin": "center center",
+        "-moz-transform-origin": "center center",
+        "-o-transform-origin": "center center",
+        "transform-origin": "center center",
+        "transform" : "rotate("+ rotation +"deg)"
+    };
 
+    var oppositeRotationCSS = {
+        "-webkit-transform-origin": "center center",
+        "-moz-transform-origin": "center center",
+        "-o-transform-origin": "center center",
+        "transform-origin": "center center",
+        "transform" : "rotate("+ -rotation +"deg)"
+    };
+
+    Object.keys(rotationCSS).forEach(function(key) {
+      div.style[key] = rotationCSS[key];
+    });
+
+    const orientationMarkerDivs = div.querySelectorAll(".orientationMarkerDiv");
+    Object.keys(rotationCSS).forEach(function(key) {
+      orientationMarkerDivs.forEach(function(div) {
+        div.style[key] = oppositeRotationCSS[key];
+      });
+    });
+  }
+
+
+  calculateOrientationMarkers(element) {
+    var enabledElement = cornerstone.getEnabledElement(element);
+    var imagePlaneMetaData = cornerstone.metaData.get('imagePlaneModule', enabledElement.image.imageId);
+    console.log(imagePlaneMetaData);
+    
+    var rowString = cornerstoneTools.orientation.getOrientationString(imagePlaneMetaData.rowCosines);
+    var columnString = cornerstoneTools.orientation.getOrientationString(imagePlaneMetaData.columnCosines);
+
+    var oppositeRowString = cornerstoneTools.orientation.invertOrientationString(rowString);
+    var oppositeColumnString = cornerstoneTools.orientation.invertOrientationString(columnString);
+
+    var markers = {
+        top: oppositeColumnString,
+        bottom: columnString,
+        left: oppositeRowString,
+        right: rowString
+    }
+
+    var topMid = element.querySelector('.mrtopmiddle .orientationMarker');
+    var bottomMid = element.querySelector('.mrbottommiddle .orientationMarker');
+    var rightMid = element.querySelector('.mrrightmiddle .orientationMarker');
+    var leftMid = element.querySelector('.mrleftmiddle .orientationMarker');
+
+    topMid.textContent = markers.top;
+    bottomMid.textContent = markers.bottom;
+    rightMid.textContent = markers.right;
+    leftMid.textContent = markers.left;
+  }
+
+  updateOrientationMarkers(element, viewport) {
+    // Apply rotations
+    var orientationMarkers = element.querySelector('.orientationMarkers');
+    this.rotateMarker(orientationMarkers, viewport.rotation);
+  }
 
   componentWillMount() {
     cornerstoneTools.external.cornerstone = cornerstone;
@@ -199,6 +262,7 @@ class DicomViewer extends React.Component {
 
       document.getElementById("mrbottomleft").textContent = `WW/WC: ${Math.round(viewport.voi.windowWidth)}/${Math.round(viewport.voi.windowCenter)}`;
       document.getElementById("mrbottomright").textContent = `Zoom: ${viewport.scale.toFixed(2)}`;
+      this.updateOrientationMarkers(e.target, viewport);
     }
 
     element.addEventListener("cornerstoneimagerendered", onImageRendered);
@@ -232,6 +296,12 @@ class DicomViewer extends React.Component {
 
     cornerstone.loadImage(this.state.imageLoaderHintsArray[stack.currentImageIdIndex]).then(image => {
       cornerstone.displayImage(element, image);
+
+      //Orientation Marker
+      var viewport = cornerstone.getViewport(element);
+      this.calculateOrientationMarkers(element, viewport);
+      this.updateOrientationMarkers(element, viewport);
+
       cornerstoneTools.mouseInput.enable(element);
       cornerstoneTools.mouseWheelInput.enable(element);
       //cornerstoneTools.touchInput.enable(element);
@@ -462,7 +532,7 @@ class DicomViewer extends React.Component {
                       Annotate
                     </Button>
 
-                    <Button classes={{label: classes.label}} color="inherit" size="small" 
+                    <Button classes={{label: classes.label}} color="inherit" size="small"
                       onClick={() => {
                         if(this.state.playingClip==false)
                         {
@@ -552,7 +622,13 @@ class DicomViewer extends React.Component {
                           const element = this.dicomImage;
                           const viewport = cornerstone.getViewport(element);
                           viewport.vflip = !viewport.vflip;
-                          cornerstone.setViewport(element, viewport);}}
+                          cornerstone.setViewport(element, viewport);
+
+                          var topMid = element.querySelector('.mrtopmiddle .orientationMarker');
+                          var bottomMid = element.querySelector('.mrbottommiddle .orientationMarker');
+                          var temp = topMid.textContent;
+                          topMid.textContent = bottomMid.textContent;
+                          bottomMid.textContent = temp;}}
                           >
                         <VFlipIcon />
                         Flip V
@@ -563,7 +639,13 @@ class DicomViewer extends React.Component {
                           const element = this.dicomImage;
                           const viewport = cornerstone.getViewport(element);
                           viewport.hflip = !viewport.hflip;
-                          cornerstone.setViewport(element, viewport);}}
+                          cornerstone.setViewport(element, viewport);
+
+                          var rightMid = element.querySelector('.mrrightmiddle .orientationMarker');
+                          var leftMid = element.querySelector('.mrleftmiddle .orientationMarker');
+                          var temp = rightMid.textContent;
+                          rightMid.textContent = leftMid.textContent;
+                          leftMid.textContent = temp;}}
                           >
                         <HFlipIcon />
                         Flip H
@@ -599,6 +681,13 @@ class DicomViewer extends React.Component {
                         onClick={() => {
                           const element = this.dicomImage;
                           cornerstone.reset(element);
+
+                          const viewport = cornerstone.getViewport(element);
+                          viewport.hflip = false;
+                          viewport.vflip = false;
+                          viewport.rotation = 0;
+                          cornerstone.setViewport(element, viewport);
+                          this.calculateOrientationMarkers(element, viewport);
                           }}
                           >
                         <ReplayIcon />
