@@ -91,6 +91,12 @@ class DicomViewer extends React.Component {
     }
   }
 
+  componentWillReceiveProps(nextProps) {
+      if (this.props.study !== nextProps.study && nextProps.study!=null) {
+        console.log(nextProps.study)
+      }
+    }
+
   handleClick = event => {
     this.setState({
       anchorEl: event.currentTarget
