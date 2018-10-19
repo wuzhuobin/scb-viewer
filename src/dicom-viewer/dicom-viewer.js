@@ -100,7 +100,70 @@ class DicomViewer extends React.Component {
     });
   };
 
+  rotateMarker(div, rotation) {
+    var rotationCSS = {
+        "-webkit-transform-origin": "center center",
+        "-moz-transform-origin": "center center",
+        "-o-transform-origin": "center center",
+        "transform-origin": "center center",
+        "transform" : "rotate("+ rotation +"deg)"
+    };
 
+    var oppositeRotationCSS = {
+        "-webkit-transform-origin": "center center",
+        "-moz-transform-origin": "center center",
+        "-o-transform-origin": "center center",
+        "transform-origin": "center center",
+        "transform" : "rotate("+ -rotation +"deg)"
+    };
+
+    Object.keys(rotationCSS).forEach(function(key) {
+      div.style[key] = rotationCSS[key];
+    });
+
+    const orientationMarkerDivs = div.querySelectorAll(".orientationMarkerDiv");
+    Object.keys(rotationCSS).forEach(function(key) {
+      orientationMarkerDivs.forEach(function(div) {
+        div.style[key] = oppositeRotationCSS[key];
+      });
+    });
+  }
+
+
+  calculateOrientationMarkers(element) {
+    var enabledElement = cornerstone.getEnabledElement(element);
+    var imagePlaneMetaData = cornerstone.metaData.get('imagePlaneModule', enabledElement.image.imageId);
+    console.log(imagePlaneMetaData);
+    
+    var rowString = cornerstoneTools.orientation.getOrientationString(imagePlaneMetaData.rowCosines);
+    var columnString = cornerstoneTools.orientation.getOrientationString(imagePlaneMetaData.columnCosines);
+
+    var oppositeRowString = cornerstoneTools.orientation.invertOrientationString(rowString);
+    var oppositeColumnString = cornerstoneTools.orientation.invertOrientationString(columnString);
+
+    var markers = {
+        top: oppositeColumnString,
+        bottom: columnString,
+        left: oppositeRowString,
+        right: rowString
+    }
+
+    var topMid = element.querySelector('.mrtopmiddle .orientationMarker');
+    var bottomMid = element.querySelector('.mrbottommiddle .orientationMarker');
+    var rightMid = element.querySelector('.mrrightmiddle .orientationMarker');
+    var leftMid = element.querySelector('.mrleftmiddle .orientationMarker');
+
+    topMid.textContent = markers.top;
+    bottomMid.textContent = markers.bottom;
+    rightMid.textContent = markers.right;
+    leftMid.textContent = markers.left;
+  }
+
+  updateOrientationMarkers(element, viewport) {
+    // Apply rotations
+    var orientationMarkers = element.querySelector('.orientationMarkers');
+    this.rotateMarker(orientationMarkers, viewport.rotation);
+  }
 
   componentWillMount() {
     cornerstoneTools.external.cornerstone = cornerstone;
@@ -121,24 +184,24 @@ class DicomViewer extends React.Component {
     //   resolve(['http://127.0.0.1:8080/0100.dcm','http://127.0.0.1:8080/0010.dcm','http://127.0.0.1:8080/1400.dcm','http://127.0.0.1:8080/0250.dcm','http://127.0.0.1:8080/0410.dcm']);
     // })
 
-    // return new Promise(function(resolve,reject){
-    //   resolve(['http://192.168.1.108:8080/0100.dcm','http://192.168.1.108:8080/0010.dcm','http://192.168.1.108:8080/1400.dcm','http://192.168.1.108:8080/0250.dcm','http://192.168.1.108:8080/0410.dcm']);
-    // })
-
     return new Promise(function(resolve,reject){
-      var queryResult =   fetch("http://223.255.146.2:8042/orthanc/series/" + GET+ "/ordered-slices").then(
-        (res)=>{return res.json();}).then((json)=>{ 
-        let cacheImagePathArray = [];
-        for(let i = 0; i < json.Dicom.length; ++i){
-          let path = "http://223.255.146.2:8042/orthanc" + json.Dicom[i]; 
-          cacheImagePathArray.push(path);
-        }
-        // console.log(cacheImagePathArray);
-        return cacheImagePathArray;
-      });
-      resolve(queryResult);
+      resolve(['http://192.168.1.108:8080/0100.dcm','http://192.168.1.108:8080/0010.dcm','http://192.168.1.108:8080/1400.dcm','http://192.168.1.108:8080/0250.dcm','http://192.168.1.108:8080/0410.dcm']);
+    })
 
-    });
+    // return new Promise(function(resolve,reject){
+    //   var queryResult =   fetch("http://223.255.146.2:8042/orthanc/series/" + GET+ "/ordered-slices").then(
+    //     (res)=>{return res.json();}).then((json)=>{ 
+    //     let cacheImagePathArray = [];
+    //     for(let i = 0; i < json.Dicom.length; ++i){
+    //       let path = "http://223.255.146.2:8042/orthanc" + json.Dicom[i]; 
+    //       cacheImagePathArray.push(path);
+    //     }
+    //     // console.log(cacheImagePathArray);
+    //     return cacheImagePathArray;
+    //   });
+    //   resolve(queryResult);
+
+    // });
   }
 
   seriesImages(id){
@@ -199,6 +262,7 @@ class DicomViewer extends React.Component {
 
       document.getElementById("mrbottomleft").textContent = `WW/WC: ${Math.round(viewport.voi.windowWidth)}/${Math.round(viewport.voi.windowCenter)}`;
       document.getElementById("mrbottomright").textContent = `Zoom: ${viewport.scale.toFixed(2)}`;
+      this.updateOrientationMarkers(e.target, viewport);
     }
 
     element.addEventListener("cornerstoneimagerendered", onImageRendered);
@@ -232,6 +296,12 @@ class DicomViewer extends React.Component {
 
     cornerstone.loadImage(this.state.imageLoaderHintsArray[stack.currentImageIdIndex]).then(image => {
       cornerstone.displayImage(element, image);
+
+      //Orientation Marker
+      var viewport = cornerstone.getViewport(element);
+      this.calculateOrientationMarkers(element, viewport);
+      this.updateOrientationMarkers(element, viewport);
+
       cornerstoneTools.mouseInput.enable(element);
       cornerstoneTools.mouseWheelInput.enable(element);
       //cornerstoneTools.touchInput.enable(element);
@@ -247,6 +317,12 @@ class DicomViewer extends React.Component {
       cornerstoneTools.simpleAngle.enable(element);
       cornerstoneTools.highlight.enable(element);
       cornerstoneTools.arrowAnnotate.enable(element);
+
+      console.log(image.columnPixelSpacing);//<----
+
+      cornerstoneTools.touchInput.enable(element);
+      cornerstoneTools.zoomTouchPinch.activate(element);
+      cornerstoneTools.panMultiTouch.activate(element);
 
       //*****Added Play clip
 
@@ -278,7 +354,7 @@ class DicomViewer extends React.Component {
       // Enable all tools we want to use with this element
       cornerstoneTools.stackScroll.activate(element, 1);//<--------------ui button of enablt scrolling through left button
       cornerstoneTools.stackScrollWheel.activate(element);
-
+      cornerstoneTools.scrollIndicator.enable(element);
       // Uncomment below to enable stack prefetching
       // With the example images the loading will be extremely quick, though
       // cornerstoneTools.stackPrefetch.enable(element, 3);
@@ -307,6 +383,7 @@ class DicomViewer extends React.Component {
       }
       else {
           cornerstoneTools.stackScroll.deactivate(this.dicomImage, 1);
+          cornerstoneTools.stackScrollTouchDrag.deactivate(this.dicomImage);
           console.log("Abc");
       }
 
@@ -341,6 +418,10 @@ class DicomViewer extends React.Component {
     else if (["wwwc"].includes(toolName)){
         cornerstoneTools.zoom.deactivate(this.dicomImage,1);
         cornerstoneTools.pan.deactivate(this.dicomImage,1);
+
+        cornerstoneTools.zoomTouchDrag.deactivate(this.dicomImage);
+        cornerstoneTools.panTouchDrag.deactivate(this.dicomImage);
+        cornerstoneTools.wwwcTouchDrag.deactivate(this.dicomImage);
 
         cornerstoneTools.wwwc.disable(this.dicomImage,1);
         cornerstoneTools.probe.disable(this.dicomImage, 1);
@@ -401,23 +482,23 @@ class DicomViewer extends React.Component {
       <div className={classes.root}>
           <AppBar className={classes.appBar}>
             <ToggleButtonGroup exclusive >
-                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => { this.enableTool("stackScroll", 1); }}>
+                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => { this.enableTool("stackScroll", 1); cornerstoneTools.stackScrollTouchDrag.activate(this.dicomImage); }}>
 
                       <NavigationIcon />
                       Navigate
                     </Button>
 
-                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => { this.enableTool("wwwc", 1); }}>
+                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => { this.enableTool("wwwc", 1); cornerstoneTools.wwwcTouchDrag.activate(this.dicomImage); }}>
                       <Brightness6Icon />
                       Levels
                     </Button>
 
-                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {this.enableTool("pan", 3);}}>
+                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {this.enableTool("pan", 3); cornerstoneTools.panTouchDrag.activate(this.dicomImage);}}>
                       <OpenWithIcon />
                       Pan
                     </Button>
               
-                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {this.enableTool("zoom", 5);}}>
+                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {this.enableTool("zoom", 5); cornerstoneTools.zoomTouchDrag.activate(this.dicomImage);}}>
                       <SearchIcon />
                       Zoom
                     </Button>
@@ -462,7 +543,7 @@ class DicomViewer extends React.Component {
                       Annotate
                     </Button>
 
-                    <Button classes={{label: classes.label}} color="inherit" size="small" 
+                    <Button classes={{label: classes.label}} color="inherit" size="small"
                       onClick={() => {
                         if(this.state.playingClip==false)
                         {
@@ -552,7 +633,13 @@ class DicomViewer extends React.Component {
                           const element = this.dicomImage;
                           const viewport = cornerstone.getViewport(element);
                           viewport.vflip = !viewport.vflip;
-                          cornerstone.setViewport(element, viewport);}}
+                          cornerstone.setViewport(element, viewport);
+
+                          var topMid = element.querySelector('.mrtopmiddle .orientationMarker');
+                          var bottomMid = element.querySelector('.mrbottommiddle .orientationMarker');
+                          var temp = topMid.textContent;
+                          topMid.textContent = bottomMid.textContent;
+                          bottomMid.textContent = temp;}}
                           >
                         <VFlipIcon />
                         Flip V
@@ -563,7 +650,13 @@ class DicomViewer extends React.Component {
                           const element = this.dicomImage;
                           const viewport = cornerstone.getViewport(element);
                           viewport.hflip = !viewport.hflip;
-                          cornerstone.setViewport(element, viewport);}}
+                          cornerstone.setViewport(element, viewport);
+
+                          var rightMid = element.querySelector('.mrrightmiddle .orientationMarker');
+                          var leftMid = element.querySelector('.mrleftmiddle .orientationMarker');
+                          var temp = rightMid.textContent;
+                          rightMid.textContent = leftMid.textContent;
+                          leftMid.textContent = temp;}}
                           >
                         <HFlipIcon />
                         Flip H
@@ -599,6 +692,13 @@ class DicomViewer extends React.Component {
                         onClick={() => {
                           const element = this.dicomImage;
                           cornerstone.reset(element);
+
+                          const viewport = cornerstone.getViewport(element);
+                          viewport.hflip = false;
+                          viewport.vflip = false;
+                          viewport.rotation = 0;
+                          cornerstone.setViewport(element, viewport);
+                          this.calculateOrientationMarkers(element, viewport);
                           }}
                           >
                         <ReplayIcon />
