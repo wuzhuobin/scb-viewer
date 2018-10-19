@@ -4,7 +4,7 @@ import {Button, Divider, Typography, TextField, Grid, Table, TableBody, TableCel
   Collapse, TableRowColumn} from '@material-ui/core';
 import {ExpandMore, ExpandLess} from '@material-ui/icons'
 import { withStyles } from '@material-ui/core/styles';
-import PACS from "orthanc/src/pacs"
+import PACS from "orthanc"
 import Studies from "./Studies"
 import classNames from 'classnames';
 
@@ -71,7 +71,7 @@ class Patients extends React.Component {
   }
 
     render() {
-    	const {open} = this.state
+    	const {open, studies} = this.state
     	const {patient, classes} = this.props
 
     	return(
@@ -81,28 +81,36 @@ class Patients extends React.Component {
               id={patient.id} 
               onClick={this.handleStudyOpen}
               >
+              <TableCell padding={'none'} colSpan={0} > 
+                  {this.state.open ? <ExpandLess style={{color: 'white'}} /> : <ExpandMore style={{color: 'white'}} />}    
+              </TableCell>
               <TableCell className={classes.tableCell}>{patient.name}</TableCell>
               <TableCell className={classes.tableCell}>{patient.patientId}</TableCell>
               <TableCell className={classes.tableCell}>{patient.birthDate}</TableCell>
               <TableCell className={classes.tableCell}>{patient.gender}</TableCell>
-              <TableCell padding={'none'} colSpan={0} > 
-                  {this.state.open ? <ExpandLess style={{color: 'white'}} /> : <ExpandMore style={{color: 'white'}} />}    
-              </TableCell>
+              <TableCell></TableCell>
+              <TableCell></TableCell>
+              <TableCell></TableCell>
+              <TableCell></TableCell>
             </TableRow>
 
-              {this.state.open && (
-              <TableRow className={classes.tableRowOpen}>
-                <TableCell padding={'none'} colSpan={12}> 
-                    <Table>
-                      <TableBody>
-                      	{this.state.studies.map(study => {return (<Studies study={study}/>)})}
-                      </TableBody>
-                    </Table>
-                </TableCell>
-              </TableRow>
-            )}
+            {this.state.open && (
+              this.state.studies.map(study => {
+                console.log(study)
+                return (
+                  <TableRow id={study.id} hover onDoubleClick={event => this.handleSeriesDoubleClick(event, study.id)}>
+                    <TableCell></TableCell>
+                    <TableCell></TableCell>
+                    <TableCell></TableCell>
+                    <TableCell></TableCell>
+                    <TableCell></TableCell>
+                    <TableCell className={classes.tableCell}>{study.Description}</TableCell>
+                    <TableCell className={classes.tableCell}>{study.Institution}</TableCell>
+                    <TableCell className={classes.tableCell}>{study.RequestedProcedure}</TableCell>
+                    <TableCell className={classes.tableCell}>{study.StudyDate}</TableCell>
+                  </TableRow>
+                  )}))}
         </React.Fragment>
-
     	)
     }
 
@@ -110,15 +118,3 @@ class Patients extends React.Component {
 
 
 export default withStyles(styles)(Patients);
-
-                      // <TableHead>
-                      //   <TableRow className={classes.seriesHeader}>
-                      //     <TableCell></TableCell>
-                      //     <TableCell style={{color: 'white'}}>Institution</TableCell>
-                      //     <TableCell style={{color: 'white'}}>Description</TableCell>
-                      //     <TableCell style={{color: 'white'}}>Requested Procedure</TableCell>
-                      //     <TableCell style={{color: 'white'}}>Study Date</TableCell>
-                      //     <TableCell style={{color: 'white'}}>Study ID</TableCell>
-                      //     <TableCell></TableCell>
-                      //   </TableRow>
-                      // </TableHead>
