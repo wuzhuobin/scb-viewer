@@ -17,11 +17,11 @@ const styles = theme => ({
   tableCell:{
     color: 'white',
   },
-  seriesHeader:{
-    backgroundColor: theme.palette.secondary.main
-  },
   tableRowOpen:{
     backgroundColor: theme.palette.secondary.main,
+  },
+  study:{
+    '&:hover': {backgroundColor: theme.palette.secondary.main,},
   }
 })
 
@@ -71,7 +71,7 @@ class Patients extends React.Component {
 
     render() {
     	const {open, studies} = this.state
-    	const {patient, classes} = this.props
+    	const {patient, onStudyClick, classes} = this.props
 
     	return(
         <React.Fragment>
@@ -95,9 +95,8 @@ class Patients extends React.Component {
 
             {this.state.open && (
               this.state.studies.map(study => {
-                console.log(study)
                 return (
-                  <TableRow id={study.id} hover onDoubleClick={event => this.handleSeriesDoubleClick(event, study.id)}>
+                  <TableRow id={study.id} onClick={event => onStudyClick(event, study.id)} className={classes.study}>
                     <TableCell></TableCell>
                     <TableCell></TableCell>
                     <TableCell></TableCell>

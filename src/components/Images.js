@@ -50,7 +50,7 @@ const styles = theme => ({
   },
   textField: {
     margin: theme.spacing.unit,
-    width: 150,
+    width: 10,
   },
   button: {
     margin: theme.spacing.unit*0,
@@ -73,7 +73,7 @@ const styles = theme => ({
   tableWrapper: {
     overflow: 'auto',
     color: theme.palette.secondary.contrastText,
-    height: 'calc(100% - 151px)'
+    height: 'calc(100% - 171px)'
   },
   // tablePagination: {
   //   color: theme.palette.secondary.contrastText,
@@ -82,7 +82,7 @@ const styles = theme => ({
     
   },
   seriesPreview:{
-    height: '150px',
+    height: '170px',
     // width: ''
     // overflow: 'auto',
     // 
@@ -162,7 +162,8 @@ class Images extends React.Component {
       startDate: '',
       endDate: '',
       modality: 'all',
-      patients: []
+      patients: [],
+      study: null,
     }
     PACS.allPatients((patientIdjsons) => {
       let promises = [];
@@ -209,8 +210,16 @@ class Images extends React.Component {
     // this.setState({ rowsPerPage: event.target.value });
   };
 
+  handleStudyClick = (event, study) =>{
+    console.log("study click")
+    console.log(event)
+    console.log(study)
+    this.setState({study: study})
+
+  }
+
   render() {
-    const {} = this.state
+    const {study} = this.state
     const {classes} = this.props
 
     return (
@@ -230,14 +239,14 @@ class Images extends React.Component {
           <Table className={classes.table}>
             <EnhancedTableHead />
             <TableBody >
-              {this.state.patients.map( patient => {return (<Patients patient={patient}/>)})}
+              {this.state.patients.map( patient => {return (<Patients patient={patient} onStudyClick={this.handleStudyClick}/>)})}
             </TableBody>
           </Table>
         </div>
 
         <Divider className={classes.divider}/>
         <div className={classes.seriesPreview}>
-          <SeriesPreview />
+          <SeriesPreview study={study} />
         </div>
 
         <Button variant="fab" color="secondary" className={classes.fab} onClick={this.handleUploadOpen}>
