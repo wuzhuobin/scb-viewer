@@ -323,7 +323,7 @@ class DicomViewer extends React.Component {
       //Orientation Marker
       var viewport = cornerstone.getViewport(element);
 
-        console.log(this.state.rowCosine);
+      console.log(image.patientName);
       if (stack.currentImageIdIndex===0){
         this.setState({
           rowCosine:image.patientOri.slice(0,3),
