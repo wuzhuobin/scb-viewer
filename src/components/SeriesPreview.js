@@ -94,7 +94,7 @@ class SeriesPreview extends React.Component {
                     seriesJsons[i].MainDicomTags.StationName
                   );
                   serie.id = json.Series[i];
-                  serie.slicesCount = 9999;
+                  serie.slicesCount = seriesJsons[i].Instances.length;
                   series.push(serie);
                 }
                 // console.log(series)
