@@ -111,12 +111,6 @@ class DicomViewer extends React.Component {
     });
   };
 
-    updateOrientationMarkers(element, viewport) {
-    // Apply rotations
-    // var orientationMarkers = document.querySelector('.orientationMarkers');
-    // console.log(orientationMarkers);
-    // this.rotateMarker(orientationMarkers, viewport.rotation);
-  };
 
     rotateMarker(div, rotation) {
     var rotationCSS = {
@@ -180,9 +174,6 @@ class DicomViewer extends React.Component {
   }
 
 
-
-
-
   componentWillMount() {
     cornerstoneTools.external.cornerstone = cornerstone;
     cornerstoneTools.external.cornerstoneMath = cornerstoneMath;
@@ -190,12 +181,13 @@ class DicomViewer extends React.Component {
   }
 
   componentDidMount() {
-    console.log("didmount")
-    console.log(this.props.series)
+    console.log("didmount");
+    console.log(this.props.series);
+    // this.dicomImage = null;
     this.readImage(this.props, this.state, cornerstone).then(res=>this.displayImage());
   }
 
-  getImagePathList(IP,Port,GET){//sync request for now
+  getImagePathList(IP,Port,Path1){//sync request for now
     // return ['./assets/Test1/0000.dcm'];
     // return ['http://192.168.1.126:3000/orthanc/instances/2d3e243d-8b918a6f-b3456d3e-0546d044-dab91ee0/file'];
     // return ['http://127.0.0.1:8080/0100.dcm'];
@@ -209,7 +201,7 @@ class DicomViewer extends React.Component {
     // })
 
     return new Promise(function(resolve,reject){
-      var queryResult =   fetch("http://223.255.146.2:8042/orthanc/series/" + GET+ "/ordered-slices").then(
+      var queryResult =   fetch("http://223.255.146.2:8042/orthanc/series/" + Path1+ "/ordered-slices").then(
         (res)=>{return res.json();}).then((json)=>{ 
         let cacheImagePathArray = [];
         for(let i = 0; i < json.Dicom.length; ++i){
@@ -240,13 +232,15 @@ class DicomViewer extends React.Component {
 
 
   readImage(props, state, cornerstoneInstance){
+    console.log("readimage")
+    console.log(props.series)
       //Get image path Array first
       const loadingResult = this.getImagePathList(1,1,props.series)
       // const loadingResult = this.getImagePathList(1,1,"cf8192f8-50e817d9-2aae4764-3c85d142-dc59a8d0")
       .then((queryList)=>{
         var cacheimagePathArray = [];
         const cacheimageLoaderHintsArray = [...Array(queryList.length).keys()].map(function(number){
-          return "example://" + String(number);
+          return props.series+"://" + String(number);
         });
         for (var i=0;i<queryList.length;i++){
           cacheimagePathArray.push(queryList[i]);
@@ -261,13 +255,16 @@ class DicomViewer extends React.Component {
         imageLoaderHintsArray:cacheimageLoaderHintsArray,
         hardCodeNumDcm:cacheimagePathArray.length
       }));
-      dicomLoader(cornerstoneInstance,cacheimagePathArray);
+      dicomLoader(cornerstoneInstance,cacheimagePathArray,props.series);
     });
 
+  console.log('loading result')
+  console.log(loadingResult)
+
   return loadingResult;
-
-
   }
+
+
 
 
 
@@ -275,37 +272,8 @@ class DicomViewer extends React.Component {
 
   displayImage = () => {
 
-
-
     const element = this.dicomImage;
-    // Listen for changes to the viewport so we can update the text overlays in the corner
-    
-    function onImageRendered(e) {
-      const viewport = cornerstone.getViewport(e.target);
 
-      document.getElementById("mrbottomleft").textContent = `WW/WC: ${Math.round(viewport.voi.windowWidth)}/${Math.round(viewport.voi.windowCenter)}`;
-      document.getElementById("mrbottomright").textContent = `Zoom: ${viewport.scale.toFixed(2)}`;
-      //updateOrientationMarkers(e.target, viewport);
-    }
-
-    element.addEventListener("cornerstoneimagerendered", onImageRendered);
-    
-    const config = {
-
-      // invert: true,
-      minScale: 0.25,
-      maxScale: 20.0,
-      preventZoomOutsideImage: true,
-    };
-
-    // Comment this out to draw only the top and left markers
-
-    cornerstoneTools.zoom.setConfiguration(config);
-
-    // const wheelEvents = ['mousewheel', 'DOMMouseScroll'];
-    // for (var i=0;i<wheelEvents.length;i++){
-    //   element.addEventListener(wheelEvents[i],this.wheelEventsHandler);
-    // }
 
     var stack = {
         currentImageIdIndex : 0,
@@ -332,10 +300,6 @@ class DicomViewer extends React.Component {
       }
 
       this.calculateOrientationMarkers(element, viewport, this.state);
-      this.updateOrientationMarkers(element, viewport);
-
-
-
 
       cornerstoneTools.mouseInput.enable(element);
       cornerstoneTools.mouseWheelInput.enable(element);
@@ -352,8 +316,6 @@ class DicomViewer extends React.Component {
       cornerstoneTools.simpleAngle.enable(element);
       cornerstoneTools.highlight.enable(element);
       cornerstoneTools.arrowAnnotate.enable(element);
-
-      // console.log(image.columnPixelSpacing);//<----
 
       cornerstoneTools.touchInput.enable(element);
       cornerstoneTools.zoomTouchPinch.activate(element);
@@ -394,7 +356,38 @@ class DicomViewer extends React.Component {
       // With the example images the loading will be extremely quick, though
       // cornerstoneTools.stackPrefetch.enable(element, 3);
     });
+
+    function onImageRendered(e) {
+      const viewport = cornerstone.getViewport(e.target);
+
+      document.getElementById("mrbottomleft").textContent = `WW/WC: ${Math.round(viewport.voi.windowWidth)}/${Math.round(viewport.voi.windowCenter)}`;
+      document.getElementById("mrbottomright").textContent = `Zoom: ${viewport.scale.toFixed(2)}`;
+    }
+
+    element.addEventListener("cornerstoneimagerendered", onImageRendered);
+    
+    const config = {
+
+      // invert: true,
+      minScale: 0.25,
+      maxScale: 20.0,
+      preventZoomOutsideImage: true,
+    };
+
+
+    cornerstoneTools.zoom.setConfiguration(config);
+
+
+
+
+
+
   };
+
+
+
+
+
 
   enableTool = (toolName, mouseButtonNumber) => {
     this.disableAllTools();
