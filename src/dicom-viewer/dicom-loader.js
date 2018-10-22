@@ -57,7 +57,6 @@ function getArrayMinMax(a){
 const dicomLoader = (cs,imageArray) => {
   const num_dcm = imageArray.length;
   var imageSeries = [];
-  var numCompleted = 0;
   var maxQueryedId = 0;
   for (var i=0;i<num_dcm;i++){
     imageSeries.push(null);
@@ -93,8 +92,6 @@ const dicomLoader = (cs,imageArray) => {
           resolve({
             minPixelValue: image.getImageMin(),
             maxPixelValue: image.getImageMax(),
-            // slope: image.getDataScaleSlope(),
-            // intercept: image.getDataScaleIntercept(),
             patientPos: image.getImagePosition(),
             patientOri: image.getImageDirections(),
             windowCenter: image.getWindowCenter(),
@@ -112,12 +109,9 @@ const dicomLoader = (cs,imageArray) => {
         }
         else {
           const range = computeImageMinMax(image);
-          // console.log(image.getImagePosition());
           resolve({
             minPixelValue: range[0],
             maxPixelValue: range[1],
-            // slope: image.getDataScaleSlope(),
-            // intercept: image.getDataScaleIntercept(),
             patientPos: image.getImagePosition(),
             patientOri: image.getImageDirections(),
             windowCenter: image.getWindowCenter(),
@@ -154,20 +148,19 @@ const dicomLoader = (cs,imageArray) => {
       }
       BatchLoadImage(failedSeries);
     }
-    // console.log(onceReadSeries.length);
-    // console.log(maxQueryedId);
+
     if (onceReadSeries.length){
       var minMax = getArrayMinMax(onceReadSeries);
-      if (maxQueryedId >= minMax[1]-CacheBuffer){
+      if (maxQueryedId > minMax[1]-CacheBuffer){
         const currentMaxRead = minMax[1];
-        // console.log(currentMaxRead);
         const numAdditionalRead = Math.min(num_dcm-1-currentMaxRead, BatchReadSize);
-        // console.log(numAdditionalRead);
         var toReadArray = [];
-        for (var i=0;i<numAdditionalRead;i++){
-          toReadArray.push(currentMaxRead+i+1);
+        for (var j=0;j<numAdditionalRead;j++){
+          toReadArray.push(currentMaxRead+j+1);
         }
-        BatchLoadImage(toReadArray);
+        if(numAdditionalRead){
+          BatchLoadImage(toReadArray);
+        }
       }
 
     }
@@ -176,8 +169,8 @@ const dicomLoader = (cs,imageArray) => {
  
   
   function getImageI(imageId) {
-    const width = 256;
-    const height = 256;
+    // const width = 256;
+    // const height = 256;
 
     function getPixelData() {
       if (String(imageId).substring(0,10) === "example://"){
