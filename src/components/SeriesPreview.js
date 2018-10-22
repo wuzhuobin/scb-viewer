@@ -33,7 +33,7 @@ const styles = theme => ({
     color: "yellow",
   },
   seriesContent:{
-    top: "100%",
+    // top: "100%",
     paddingLeft: 5,
     paddingBottom: 5,
     transform: "translateY(-100%)",
