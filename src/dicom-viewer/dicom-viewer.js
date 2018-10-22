@@ -193,10 +193,6 @@ class DicomViewer extends React.Component {
   }
 
   handleResize(event,dicomImage){
-    console.log("resizzzzzzzzzzzzzzzzzze")
-    // console.log(event)
-    console.log(dicomImage)
-
     if (dicomImage)
     {
         console.log('updateSize')
