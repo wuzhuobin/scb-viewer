@@ -338,6 +338,7 @@ class DicomViewer extends React.Component {
       cornerstoneTools.touchInput.enable(element);
       cornerstoneTools.zoomTouchPinch.activate(element);
       cornerstoneTools.panMultiTouch.activate(element);
+      cornerstoneTools.stackScrollTouchDrag.activate(element);
 
       //*****Added Play clip
 
@@ -501,13 +502,14 @@ class DicomViewer extends React.Component {
         cornerstoneTools.rotateTouchDrag.deactivate(this.dicomImage);
         cornerstoneTools.rotateTouch.disable(this.dicomImage);
         cornerstoneTools.ellipticalRoiTouch.deactivate(this.dicomImage);
-        cornerstoneTools.angleTouch.deactivate(this.dicomImage);
+        cornerstoneTools.simpleAngleTouch.deactivate(this.dicomImage);
         cornerstoneTools.rectangleRoiTouch.deactivate(this.dicomImage);
         cornerstoneTools.lengthTouch.deactivate(this.dicomImage);
         cornerstoneTools.probeTouch.deactivate(this.dicomImage);
         cornerstoneTools.zoomTouchDrag.deactivate(this.dicomImage);
         cornerstoneTools.wwwcTouchDrag.deactivate(this.dicomImage);
         cornerstoneTools.stackScrollTouchDrag.deactivate(this.dicomImage);
+        cornerstoneTools.arrowAnnotateTouch.deactivate(this.dicomImage);
   };
 
   dicomImageRef = el => {
@@ -582,7 +584,7 @@ class DicomViewer extends React.Component {
                       Highlight
                     </Button>
 
-                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {this.enableTool("arrowAnnotate", 1);}}>
+                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {this.enableTool("arrowAnnotate", 1); cornerstoneTools.arrowAnnotateTouch.activate(this.dicomImage);}}>
                       <AnnotateIcon />
                       Annotate
                     </Button>
