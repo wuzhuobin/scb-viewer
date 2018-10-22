@@ -52,6 +52,7 @@ const styles = theme=> ({
     },
     drawerOpen:{
         width: 'calc(100vw - 240px)',
+        height: 'calc(100vh - 128px)',
     },
     appBar:{
           flexGrow: 1,    
@@ -70,7 +71,11 @@ const styles = theme=> ({
       borderStyle: "solid",
       borderRadius:"0px",
       marginTop: "64px",
-      height: "calc(100vh - 128px - 6px)"
+      height: "calc(100vh - 128px - 6px)",
+      width: "calc(100vw - 6px)"
+     },
+     paperDrawerOpen:{
+      width: "calc(100vw - 6px - 240px)"
      },
 
     label: {
@@ -522,8 +527,14 @@ class DicomViewer extends React.Component {
     const { anchorEl } = this.state;
     const open = Boolean(anchorEl)
 
-    var viewerHeight = window.innerHeight-128-6 //4 is border
-    var viewerWidth = window.innerWidth-128-6 //4 is border
+    if (this.dicomImage !== null)
+    {
+      if (this.dicomImage.getElementsByClassName("cornerstone-canvas")[0]){
+        this.dicomImage.getElementsByClassName("cornerstone-canvas")[0].style.height = 'calc(100vh - 128px - 6px)'
+        this.dicomImage.getElementsByClassName("cornerstone-canvas")[0].style.width = 'calc(100%)'
+      }
+    }
+    
 
     return (
       <div className={classNames(classes.root, {[classes.drawerOpen]: this.props.drawerOpen,})}>
@@ -765,17 +776,24 @@ class DicomViewer extends React.Component {
             </Toolbar>
           </AppBar>
 
-        <Paper className={classes.paper}>
+        <Paper className={classNames(classes.paper, {[classes.paperDrawerOpen]: this.props.drawerOpen,})}>
           <div
-            style={{
+            style={this.props.drawerOpen? {
               // flexGrow: 1,    
               // display: 'flex',
-              // width: "calc(100vw-4px)",
-              // height: "calc(100vh-4px)",
+              width: "calc(100vw - 240px - 6px)",
+              height: "calc(100vh - 128px - 6px)",
               position: "relative",
               color: "yellow",
               // margin: 9
-            }}
+            } :
+            {
+              width: "calc(100vw - 6px)",
+              height: "calc(100vh - 128px - 6px)",
+              position: "relative",
+              color: "yellow",
+            }
+          }
                 onContextMenu={() => false}
                 className="cornerstone-enabled-image"
                 unselectable="on"
