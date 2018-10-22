@@ -1,7 +1,7 @@
 import React from 'react'
 import {List, ListItem, ListItemIcon, ListItemText, Drawer, Divider, IconButton, Typography} from '@material-ui/core'
 import {withStyles} from '@material-ui/core/styles'
-import {Collections, Portrait, Visibility, ChevronLeft} from '@material-ui/icons'
+import {Collections, Portrait, Visibility, ChevronLeft, ThreeDRotation} from '@material-ui/icons'
 
 const drawerWidth =240;
 
@@ -77,11 +77,9 @@ class DrawerMenu extends React.Component {
                 </ListItemIcon>
                 <ListItemText primary={<Typography variant="h6" style={{ color: 'white' }}>2D Viewer</Typography>} />
                 </ListItem>
-            </List>
-            <List>
                 <ListItem button onClick={() => {onChangePage(3);}} className={classes.button}>
                 <ListItemIcon>
-                  <Visibility className={classes.button} />
+                  <ThreeDRotation className={classes.button} />
                 </ListItemIcon>
                 <ListItemText primary={<Typography variant="h6" style={{ color: 'white' }}>3D Viewer</Typography>} />
                 </ListItem>
