@@ -3,7 +3,7 @@ import React from "react";
 import {Grid, Paper, CardContent, Typography} from '@material-ui/core';
 import {ExpandMore, ExpandLess} from '@material-ui/icons'
 import { withStyles } from '@material-ui/core/styles';
-import PACS from "orthanc/src/pacs";
+import PACS from "orthanc";
 
 const styles = theme => ({
 	root:{
@@ -33,7 +33,7 @@ const styles = theme => ({
     color: "yellow",
   },
   seriesContent:{
-    top: "100%",
+    // top: "100%",
     paddingLeft: 5,
     paddingBottom: 5,
     transform: "translateY(-100%)",
@@ -53,6 +53,7 @@ class SeriesPreview extends React.Component {
     	this.state={
         open:false,
         series: [],
+        imgs: [],
       };
 	}
 
@@ -86,9 +87,9 @@ class SeriesPreview extends React.Component {
                 let series = [];
                 for (let i = 0; i < seriesJsons.length; ++i) {
                   let serie = createData(
-                    "",
+                    seriesJsons[i].MainDicomTags.BodyPartExamined,
                     seriesJsons[i].MainDicomTags.Modality,
-                    "",
+                    seriesJsons[i].MainDicomTags.ProtocolName,
                     seriesJsons[i].MainDicomTags.SeriesNumber,
                     seriesJsons[i].MainDicomTags.StationName
                   );
@@ -101,10 +102,20 @@ class SeriesPreview extends React.Component {
             );
           }.bind(this)
         )
+        // update images 
+        PACS.studyInfo(study, (json)=>{
+          for (let i = 0; i < json.Series.length; ++i) {
+            PACS.seriesPreview(json.Series[i], (str)=>{
+              let imgs = this.state.imgs.slice();  
+              imgs.push(str);
+              this.setState({imgs: imgs});
+            } );
+          } 
+        });
   }
    
     render() {
-    	const {series} = this.state
+    	const {series, imgs} = this.state
     	const {onSelectSeries, study, classes} = this.props
 
     	return(
@@ -116,10 +127,11 @@ class SeriesPreview extends React.Component {
                 className={classes.demo}
                 alignItems='center'
               >
-                {series.map(serie => (
+                {series.map((serie, index) => (
                   <Grid key={serie.id} item>
-                    <Paper className={classes.paper} onDoubleClick={event => this.handleSeriesDoubleClick(event, serie.id)}>
-                      <div className={classes.seriesContent}>
+                  <Paper className={classes.paper} onDoubleClick={event => this.handleSeriesDoubleClick(event, serie.id)}>
+                    <img src={imgs[index]} height="140px" width="140px"></img>
+                    <div className={classes.seriesContent}>
                         <Typography className={classes.text}>
                           {serie.bodyPart}
                         </Typography>
