@@ -113,9 +113,9 @@ class DicomViewer extends React.Component {
 
     updateOrientationMarkers(element, viewport) {
     // Apply rotations
-    var orientationMarkers = document.querySelector('.orientationMarkers');
-    console.log(orientationMarkers);
-    this.rotateMarker(orientationMarkers, viewport.rotation);
+    // var orientationMarkers = document.querySelector('.orientationMarkers');
+    // console.log(orientationMarkers);
+    // this.rotateMarker(orientationMarkers, viewport.rotation);
   };
 
     rotateMarker(div, rotation) {
@@ -805,22 +805,20 @@ class DicomViewer extends React.Component {
                 WW/WC:
               </div>
 
-              <div class="orientationMarkers" style={{position: "absolute", top: "0%", left: "0%", width: 0, height: 0}}>
-                <div class="mrbottommiddle orientationMarkerDiv" style={{ position: "absolute", bottom: "0.5%", left: "50%" }}>
-                  <span class="orientationMarker">Q</span>
-                </div>
+              <div class="mrbottommiddle orientationMarkerDiv" style={{ position: "absolute", bottom: "0.5%", left: "50%" }}>
+                <span class="orientationMarker">Q</span>
+              </div>
 
-                <div class="mrleftmiddle orientationMarkerDiv" style={{ position: "absolute", bottom: "50%", left: "0.5%" }}>
-                  <span class="orientationMarker">Q</span>
-                </div>
+              <div class="mrleftmiddle orientationMarkerDiv" style={{ position: "absolute", bottom: "50%", left: "0.5%" }}>
+                <span class="orientationMarker">Q</span>
+              </div>
 
-                <div class="mrtopmiddle orientationMarkerDiv" style={{ position: "absolute", top: "0.5%", left: "50%" }}>
-                  <span class="orientationMarker">Q</span>
-                </div>
+              <div class="mrtopmiddle orientationMarkerDiv" style={{ position: "absolute", top: "0.5%", left: "50%" }}>
+                <span class="orientationMarker">Q</span>
+              </div>
 
-                <div  class="mrrightmiddle orientationMarkerDiv" style={{ position: "absolute", bottom: "50%", right: "0.5%" }}>
-                  <span class="orientationMarker">Q</span>
-                </div>
+              <div  class="mrrightmiddle orientationMarkerDiv" style={{ position: "absolute", bottom: "50%", right: "0.5%" }}>
+                <span class="orientationMarker">Q</span>
               </div>
 
             </div>
