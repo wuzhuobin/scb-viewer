@@ -78,6 +78,14 @@ class DrawerMenu extends React.Component {
                 <ListItemText primary={<Typography variant="h6" style={{ color: 'white' }}>2D Viewer</Typography>} />
                 </ListItem>
             </List>
+            <List>
+                <ListItem button onClick={() => {onChangePage(3);}} className={classes.button}>
+                <ListItemIcon>
+                  <Visibility className={classes.button} />
+                </ListItemIcon>
+                <ListItemText primary={<Typography variant="h6" style={{ color: 'white' }}>3D Viewer</Typography>} />
+                </ListItem>
+            </List>
           </Drawer>
         	);
         </div>

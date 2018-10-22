@@ -54,8 +54,9 @@ function getArrayMinMax(a){
 
 
 
-const dicomLoader = (cs,imageArray) => {
+const dicomLoader = (cs,imageArray, loaderHint) => {
   const num_dcm = imageArray.length;
+  const cacheLoaderHint = loaderHint;
   var imageSeries = [];
   var maxQueryedId = 0;
   for (var i=0;i<num_dcm;i++){
@@ -94,6 +95,7 @@ const dicomLoader = (cs,imageArray) => {
             maxPixelValue: image.getImageMax(),
             patientPos: image.getImagePosition(),
             patientOri: image.getImageDirections(),
+            patientName: image.getPatientName(),
             windowCenter: image.getWindowCenter(),
             windowWidth: image.getWindowWidth(),
             getPixelData: () => image.getInterpretedData(),
@@ -114,6 +116,7 @@ const dicomLoader = (cs,imageArray) => {
             maxPixelValue: range[1],
             patientPos: image.getImagePosition(),
             patientOri: image.getImageDirections(),
+            patientName: image.getPatientName(),
             windowCenter: image.getWindowCenter(),
             windowWidth: image.getWindowWidth(),
             getPixelData: () => image.getInterpretedData(),
@@ -173,8 +176,9 @@ const dicomLoader = (cs,imageArray) => {
     // const height = 256;
 
     function getPixelData() {
-      if (String(imageId).substring(0,10) === "example://"){
-        const id = parseInt(String(imageId).substring(10,String(imageId).length));
+      const loaderHintLength = cacheLoaderHint.length;
+      if (String(imageId).substring(0,loaderHintLength+3) === cacheLoaderHint+"://"){
+        const id = parseInt(String(imageId).substring(loaderHintLength+3,String(imageId).length));
         console.log("Accessing " + id + "-th image out of " + imageSeries.length + " images");
         if (id>maxQueryedId){
           maxQueryedId = id;
@@ -223,7 +227,7 @@ const dicomLoader = (cs,imageArray) => {
   }
 
   // register our imageLoader plugin with cornerstone
-  cs.registerImageLoader("example", getImageI);
+  cs.registerImageLoader(cacheLoaderHint, getImageI);
 };
 
 export default dicomLoader;
