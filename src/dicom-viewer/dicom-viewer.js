@@ -41,18 +41,24 @@ import CardContent from '@material-ui/core/CardContent';
 import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
 import Popover from "@material-ui/core/Popover";
 
+import classNames from 'classnames';
+
 const styles = theme=> ({
     root:{    
-        width: '100%',
+        width: '100vw',
+        height: 'calc(100vh - 128px)',
+        // overflow: 'auto',
         // flexGrow: 1,
     },
-    
+    drawerOpen:{
+        width: 'calc(100vw - 240px)',
+    },
     appBar:{
           flexGrow: 1,    
           zIndex: 1,
-          overflow: 'hidden',
-          position: 'static',
-          display: 'flex',
+          overflow: 'auto',
+          position: 'absolute',
+          // display: 'flex',
           height: '64px',
           justifyContent: 'center',
           background: theme.palette.secondary.main
@@ -63,6 +69,8 @@ const styles = theme=> ({
       borderColor: theme.palette.primary.main,
       borderStyle: "solid",
       borderRadius:"0px",
+      marginTop: "64px",
+      height: "calc(100vh - 128px - 6px)"
      },
 
     label: {
@@ -514,12 +522,12 @@ class DicomViewer extends React.Component {
 
     var viewerHeight = window.innerHeight-128-6 //4 is border
     var viewerWidth = window.innerWidth-128-6 //4 is border
-    return (
-      <div className={classes.root}>
-          <AppBar className={classes.appBar}>
-            <ToggleButtonGroup exclusive >
-                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => { this.enableTool("stackScroll", 1);  cornerstoneTools.stackScrollTouchDrag.activate(this.dicomImage);}}>
 
+    return (
+      <div className={classNames(classes.root, {[classes.drawerOpen]: this.props.drawerOpen,})}>
+          <AppBar className={classes.appBar}>
+            <Toolbar>
+                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => { this.enableTool("stackScroll", 1);  cornerstoneTools.stackScrollTouchDrag.activate(this.dicomImage);}}>
                       <NavigationIcon />
                       Navigate
                     </Button>
@@ -751,10 +759,8 @@ class DicomViewer extends React.Component {
                         <ReplayIcon />
                         Reset
                       </Button>
-
                     </Popover>             
-
-            </ToggleButtonGroup>
+            </Toolbar>
           </AppBar>
 
         <Paper className={classes.paper}>
@@ -780,10 +786,8 @@ class DicomViewer extends React.Component {
                 style={{
                   // flexGrow: 1,    
                   // display: 'flex',
-                  // width: "calc(100vw-4px)",
-                  // height: "calc(100vh-4px)",
-                  width: viewerWidth,
-                  height: viewerHeight,
+                  width: "100%",
+                  height: "calc(100vh - 128px - 6px)",
                   top: 0,
                   left: 0,
                   position: "relative",
