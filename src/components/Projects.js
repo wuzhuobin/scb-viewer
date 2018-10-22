@@ -6,6 +6,7 @@ import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
+import ProjectTable from './ProjectTable'
 
 function TabContainer(props) {
   return (
@@ -51,7 +52,7 @@ class Projects extends React.Component {
       <div className={classes.root}>
         <AppBar position="static">
           <Tabs value={value} onChange={this.handleChange}>
-            <Tab value="one" label="New Arrivals in the Longest Text of Nonfiction" />
+            <Tab value="one" label="Project" />
             <Tab value="two" label="Item Two" />
             <Tab value="three" label="Item Three" />
             <Button variant="contained" color="secondary" className={classes.button}>
@@ -60,7 +61,7 @@ class Projects extends React.Component {
           </Tabs>
         
         </AppBar>
-        {value === 'one' && <TabContainer>Item OneABC</TabContainer>}
+        {value === 'one' && <TabContainer><ProjectTable/></TabContainer>}
         {value === 'two' && <TabContainer>Item Two</TabContainer>}
         {value === 'three' && <TabContainer>Item Three</TabContainer>}
       </div>
