@@ -31,6 +31,7 @@ const styles = theme=> ({
   },
   contentShift: {
       marginLeft: drawerWidth,
+      width: 'calc(100vw - 240px)',
       transition: theme.transitions.create('margin', {
           easing: theme.transitions.easing.easeOut,
           duration: theme.transitions.duration.enteringScreen,
@@ -73,7 +74,7 @@ class Content extends React.Component {
             >
               {page === 0 && <Images onSelectSeries={this.onSelectSeries}/>}
               {page === 1 && <Projects />}         
-              {page === 2 && <DicomViewer series={this.state.series}/>}
+              {page === 2 && <DicomViewer series={this.state.series} drawerOpen={this.props.open}/>}
           </main>
         </div>
     );
