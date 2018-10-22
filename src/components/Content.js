@@ -6,6 +6,7 @@ import DicomViewer from "../dicom-viewer";
 import {Collections, Portrait, Visibility} from '@material-ui/icons'
 import classNames from 'classnames';
 import DrawerMenu from "./DrawerMenu";
+import Projects from './Projects';
 
 const drawerWidth = 240;
 
@@ -71,7 +72,7 @@ class Content extends React.Component {
                 })}
             >
               {page === 0 && <Images onSelectSeries={this.onSelectSeries}/>}
-              {page === 1 && <div>Projects</div>}
+              {page === 1 && <Projects />}         
               {page === 2 && <DicomViewer series={this.state.series}/>}
           </main>
         </div>
@@ -79,3 +80,5 @@ class Content extends React.Component {
 }
 }
 export default withStyles(styles)(Content);
+
+ //<div>Projects</div>}
