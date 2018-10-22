@@ -355,9 +355,9 @@ class DicomViewer extends React.Component {
 
       // console.log(image.columnPixelSpacing);//<----
 
-      // cornerstoneTools.touchInput.enable(element);
-      // cornerstoneTools.zoomTouchPinch.activate(element);
-      // cornerstoneTools.panMultiTouch.activate(element);
+      cornerstoneTools.touchInput.enable(element);
+      cornerstoneTools.zoomTouchPinch.activate(element);
+      cornerstoneTools.panMultiTouch.activate(element);
 
       //*****Added Play clip
 
@@ -419,7 +419,6 @@ class DicomViewer extends React.Component {
       else {
           cornerstoneTools.stackScroll.deactivate(this.dicomImage, 1);
           cornerstoneTools.stackScrollTouchDrag.deactivate(this.dicomImage);
-          console.log("Abc");
       }
 
     }
@@ -487,18 +486,17 @@ class DicomViewer extends React.Component {
   // helper function used by the tool button handlers to disable the active tool
   // before making a new tool active
   disableAllTools = () => {
-    // cornerstoneTools.wwwc.disable(this.dicomImage,1);
-    // cornerstoneTools.probe.disable(this.dicomImage, 1);
-    // cornerstoneTools.length.disable(this.dicomImage, 1);
-    // cornerstoneTools.ellipticalRoi.disable(this.dicomImage, 1);
-    // cornerstoneTools.rectangleRoi.disable(this.dicomImage, 1);
-    // cornerstoneTools.angle.disable(this.dicomImage, 1);
-    // cornerstoneTools.highlight.disable(this.dicomImage, 1);
-    // cornerstoneTools.freehand.disable(this.dicomImage, 1);
-
-    // cornerstoneTools.stackScroll.deactivate(this.dicomImage, 1);
-    // cornerstoneTools.pan.activate(this.dicomImage, 2); // 2 is middle mouse button
-    // cornerstoneTools.zoom.activate(this.dicomImage, 4); // 4 is right mouse button
+        cornerstoneTools.panTouchDrag.deactivate(this.dicomImage);
+        cornerstoneTools.rotateTouchDrag.deactivate(this.dicomImage);
+        cornerstoneTools.rotateTouch.disable(this.dicomImage);
+        cornerstoneTools.ellipticalRoiTouch.deactivate(this.dicomImage);
+        cornerstoneTools.angleTouch.deactivate(this.dicomImage);
+        cornerstoneTools.rectangleRoiTouch.deactivate(this.dicomImage);
+        cornerstoneTools.lengthTouch.deactivate(this.dicomImage);
+        cornerstoneTools.probeTouch.deactivate(this.dicomImage);
+        cornerstoneTools.zoomTouchDrag.deactivate(this.dicomImage);
+        cornerstoneTools.wwwcTouchDrag.deactivate(this.dicomImage);
+        cornerstoneTools.stackScrollTouchDrag.deactivate(this.dicomImage);
   };
 
   dicomImageRef = el => {
@@ -517,48 +515,48 @@ class DicomViewer extends React.Component {
       <div className={classes.root}>
           <AppBar className={classes.appBar}>
             <ToggleButtonGroup exclusive >
-                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => { this.enableTool("stackScroll", 1);  }}>
+                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => { this.enableTool("stackScroll", 1);  cornerstoneTools.stackScrollTouchDrag.activate(this.dicomImage);}}>
 
                       <NavigationIcon />
                       Navigate
                     </Button>
 
-                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => { this.enableTool("wwwc", 1); }}>
+                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => { this.enableTool("wwwc", 1);  cornerstoneTools.wwwcTouchDrag.activate(this.dicomImage); }}>
                       <Brightness6Icon />
                       Levels
                     </Button>
 
-                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {this.enableTool("pan", 3); }}>
+                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {this.enableTool("pan", 3);  cornerstoneTools.panTouchDrag.activate(this.dicomImage); }}>
                       <OpenWithIcon />
                       Pan
                     </Button>
               
-                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {this.enableTool("zoom", 5); }}>
+                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {this.enableTool("zoom", 5);  cornerstoneTools.zoomTouchDrag.activate(this.dicomImage); }}>
                       <SearchIcon />
                       Zoom
                     </Button>
 
-                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {this.enableTool("length", 1);}}>
+                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {this.enableTool("length", 1); cornerstoneTools.lengthTouch.activate(this.dicomImage); }}>
                       <LinearScaleIcon />
                       Length
                     </Button>
 
-                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {this.enableTool("simpleAngle", 1);}}>
+                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {this.enableTool("simpleAngle", 1); cornerstoneTools.simpleAngleTouch.activate(this.dicomImage); }}>
                       <ArrowBackIosIcon />
                       Angle
                     </Button>
 
-                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {this.enableTool("probe", 1);}}>
+                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {this.enableTool("probe", 1); cornerstoneTools.probeTouch.activate(this.dicomImage); }}>
                       <AdjustIcon />
                       Probe
                     </Button>
                   
-                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {this.enableTool("ellipticalRoi", 1);}}>
+                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {this.enableTool("ellipticalRoi", 1); cornerstoneTools.ellipticalRoiTouch.activate(this.dicomImage); }}>
                       <PanoramaFishEyeIcon />
                       Elliptical
                     </Button>
 
-                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {this.enableTool("rectangleRoi", 1);}}>
+                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {this.enableTool("rectangleRoi", 1); cornerstoneTools.rectangleRoiTouch.activate(this.dicomImage); }}>
                       <CropDinIcon />
                       Rectangle
                     </Button>
