@@ -87,7 +87,8 @@ const styles = theme => ({
     color: 'white'
   },
   tablePaginationActions: {
-    color: 'white'
+    color: 'white',
+
   },
   seriesPreview:{
     height: '170px',
@@ -223,19 +224,18 @@ class Images extends React.Component {
     const {study} = this.state
     const {onSelectSeries, classes} = this.props
 
-    console.log(classes)
-
     return (
       <div className={classes.root}>
         <div className={classes.tableWrapper}>
           <TablePagination
               component="div"
               colSpan={20}
-              count={20}
+              count={this.state.patients.length}
               rowsPerPage={5}
               page={0}
               onChangePage={this.handleChangePage}
               onChangeRowsPerPage={this.handleChangeRowsPerPage}
+              labelRowsPerPage='Patients per page:'
               classes={{
                 root: classes.tablePagination,
                 caption: classes.tablePaginationCaption,
