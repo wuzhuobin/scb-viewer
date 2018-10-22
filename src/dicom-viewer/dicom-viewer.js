@@ -41,18 +41,24 @@ import CardContent from '@material-ui/core/CardContent';
 import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
 import Popover from "@material-ui/core/Popover";
 
+import classNames from 'classnames';
+
 const styles = theme=> ({
     root:{    
-        width: '100%',
+        width: '100vw',
+        height: 'calc(100vh - 128px)',
+        // overflow: 'auto',
         // flexGrow: 1,
     },
-    
+    drawerOpen:{
+        width: 'calc(100vw - 240px)',
+    },
     appBar:{
           flexGrow: 1,    
           zIndex: 1,
-          overflow: 'hidden',
-          position: 'static',
-          display: 'flex',
+          overflow: 'auto',
+          position: 'absolute',
+          // display: 'flex',
           height: '64px',
           justifyContent: 'center',
           background: theme.palette.secondary.main
@@ -63,6 +69,8 @@ const styles = theme=> ({
       borderColor: theme.palette.primary.main,
       borderStyle: "solid",
       borderRadius:"0px",
+      marginTop: "64px",
+      height: "calc(100vh - 128px - 6px)"
      },
 
     label: {
@@ -94,7 +102,6 @@ class DicomViewer extends React.Component {
   componentWillReceiveProps(nextProps) {
       console.log("willrecieve")
       if (this.props.series !== nextProps.series && nextProps.series!=null) {
-        
         console.log(nextProps.series)
       }
     }
@@ -111,12 +118,6 @@ class DicomViewer extends React.Component {
     });
   };
 
-    updateOrientationMarkers(element, viewport) {
-    // Apply rotations
-    // var orientationMarkers = document.querySelector('.orientationMarkers');
-    // console.log(orientationMarkers);
-    // this.rotateMarker(orientationMarkers, viewport.rotation);
-  };
 
     rotateMarker(div, rotation) {
     var rotationCSS = {
@@ -180,9 +181,6 @@ class DicomViewer extends React.Component {
   }
 
 
-
-
-
   componentWillMount() {
     cornerstoneTools.external.cornerstone = cornerstone;
     cornerstoneTools.external.cornerstoneMath = cornerstoneMath;
@@ -190,12 +188,14 @@ class DicomViewer extends React.Component {
   }
 
   componentDidMount() {
-    console.log("didmount")
-    console.log(this.props.series)
+    if (this.props.series === null){
+      alert("No image selected!");
+    }
     this.readImage(this.props, this.state, cornerstone).then(res=>this.displayImage());
+
   }
 
-  getImagePathList(IP,Port,GET){//sync request for now
+  getImagePathList(IP,Port,Path1){//sync request for now
     // return ['./assets/Test1/0000.dcm'];
     // return ['http://192.168.1.126:3000/orthanc/instances/2d3e243d-8b918a6f-b3456d3e-0546d044-dab91ee0/file'];
     // return ['http://127.0.0.1:8080/0100.dcm'];
@@ -208,20 +208,26 @@ class DicomViewer extends React.Component {
     //   resolve(['http://192.168.1.108:8080/0100.dcm','http://192.168.1.108:8080/0010.dcm','http://192.168.1.108:8080/1400.dcm','http://192.168.1.108:8080/0250.dcm','http://192.168.1.108:8080/0410.dcm']);
     // })
 
-    return new Promise(function(resolve,reject){
-      var queryResult =   fetch("http://223.255.146.2:8042/orthanc/series/" + GET+ "/ordered-slices").then(
-        (res)=>{return res.json();}).then((json)=>{ 
-        let cacheImagePathArray = [];
-        for(let i = 0; i < json.Dicom.length; ++i){
-          let path = "http://223.255.146.2:8042/orthanc" + json.Dicom[i]; 
-          cacheImagePathArray.push(path);
-        }
+    if (Path1===null){
+      return new Promise(function(resolve,reject){resolve(["http://223.255.146.2:8042/orthanc/instances/fedab2d3-b15265e7-fa7f9b03-55568349-ef5d91ad/file"])});
+    }
+    else{
+      return new Promise(function(resolve,reject){
+        var queryResult =   fetch("http://223.255.146.2:8042/orthanc/series/" + Path1+ "/ordered-slices").then(
+          (res)=>{return res.json();}).then((json)=>{ 
+            let cacheImagePathArray = [];
+            for(let i = 0; i < json.Dicom.length; ++i){
+              let path = "http://223.255.146.2:8042/orthanc" + json.Dicom[i]; 
+              cacheImagePathArray.push(path);
+            }
         // console.log(cacheImagePathArray);
         return cacheImagePathArray;
       });
-      resolve(queryResult);
+          resolve(queryResult);
 
-    });
+        });
+    }
+
   }
 
   seriesImages(id){
@@ -242,11 +248,17 @@ class DicomViewer extends React.Component {
   readImage(props, state, cornerstoneInstance){
       //Get image path Array first
       const loadingResult = this.getImagePathList(1,1,props.series)
-      // const loadingResult = this.getImagePathList(1,1,"cf8192f8-50e817d9-2aae4764-3c85d142-dc59a8d0")
       .then((queryList)=>{
         var cacheimagePathArray = [];
+        var loaderHint = "";
+        if (props.series){
+          loaderHint = props.series;
+        }
+        else {
+          loaderHint = "noImage";
+        }
         const cacheimageLoaderHintsArray = [...Array(queryList.length).keys()].map(function(number){
-          return "example://" + String(number);
+          return loaderHint+"://" + String(number);
         });
         for (var i=0;i<queryList.length;i++){
           cacheimagePathArray.push(queryList[i]);
@@ -261,13 +273,16 @@ class DicomViewer extends React.Component {
         imageLoaderHintsArray:cacheimageLoaderHintsArray,
         hardCodeNumDcm:cacheimagePathArray.length
       }));
-      dicomLoader(cornerstoneInstance,cacheimagePathArray);
+      dicomLoader(cornerstoneInstance,cacheimagePathArray,loaderHint);
     });
 
+  console.log('loading result')
+  console.log(loadingResult)
+
   return loadingResult;
-
-
   }
+
+
 
 
 
@@ -275,37 +290,8 @@ class DicomViewer extends React.Component {
 
   displayImage = () => {
 
-
-
     const element = this.dicomImage;
-    // Listen for changes to the viewport so we can update the text overlays in the corner
-    
-    function onImageRendered(e) {
-      const viewport = cornerstone.getViewport(e.target);
 
-      document.getElementById("mrbottomleft").textContent = `WW/WC: ${Math.round(viewport.voi.windowWidth)}/${Math.round(viewport.voi.windowCenter)}`;
-      document.getElementById("mrbottomright").textContent = `Zoom: ${viewport.scale.toFixed(2)}`;
-      //updateOrientationMarkers(e.target, viewport);
-    }
-
-    element.addEventListener("cornerstoneimagerendered", onImageRendered);
-    
-    const config = {
-
-      // invert: true,
-      minScale: 0.25,
-      maxScale: 20.0,
-      preventZoomOutsideImage: true,
-    };
-
-    // Comment this out to draw only the top and left markers
-
-    cornerstoneTools.zoom.setConfiguration(config);
-
-    // const wheelEvents = ['mousewheel', 'DOMMouseScroll'];
-    // for (var i=0;i<wheelEvents.length;i++){
-    //   element.addEventListener(wheelEvents[i],this.wheelEventsHandler);
-    // }
 
     var stack = {
         currentImageIdIndex : 0,
@@ -323,7 +309,7 @@ class DicomViewer extends React.Component {
       //Orientation Marker
       var viewport = cornerstone.getViewport(element);
 
-        console.log(this.state.rowCosine);
+      console.log(image.patientName);
       if (stack.currentImageIdIndex===0){
         this.setState({
           rowCosine:image.patientOri.slice(0,3),
@@ -332,10 +318,6 @@ class DicomViewer extends React.Component {
       }
 
       this.calculateOrientationMarkers(element, viewport, this.state);
-      this.updateOrientationMarkers(element, viewport);
-
-
-
 
       cornerstoneTools.mouseInput.enable(element);
       cornerstoneTools.mouseWheelInput.enable(element);
@@ -353,11 +335,9 @@ class DicomViewer extends React.Component {
       cornerstoneTools.highlight.enable(element);
       cornerstoneTools.arrowAnnotate.enable(element);
 
-      // console.log(image.columnPixelSpacing);//<----
-
-      // cornerstoneTools.touchInput.enable(element);
-      // cornerstoneTools.zoomTouchPinch.activate(element);
-      // cornerstoneTools.panMultiTouch.activate(element);
+      cornerstoneTools.touchInput.enable(element);
+      cornerstoneTools.zoomTouchPinch.activate(element);
+      cornerstoneTools.panMultiTouch.activate(element);
 
       //*****Added Play clip
 
@@ -394,7 +374,38 @@ class DicomViewer extends React.Component {
       // With the example images the loading will be extremely quick, though
       // cornerstoneTools.stackPrefetch.enable(element, 3);
     });
+
+    function onImageRendered(e) {
+      const viewport = cornerstone.getViewport(e.target);
+
+      document.getElementById("mrbottomleft").textContent = `WW/WC: ${Math.round(viewport.voi.windowWidth)}/${Math.round(viewport.voi.windowCenter)}`;
+      document.getElementById("mrbottomright").textContent = `Zoom: ${viewport.scale.toFixed(2)}`;
+    }
+
+    element.addEventListener("cornerstoneimagerendered", onImageRendered);
+    
+    const config = {
+
+      // invert: true,
+      minScale: 0.25,
+      maxScale: 20.0,
+      preventZoomOutsideImage: true,
+    };
+
+
+    cornerstoneTools.zoom.setConfiguration(config);
+
+
+
+
+
+
   };
+
+
+
+
+
 
   enableTool = (toolName, mouseButtonNumber) => {
     this.disableAllTools();
@@ -419,7 +430,6 @@ class DicomViewer extends React.Component {
       else {
           cornerstoneTools.stackScroll.deactivate(this.dicomImage, 1);
           cornerstoneTools.stackScrollTouchDrag.deactivate(this.dicomImage);
-          console.log("Abc");
       }
 
     }
@@ -487,18 +497,17 @@ class DicomViewer extends React.Component {
   // helper function used by the tool button handlers to disable the active tool
   // before making a new tool active
   disableAllTools = () => {
-    // cornerstoneTools.wwwc.disable(this.dicomImage,1);
-    // cornerstoneTools.probe.disable(this.dicomImage, 1);
-    // cornerstoneTools.length.disable(this.dicomImage, 1);
-    // cornerstoneTools.ellipticalRoi.disable(this.dicomImage, 1);
-    // cornerstoneTools.rectangleRoi.disable(this.dicomImage, 1);
-    // cornerstoneTools.angle.disable(this.dicomImage, 1);
-    // cornerstoneTools.highlight.disable(this.dicomImage, 1);
-    // cornerstoneTools.freehand.disable(this.dicomImage, 1);
-
-    // cornerstoneTools.stackScroll.deactivate(this.dicomImage, 1);
-    // cornerstoneTools.pan.activate(this.dicomImage, 2); // 2 is middle mouse button
-    // cornerstoneTools.zoom.activate(this.dicomImage, 4); // 4 is right mouse button
+        cornerstoneTools.panTouchDrag.deactivate(this.dicomImage);
+        cornerstoneTools.rotateTouchDrag.deactivate(this.dicomImage);
+        cornerstoneTools.rotateTouch.disable(this.dicomImage);
+        cornerstoneTools.ellipticalRoiTouch.deactivate(this.dicomImage);
+        cornerstoneTools.angleTouch.deactivate(this.dicomImage);
+        cornerstoneTools.rectangleRoiTouch.deactivate(this.dicomImage);
+        cornerstoneTools.lengthTouch.deactivate(this.dicomImage);
+        cornerstoneTools.probeTouch.deactivate(this.dicomImage);
+        cornerstoneTools.zoomTouchDrag.deactivate(this.dicomImage);
+        cornerstoneTools.wwwcTouchDrag.deactivate(this.dicomImage);
+        cornerstoneTools.stackScrollTouchDrag.deactivate(this.dicomImage);
   };
 
   dicomImageRef = el => {
@@ -513,52 +522,52 @@ class DicomViewer extends React.Component {
 
     var viewerHeight = window.innerHeight-128-6 //4 is border
     var viewerWidth = window.innerWidth-128-6 //4 is border
-    return (
-      <div className={classes.root}>
-          <AppBar className={classes.appBar}>
-            <ToggleButtonGroup exclusive >
-                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => { this.enableTool("stackScroll", 1);  }}>
 
+    return (
+      <div className={classNames(classes.root, {[classes.drawerOpen]: this.props.drawerOpen,})}>
+          <AppBar className={classes.appBar}>
+            <Toolbar>
+                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => { this.enableTool("stackScroll", 1);  cornerstoneTools.stackScrollTouchDrag.activate(this.dicomImage);}}>
                       <NavigationIcon />
                       Navigate
                     </Button>
 
-                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => { this.enableTool("wwwc", 1); }}>
+                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => { this.enableTool("wwwc", 1);  cornerstoneTools.wwwcTouchDrag.activate(this.dicomImage); }}>
                       <Brightness6Icon />
                       Levels
                     </Button>
 
-                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {this.enableTool("pan", 3); }}>
+                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {this.enableTool("pan", 3);  cornerstoneTools.panTouchDrag.activate(this.dicomImage); }}>
                       <OpenWithIcon />
                       Pan
                     </Button>
               
-                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {this.enableTool("zoom", 5); }}>
+                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {this.enableTool("zoom", 5);  cornerstoneTools.zoomTouchDrag.activate(this.dicomImage); }}>
                       <SearchIcon />
                       Zoom
                     </Button>
 
-                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {this.enableTool("length", 1);}}>
+                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {this.enableTool("length", 1); cornerstoneTools.lengthTouch.activate(this.dicomImage); }}>
                       <LinearScaleIcon />
                       Length
                     </Button>
 
-                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {this.enableTool("simpleAngle", 1);}}>
+                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {this.enableTool("simpleAngle", 1); cornerstoneTools.simpleAngleTouch.activate(this.dicomImage); }}>
                       <ArrowBackIosIcon />
                       Angle
                     </Button>
 
-                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {this.enableTool("probe", 1);}}>
+                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {this.enableTool("probe", 1); cornerstoneTools.probeTouch.activate(this.dicomImage); }}>
                       <AdjustIcon />
                       Probe
                     </Button>
                   
-                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {this.enableTool("ellipticalRoi", 1);}}>
+                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {this.enableTool("ellipticalRoi", 1); cornerstoneTools.ellipticalRoiTouch.activate(this.dicomImage); }}>
                       <PanoramaFishEyeIcon />
                       Elliptical
                     </Button>
 
-                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {this.enableTool("rectangleRoi", 1);}}>
+                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {this.enableTool("rectangleRoi", 1); cornerstoneTools.rectangleRoiTouch.activate(this.dicomImage); }}>
                       <CropDinIcon />
                       Rectangle
                     </Button>
@@ -750,10 +759,8 @@ class DicomViewer extends React.Component {
                         <ReplayIcon />
                         Reset
                       </Button>
-
                     </Popover>             
-
-            </ToggleButtonGroup>
+            </Toolbar>
           </AppBar>
 
         <Paper className={classes.paper}>
@@ -779,10 +786,8 @@ class DicomViewer extends React.Component {
                 style={{
                   // flexGrow: 1,    
                   // display: 'flex',
-                  // width: "calc(100vw-4px)",
-                  // height: "calc(100vh-4px)",
-                  width: viewerWidth,
-                  height: viewerHeight,
+                  width: "100%",
+                  height: "calc(100vh - 128px - 6px)",
                   top: 0,
                   left: 0,
                   position: "relative",

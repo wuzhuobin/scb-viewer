@@ -103,10 +103,12 @@ class SeriesPreview extends React.Component {
           }.bind(this)
         )
         // update images 
+        // this.setState({imgs: []});
+        this.state.imgs = [];
         PACS.studyInfo(study, (json)=>{
           for (let i = 0; i < json.Series.length; ++i) {
             PACS.seriesPreview(json.Series[i], (str)=>{
-              let imgs = this.state.imgs.slice();  
+              let imgs = this.state.imgs.slice(); 
               imgs.push(str);
               this.setState({imgs: imgs});
             } );
