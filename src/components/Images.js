@@ -1,10 +1,11 @@
 import React from "react";
 
 import {Button, Divider, Typography, TextField, Table, TableBody, TableCell, TableHead, TableRow, TablePagination,
-TableSortLabel} from '@material-ui/core';
-import {CloudUpload, ExpandMore} from '@material-ui/icons'
+TableSortLabel, IconButton,} from '@material-ui/core';
+import {CloudUpload, ExpandMore, LastPage, FirstPage, KeyboardArrowRight, KeyboardArrowLeft} from '@material-ui/icons'
 
 import { withStyles } from '@material-ui/core/styles';
+import PropTypes from 'prop-types';
 import Upload from './Upload';
 import Patients from './Patients';
 import SeriesPreview from './SeriesPreview';
@@ -27,7 +28,6 @@ function getToday(){
   today = yyyy + '-' + mm + '-' + dd;
   return today
 }
-
 
 const styles = theme => ({
   root: {
@@ -75,17 +75,22 @@ const styles = theme => ({
     color: theme.palette.secondary.contrastText,
     height: 'calc(100% - 171px)'
   },
-  // tablePagination: {
-  //   color: theme.palette.secondary.contrastText,
-  // }
-  tableRow:{
-    
+  tablePagination: {
+  },
+  tablePaginationCaption: {
+    color: 'white'
+  },
+  tablePaginationSelectIcon: {
+    color: 'white'
+  },
+  tablePaginationSelect: {
+    color: 'white'
+  },
+  tablePaginationActions: {
+    color: 'white'
   },
   seriesPreview:{
     height: '170px',
-    // width: ''
-    // overflow: 'auto',
-    // 
   },
   divider:{
     backgroundColor: theme.palette.secondary.light,
@@ -218,18 +223,27 @@ class Images extends React.Component {
     const {study} = this.state
     const {onSelectSeries, classes} = this.props
 
+    console.log(classes)
+
     return (
       <div className={classes.root}>
         <div className={classes.tableWrapper}>
           <TablePagination
               component="div"
               colSpan={20}
-              count={this.state.patients.length}
+              count={20}
               rowsPerPage={5}
               page={0}
               onChangePage={this.handleChangePage}
               onChangeRowsPerPage={this.handleChangeRowsPerPage}
-                      // ActionsComponent={TablePaginationActionsWrapped}
+              classes={{
+                root: classes.tablePagination,
+                caption: classes.tablePaginationCaption,
+                selectIcon: classes.tablePaginationSelectIcon,
+                select: classes.tablePaginationSelect,
+                actions: classes.tablePaginationActions,
+              }}
+              // ActionsComponent={TablePaginationActionsWrapped}
             />
 
           <Table className={classes.table}>
