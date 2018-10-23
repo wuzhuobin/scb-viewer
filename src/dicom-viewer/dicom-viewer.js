@@ -192,13 +192,35 @@ class DicomViewer extends React.Component {
     cornerstoneTools.external.Hammer = Hammer;
   }
 
+  handleResize(event,dicomImage){
+    if (dicomImage)
+    {
+        console.log('updateSize')
+
+        dicomImage.style.height = 'calc(100vh - 128px - 6px)'
+        dicomImage.style.width = '100%'
+        try{
+            cornerstone.resize(dicomImage)          
+        }
+        catch(error)
+        {
+          console.log(error)
+        }
+    }
+
+  }
+
   componentDidMount() {
     if (this.props.series === null){
       alert("No image selected!");
     }
-    this.readImage(this.props, this.state, cornerstone).then(res=>this.displayImage());
 
+    this.readImage(this.props, this.state, cornerstone).then(res=>this.displayImage()).then(res=>{});
+    window.addEventListener('resize', (event)=>{this.handleResize(event, this.dicomImage)})
+    
   }
+
+  // component
 
   getImagePathList(IP,Port,Path1){//sync request for now
     // return ['./assets/Test1/0000.dcm'];
@@ -529,13 +551,18 @@ class DicomViewer extends React.Component {
     const { anchorEl } = this.state;
     const open = Boolean(anchorEl)
 
-    if (this.dicomImage !== null)
-    {
-      if (this.dicomImage.getElementsByClassName("cornerstone-canvas")[0]){
-        this.dicomImage.getElementsByClassName("cornerstone-canvas")[0].style.height = 'calc(100vh - 128px - 6px)'
-        this.dicomImage.getElementsByClassName("cornerstone-canvas")[0].style.width = 'calc(100%)'
-      }
-    }
+    // if (this.dicomImage !== null)
+    // {
+    //   console.log("wawawa")
+
+    //   if (this.dicomImage.getElementsByClassName("cornerstone-canvas")[0]){
+    //     this.dicomImage.getElementsByClassName("cornerstone-canvas")[0].style.height = 'calc(100vh - 128px - 6px)'
+    //     this.dicomImage.getElementsByClassName("cornerstone-canvas")[0].style.width = 'calc(100%)'
+
+    //     console.log("resizing canvas...")
+    //     console.log(this.dicomImage.getElementsByClassName("cornerstone-canvas")[0])
+    //   }
+    // }
     
 
     return (
