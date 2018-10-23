@@ -89,13 +89,35 @@ const dicomLoader = (cs,imageArray, loaderHint) => {
             const data = new DataView(response);
             const image = daikon.Series.parseImage(data);
             const spacing = image.getPixelSpacing();
-            if (image.getImageMin()){
+            var imageMin, imageMax, colSpacing=1, rowSpacing=1, imageDir= [1,0,0,0,1,0], imagePos = [0,0,0], name = "";
+            if (image.getImageMin() && image.getImageMax()){
+              imageMin = image.getImageMin();
+              imageMax = image.getImageMax();
+            }
+            else {
+              const range = computeImageMinMax(image);
+              imageMin = range[0];
+              imageMax = range[1];
+            }
+            if (spacing){
+              colSpacing = spacing[1];
+              rowSpacing = spacing[0];
+            }
+            if (image.getImageDirections()){
+              imageDir = image.getImageDirections();
+            }
+            if (image.getImagePosition()){
+              imagePos = image.getImagePosition();
+            }
+            if (image.getPatientName()){
+              name = image.getPatientName();
+            }
           resolve({
-            minPixelValue: image.getImageMin(),
-            maxPixelValue: image.getImageMax(),
-            patientPos: image.getImagePosition(),
-            patientOri: image.getImageDirections(),
-            patientName: image.getPatientName(),
+            minPixelValue: imageMin,
+            maxPixelValue: imageMax,
+            patientPos: imagePos,
+            patientOri: imageDir,
+            patientName: name,
             windowCenter: image.getWindowCenter(),
             windowWidth: image.getWindowWidth(),
             getPixelData: () => image.getInterpretedData(),
@@ -104,32 +126,10 @@ const dicomLoader = (cs,imageArray, loaderHint) => {
             height: image.getCols(),
             width: image.getRows(),
             color: false,
-            columnPixelSpacing: spacing[1],
-            rowPixelSpacing: spacing[0],
+            columnPixelSpacing: colSpacing,
+            rowPixelSpacing: rowSpacing,
             sizeInBytes: image.getRows() * image.getCols() * 2,
           });
-        }
-        else {
-          const range = computeImageMinMax(image);
-          resolve({
-            minPixelValue: range[0],
-            maxPixelValue: range[1],
-            patientPos: image.getImagePosition(),
-            patientOri: image.getImageDirections(),
-            patientName: image.getPatientName(),
-            windowCenter: image.getWindowCenter(),
-            windowWidth: image.getWindowWidth(),
-            getPixelData: () => image.getInterpretedData(),
-            rows: image.getRows(),
-            columns: image.getCols(),
-            height: image.getCols(),
-            width: image.getRows(),
-            color: false,
-            columnPixelSpacing: spacing[1],
-            rowPixelSpacing: spacing[0],
-            sizeInBytes: image.getRows() * image.getCols() * 2,
-            });
-        }
       } //else(response null) end
     });
 

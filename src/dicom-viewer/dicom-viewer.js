@@ -434,6 +434,8 @@ class DicomViewer extends React.Component {
         this.setState(state=>({currentInteractionMode:1}));
       }
       else {
+          // cornerstoneTools.pan.deactivate(this.dicomImage,1);
+          // cornerstoneTools.zoom.deactivate(this.dicomImage,1);
           cornerstoneTools.stackScroll.deactivate(this.dicomImage, 1);
           cornerstoneTools.stackScrollTouchDrag.deactivate(this.dicomImage);
       }
