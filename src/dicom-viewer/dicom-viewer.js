@@ -172,7 +172,7 @@ class DicomViewer extends React.Component {
         left: oppositeRowString,
         right: rowString
     }
-    console.log(element);
+
     var topMid = document.querySelector('.mrtopmiddle .orientationMarker');
     var bottomMid = document.querySelector('.mrbottommiddle .orientationMarker');
     var rightMid = document.querySelector('.mrrightmiddle .orientationMarker');
@@ -220,7 +220,6 @@ class DicomViewer extends React.Component {
     
   }
 
-  // component
 
   getImagePathList(IP,Port,Path1){//sync request for now
     // return ['./assets/Test1/0000.dcm'];
@@ -342,6 +341,7 @@ class DicomViewer extends React.Component {
           rowCosine:image.patientOri.slice(0,3),
           columnCosine:image.patientOri.slice(3,6),
         });
+        document.getElementById("mrtopleft").textContent = `Patient Name: ${image.patientName}`
       }
 
       this.calculateOrientationMarkers(element, viewport, this.state);
@@ -406,7 +406,7 @@ class DicomViewer extends React.Component {
     function onImageRendered(e) {
       const viewport = cornerstone.getViewport(e.target);
 
-      document.getElementById("mrbottomleft").textContent = `WW/WC: ${Math.round(viewport.voi.windowWidth)}/${Math.round(viewport.voi.windowCenter)}`;
+      document.getElementById("mrbottomleft").textContent = `WW/WC: ${Math.round(viewport.voi.windowWidth)}/${Math.round(viewport.voi.windowCenter)} , Slices: ${stack.currentImageIdIndex+1}/${stack.imageIds.length}`;
       document.getElementById("mrbottomright").textContent = `Zoom: ${viewport.scale.toFixed(2)}`;
     }
 
@@ -456,10 +456,12 @@ class DicomViewer extends React.Component {
         this.setState(state=>({currentInteractionMode:1}));
       }
       else {
-          // cornerstoneTools.pan.deactivate(this.dicomImage,1);
-          // cornerstoneTools.zoom.deactivate(this.dicomImage,1);
+          cornerstoneTools.pan.deactivate(this.dicomImage,1);
+          cornerstoneTools.zoom.deactivate(this.dicomImage,1);
           cornerstoneTools.stackScroll.deactivate(this.dicomImage, 1);
           cornerstoneTools.stackScrollTouchDrag.deactivate(this.dicomImage);
+          cornerstoneTools.pan.activate(this.dicomImage, 2); // pan is the default tool for middle mouse button
+          cornerstoneTools.zoom.activate(this.dicomImage, 4); // zoom is the default tool for right mouse button
       }
 
     }
