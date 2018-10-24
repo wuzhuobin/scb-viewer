@@ -71,6 +71,7 @@ const styles = theme=> ({
       borderStyle: "solid",
       borderRadius:"0px",
       marginTop: "64px",
+
       height: "calc(100vh - 128px - 6px)",
       width: "calc(100vw - 6px)"
      },
