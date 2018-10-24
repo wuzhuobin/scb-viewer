@@ -52,20 +52,39 @@ function getArrayMinMax(a){
   return [min,max];
 };
 
+function centerRange(center, numElement, exclusiveMax){
+  var returnArray = [];
+  for (var i=0;i<numElement;i++){
+    const j = parseInt(((i+1)/2)|0);
+    if (i%2){
+      if (center+j<exclusiveMax){
+        returnArray.push(center+j);
+      }
+    }
+    else {
+      if (center-j>=0){
+        returnArray.push(center-j);
+      }
+    }
+  }
+  return returnArray;
+}
+
 
 
 const dicomLoader = (cs,imageArray, loaderHint) => {
   const num_dcm = imageArray.length;
   const cacheLoaderHint = loaderHint;
   var imageSeries = [];
-  var maxQueryedId = 0;
+  var maxQueryedId = 0;//delibrately chosen
+  var minQueryedId = imageArray.length;//delibrately chosen
   for (var i=0;i<num_dcm;i++){
     imageSeries.push(null);
   }
   var failedSeries = [];
   var onceReadSeries = [];
-  const BatchReadSize = 100;
-  const CacheBuffer = 50;//Must be smaller than BatchReadSize
+  const BatchReadSize = 160;
+  const CacheBuffer = 50;//Must be smaller than BatchReadSize/2
 
   function BatchLoadImage(InputArray){
     console.log("Reading id of ");
@@ -139,10 +158,10 @@ const dicomLoader = (cs,imageArray, loaderHint) => {
   }
 
 
-  BatchLoadImage([...Array(Math.min(num_dcm, BatchReadSize)).keys()]);
+  BatchLoadImage(centerRange(parseInt((imageArray.length/2)|0),BatchReadSize, imageArray.length));
 
 
-  function UpdateImagesData(){
+  function UpdateImagesData(inputId){
     const numFailed = failedSeries.length;
     if (numFailed){
       console.log(numFailed + " image(s) is not loaded properly, namely ");
@@ -160,6 +179,17 @@ const dicomLoader = (cs,imageArray, loaderHint) => {
         var toReadArray = [];
         for (var j=0;j<numAdditionalRead;j++){
           toReadArray.push(currentMaxRead+j+1);
+        }
+        if(numAdditionalRead){
+          BatchLoadImage(toReadArray);
+        }
+      }
+      else if (minQueryedId<minMax[0]+CacheBuffer){
+        const currentMinRead = minMax[0];
+        const numAdditionalRead = Math.min(currentMinRead, BatchReadSize);
+        var toReadArray = [];
+        for (var j=0;j<numAdditionalRead;j++){
+          toReadArray.push(currentMinRead-j-1);
         }
         if(numAdditionalRead){
           BatchLoadImage(toReadArray);
@@ -183,11 +213,14 @@ const dicomLoader = (cs,imageArray, loaderHint) => {
         if (id>maxQueryedId){
           maxQueryedId = id;
         }
+        if (id < minQueryedId){
+          minQueryedId = id;
+        }
 
         if (failedSeries.includes(id)){
           alert("The " + id + "-th image is not loaded");
         }
-        UpdateImagesData();
+        UpdateImagesData(id);
 
         return imageSeries[id];
       }
