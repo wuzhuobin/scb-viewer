@@ -94,6 +94,7 @@ class SeriesPreview extends React.Component {
                     seriesJsons[i].MainDicomTags.StationName
                   );
                   serie.id = json.Series[i];
+                  serie.slicesCount = seriesJsons[i].Instances.length;
                   series.push(serie);
                 }
                 // console.log(series)
@@ -142,6 +143,9 @@ class SeriesPreview extends React.Component {
                         </Typography>
                         <Typography className={classes.text}>
                           {serie.protcolName}
+                        </Typography>
+                        <Typography className={classes.text}>
+                          Slices: {serie.slicesCount}
                         </Typography>
                       </div>
                     </Paper>

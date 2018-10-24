@@ -54,8 +54,9 @@ function getArrayMinMax(a){
 
 
 
-const dicomLoader = (cs,imageArray) => {
+const dicomLoader = (cs,imageArray, loaderHint) => {
   const num_dcm = imageArray.length;
+  const cacheLoaderHint = loaderHint;
   var imageSeries = [];
   var maxQueryedId = 0;
   for (var i=0;i<num_dcm;i++){
@@ -88,12 +89,35 @@ const dicomLoader = (cs,imageArray) => {
             const data = new DataView(response);
             const image = daikon.Series.parseImage(data);
             const spacing = image.getPixelSpacing();
-            if (image.getImageMin()){
+            var imageMin, imageMax, colSpacing=1, rowSpacing=1, imageDir= [1,0,0,0,1,0], imagePos = [0,0,0], name = "";
+            if (image.getImageMin() && image.getImageMax()){
+              imageMin = image.getImageMin();
+              imageMax = image.getImageMax();
+            }
+            else {
+              const range = computeImageMinMax(image);
+              imageMin = range[0];
+              imageMax = range[1];
+            }
+            if (spacing){
+              colSpacing = spacing[1];
+              rowSpacing = spacing[0];
+            }
+            if (image.getImageDirections()){
+              imageDir = image.getImageDirections();
+            }
+            if (image.getImagePosition()){
+              imagePos = image.getImagePosition();
+            }
+            if (image.getPatientName()){
+              name = image.getPatientName();
+            }
           resolve({
-            minPixelValue: image.getImageMin(),
-            maxPixelValue: image.getImageMax(),
-            patientPos: image.getImagePosition(),
-            patientOri: image.getImageDirections(),
+            minPixelValue: imageMin,
+            maxPixelValue: imageMax,
+            patientPos: imagePos,
+            patientOri: imageDir,
+            patientName: name,
             windowCenter: image.getWindowCenter(),
             windowWidth: image.getWindowWidth(),
             getPixelData: () => image.getInterpretedData(),
@@ -102,31 +126,10 @@ const dicomLoader = (cs,imageArray) => {
             height: image.getCols(),
             width: image.getRows(),
             color: false,
-            columnPixelSpacing: spacing[1],
-            rowPixelSpacing: spacing[0],
+            columnPixelSpacing: colSpacing,
+            rowPixelSpacing: rowSpacing,
             sizeInBytes: image.getRows() * image.getCols() * 2,
           });
-        }
-        else {
-          const range = computeImageMinMax(image);
-          resolve({
-            minPixelValue: range[0],
-            maxPixelValue: range[1],
-            patientPos: image.getImagePosition(),
-            patientOri: image.getImageDirections(),
-            windowCenter: image.getWindowCenter(),
-            windowWidth: image.getWindowWidth(),
-            getPixelData: () => image.getInterpretedData(),
-            rows: image.getRows(),
-            columns: image.getCols(),
-            height: image.getCols(),
-            width: image.getRows(),
-            color: false,
-            columnPixelSpacing: spacing[1],
-            rowPixelSpacing: spacing[0],
-            sizeInBytes: image.getRows() * image.getCols() * 2,
-            });
-        }
       } //else(response null) end
     });
 
@@ -173,8 +176,9 @@ const dicomLoader = (cs,imageArray) => {
     // const height = 256;
 
     function getPixelData() {
-      if (String(imageId).substring(0,10) === "example://"){
-        const id = parseInt(String(imageId).substring(10,String(imageId).length));
+      const loaderHintLength = cacheLoaderHint.length;
+      if (String(imageId).substring(0,loaderHintLength+3) === cacheLoaderHint+"://"){
+        const id = parseInt(String(imageId).substring(loaderHintLength+3,String(imageId).length));
         console.log("Accessing " + id + "-th image out of " + imageSeries.length + " images");
         if (id>maxQueryedId){
           maxQueryedId = id;
@@ -223,7 +227,7 @@ const dicomLoader = (cs,imageArray) => {
   }
 
   // register our imageLoader plugin with cornerstone
-  cs.registerImageLoader("example", getImageI);
+  cs.registerImageLoader(cacheLoaderHint, getImageI);
 };
 
 export default dicomLoader;

@@ -52,11 +52,11 @@ class Content extends React.Component {
   	}
 
     onSelectSeries = (event, series)=>{
-      console.log("onSelectSeries")
-      console.log(series)
+      // console.log("onSelectSeries")
+      // console.log(series)
       this.setState({series: series})
       this.setState({page: 2})
-      console.log(this.state.series)
+      // console.log(this.state.series)
     }
 
     render(){
@@ -75,6 +75,7 @@ class Content extends React.Component {
               {page === 0 && <Images onSelectSeries={this.onSelectSeries}/>}
               {page === 1 && <Projects />}         
               {page === 2 && <DicomViewer series={this.state.series} drawerOpen={this.props.open}/>}
+              {page === 3 && <Projects />} 
           </main>
         </div>
     );
