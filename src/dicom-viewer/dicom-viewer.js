@@ -70,7 +70,7 @@ const styles = theme=> ({
       borderStyle: "solid",
       borderRadius:"0px",
       marginTop: "64px",
-      height: "calc(100vh - 128px - 6px)"
+      height: "calc(100vh - 128px - 6px)" 
      },
 
     label: {
