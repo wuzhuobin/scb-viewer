@@ -106,8 +106,11 @@ class DicomViewer extends React.Component {
 
   componentWillReceiveProps(nextProps) {
       console.log("willrecieve")
-      if (this.props.series !== nextProps.series && nextProps.series!=null) {
-        console.log(nextProps.series)
+      console.log(nextProps);
+      if (nextProps.drawerOpen){
+          const element = this.dicomImage;
+          cornerstoneTools.stopClip(element, 31);
+          this.setState(state=>({playingClip:false}));
       }
     }
 
@@ -320,7 +323,7 @@ class DicomViewer extends React.Component {
 
 
     var stack = {
-        currentImageIdIndex : 0,
+        currentImageIdIndex : parseInt((this.state.imageLoaderHintsArray.length / 2)|0),
         imageIds: this.state.imageLoaderHintsArray
     };
 
@@ -330,19 +333,23 @@ class DicomViewer extends React.Component {
     cornerstone.enable(element);
 
     cornerstone.loadImage(this.state.imageLoaderHintsArray[stack.currentImageIdIndex]).then(image => {
-      cornerstone.displayImage(element, image);
 
+      cornerstone.displayImage(element, image);
       //Orientation Marker
       var viewport = cornerstone.getViewport(element);
 
       console.log(image.patientName);
-      if (stack.currentImageIdIndex===0){
+      if (stack.currentImageIdIndex===parseInt((this.state.imageLoaderHintsArray.length / 2)|0)){
         this.setState({
           rowCosine:image.patientOri.slice(0,3),
           columnCosine:image.patientOri.slice(3,6),
         });
         document.getElementById("mrtopleft").textContent = `Patient Name: ${image.patientName}`
       }
+
+
+
+
 
       this.calculateOrientationMarkers(element, viewport, this.state);
 
@@ -406,8 +413,14 @@ class DicomViewer extends React.Component {
     function onImageRendered(e) {
       const viewport = cornerstone.getViewport(e.target);
 
-      document.getElementById("mrbottomleft").textContent = `WW/WC: ${Math.round(viewport.voi.windowWidth)}/${Math.round(viewport.voi.windowCenter)} , Slices: ${stack.currentImageIdIndex+1}/${stack.imageIds.length}`;
-      document.getElementById("mrbottomright").textContent = `Zoom: ${viewport.scale.toFixed(2)}`;
+      var bottomLeftTag = document.getElementById("mrbottomleft"), bottomRightTag = document.getElementById("mrbottomright");
+      if (bottomLeftTag){
+        bottomLeftTag.textContent = `WW/WC: ${Math.round(viewport.voi.windowWidth)}/${Math.round(viewport.voi.windowCenter)} , Slices: ${stack.currentImageIdIndex+1}/${stack.imageIds.length}`;
+      }
+      if (bottomRightTag){
+        bottomRightTag.textContent = `Zoom: ${viewport.scale.toFixed(2)}`;
+      }
+
     }
 
     element.addEventListener("cornerstoneimagerendered", onImageRendered);
