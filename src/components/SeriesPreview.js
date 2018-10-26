@@ -26,12 +26,14 @@ const styles = theme => ({
     height: 140,
     borderStyle: 'solid',
     borderColor: theme.palette.secondary.light,
+    borderWidth: '2px',
     '&:hover': {borderColor: theme.palette.primary.light,},
   },
   item: {
   },
   text:{
-    color: "yellow",
+    color: theme.palette.primary.light,
+    fontSize: '2px',
   },
   seriesContent:{
     // top: "100%",

@@ -369,7 +369,7 @@ class DicomViewer extends React.Component {
         document.getElementById("mrtopleft").textContent = `Patient Name: ${image.patientName}`
       }
 
-      element.style.height = 'calc(100vh - 128px - 6px)'
+      element.style.height = 'calc(100vh - 128px - 2px)'
       element.style.width = '100%'
       try{
           cornerstone.resize(element)          
@@ -836,25 +836,15 @@ class DicomViewer extends React.Component {
             style={this.props.drawerOpen? {
               // flexGrow: 1,    
               // display: 'flex',
-<<<<<<< HEAD
-              width: "calc(100vw - 240px - 2px)",
+              width: "calc(100vw - 240px - 2px - 170px)",
               height: "calc(100vh - 128px - 2px)",
-=======
-              width: "calc(100vw - 240px - 6px - 170px)",
-              height: "calc(100vh - 128px - 6px)",
->>>>>>> d88a34bcfdb39c32a92452627eb6ca1c4ef6e171
               position: "relative",
               color: "#6fcbff",
               // margin: 9
             } :
             {
-<<<<<<< HEAD
-              width: "calc(100vw - 2px)",
+              width: "calc(100vw - 2px - 170px)",
               height: "calc(100vh - 128px - 2px)",
-=======
-              width: "calc(100vw - 6px - 170px)",
-              height: "calc(100vh - 128px - 6px)",
->>>>>>> d88a34bcfdb39c32a92452627eb6ca1c4ef6e171
               position: "relative",
               color: "#6fcbff",
             }
@@ -871,13 +861,8 @@ class DicomViewer extends React.Component {
                 style={{
                   // flexGrow: 1,    
                   // display: 'flex',
-<<<<<<< HEAD
-                  width: "100%",
-                  height: "calc(100vh - 128px - 2px)",
-=======
                   width: "calc(100% - 170px)",
-                  height: "calc(100vh - 128px - 6px)",
->>>>>>> d88a34bcfdb39c32a92452627eb6ca1c4ef6e171
+                  height: "calc(100vh - 128px - 2px)",
                   top: 0,
                   left: 0,
                   position: "relative",

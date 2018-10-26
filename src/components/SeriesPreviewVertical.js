@@ -31,6 +31,7 @@ const styles = theme => ({
     width: 140,
     height: 140,
     borderStyle: 'solid',
+    borderWidth: '2px',
     borderColor: theme.palette.secondary.light,
     '&:hover': {borderColor: theme.palette.primary.light,},
   },
@@ -38,7 +39,8 @@ const styles = theme => ({
     borderColor: theme.palette.primary.main,
   },
   text:{
-    color: "yellow",
+    color: theme.palette.primary.light,
+    fontSize: '2px',
   },
   seriesContent:{
     paddingLeft: 5,
