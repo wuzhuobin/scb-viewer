@@ -16,13 +16,13 @@ const styles = theme => ({
     '&:hover': {backgroundColor: theme.palette.secondary.main,},
   },
   tableCell:{
-    color: 'white',
+    color: theme.palette.primary.contrastText,
   },
   tableRowOpen:{
     backgroundColor: theme.palette.secondary.main,
   },
   study:{
-    '&:hover': {backgroundColor: theme.palette.secondary.main,},
+    '&:hover': {backgroundColor: theme.palette.primary.dark,},
   }
 })
 

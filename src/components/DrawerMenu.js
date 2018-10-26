@@ -22,7 +22,7 @@ const styles = theme=> ({
         ...theme.mixins.toolbar,
     },
    button:{
-   		color: theme.palette.secondary.contrastText,
+   		color: theme.palette.primary.contrastText,
    		'&:hover': {
       		backgroundColor: theme.palette.secondary.light,
     },

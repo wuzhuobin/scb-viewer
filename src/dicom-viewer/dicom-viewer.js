@@ -40,6 +40,7 @@ import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
 import Popover from "@material-ui/core/Popover";
+import Typography from '@material-ui/core/Typography';
 
 import classNames from 'classnames';
 
@@ -70,18 +71,32 @@ const styles = theme=> ({
       borderColor: theme.palette.primary.main,
       borderStyle: "solid",
       borderRadius:"0px",
+      borderWidth:"1px",
       marginTop: "64px",
 
-      height: "calc(100vh - 128px - 6px)",
-      width: "calc(100vw - 6px)"
+      height: "calc(100vh - 128px - 2px)",
+      width: "calc(100vw - 2px)"
      },
      paperDrawerOpen:{
-      width: "calc(100vw - 6px - 240px)"
+      width: "calc(100vw - 2px - 240px)"
      },
 
     label: {
     // Aligns the content of the button vertically.
       flexDirection: 'column',
+      textTransform: 'none',
+      fontSize: '3px',
+      color: theme.palette.primary.contrastText,
+      '&:hover': {
+          color: theme.palette.secondary.contrastText,
+          },
+    },
+
+    popover:{
+      borderStyle: "solid",
+      borderRadius:"3px",
+      borderWidth:"1px",
+      borderColor: theme.palette.primary.main,
     },
 })
 
@@ -114,10 +129,10 @@ class DicomViewer extends React.Component {
       if (this.props.drawerOpen != nextProps.drawerOpen){
         console.log("drawer open: " + nextProps.drawerOpen)
         if (nextProps.drawerOpen){
-            this.dicomImage.style.width = 'calc(100vw - 240px - 6px)'
+            this.dicomImage.style.width = 'calc(100vw - 240px - 2px)'
         }
         else{
-          this.dicomImage.style.width = 'calc(100vw - 6px)'
+          this.dicomImage.style.width = 'calc(100vw - 2px)'
         }
         cornerstone.resize(this.dicomImage)
       }
@@ -209,7 +224,7 @@ class DicomViewer extends React.Component {
     {
         console.log('updateSize')
 
-        dicomImage.style.height = 'calc(100vh - 128px - 6px)'
+        dicomImage.style.height = 'calc(100vh - 128px - 2px)'
         dicomImage.style.width = '100%'
         try{
             cornerstone.resize(dicomImage)          
@@ -418,7 +433,10 @@ class DicomViewer extends React.Component {
     function onImageRendered(e) {
       const viewport = cornerstone.getViewport(e.target);
 
-      document.getElementById("mrbottomleft").textContent = `WW/WC: ${Math.round(viewport.voi.windowWidth)}/${Math.round(viewport.voi.windowCenter)} , Slices: ${stack.currentImageIdIndex+1}/${stack.imageIds.length}`;
+      //document.getElementById("mrbottomleft").setAttribute('style', 'white-space: pre;');
+      document.getElementById("mrbottomleft").textContent = `Slices: ${stack.currentImageIdIndex+1}/${stack.imageIds.length}`;
+      document.getElementById("mrbottomleft").textContent += "\r\n";
+      document.getElementById("mrbottomleft").textContent += `WW/WC: ${Math.round(viewport.voi.windowWidth)}/${Math.round(viewport.voi.windowCenter)}`;
       document.getElementById("mrbottomright").textContent = `Zoom: ${viewport.scale.toFixed(2)}`;
     }
 
@@ -583,7 +601,7 @@ class DicomViewer extends React.Component {
       <div className={classNames(classes.root, {[classes.drawerOpen]: this.props.drawerOpen,})}>
           <AppBar className={classes.appBar}>
             <Toolbar>
-                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => { this.enableTool("stackScroll", 1);  cornerstoneTools.stackScrollTouchDrag.activate(this.dicomImage);}}>
+                    <Button classes={{label: classes.label}} color="inherit" onClick={() => { this.enableTool("stackScroll", 1);  cornerstoneTools.stackScrollTouchDrag.activate(this.dicomImage);}}>
                       <NavigationIcon />
                       Navigate
                     </Button>
@@ -663,13 +681,13 @@ class DicomViewer extends React.Component {
                       Play
                     </Button>
 
-                    <Button classes={{label: classes.label}} color="inherit" size="small" aria-owns={open ? "simple-popper" : null} aria-haspopup="true" variant="contained"
+                    <Button classes={{label: classes.label}} color="inherit" size="small" aria-owns={open ? "simple-popper" : null} aria-haspopup="true"
                       onClick={this.handleClick}>
                       <MoreIcon />
                       More
                     </Button>
 
-                    <Popover id="simple-popper" open={open} anchorEl={anchorEl}
+                    <Popover id="simple-popper" classes={classes.popover} open={open} anchorEl={anchorEl}
                         anchorOrigin={{ vertical: "bottom", horizontal: "center"}}
                         transformOrigin={{vertical: "top", horizontal: "center"}}
                         onClose={this.handleClose}
@@ -824,17 +842,17 @@ class DicomViewer extends React.Component {
             style={this.props.drawerOpen? {
               // flexGrow: 1,    
               // display: 'flex',
-              width: "calc(100vw - 240px - 6px)",
-              height: "calc(100vh - 128px - 6px)",
+              width: "calc(100vw - 240px - 2px)",
+              height: "calc(100vh - 128px - 2px)",
               position: "relative",
-              color: "yellow",
+              color: "#6fcbff",
               // margin: 9
             } :
             {
-              width: "calc(100vw - 6px)",
-              height: "calc(100vh - 128px - 6px)",
+              width: "calc(100vw - 2px)",
+              height: "calc(100vh - 128px - 2px)",
               position: "relative",
-              color: "yellow",
+              color: "#6fcbff",
             }
           }
                 onContextMenu={() => false}
@@ -850,7 +868,7 @@ class DicomViewer extends React.Component {
                   // flexGrow: 1,    
                   // display: 'flex',
                   width: "100%",
-                  height: "calc(100vh - 128px - 6px)",
+                  height: "calc(100vh - 128px - 2px)",
                   top: 0,
                   left: 0,
                   position: "relative",
@@ -869,7 +887,7 @@ class DicomViewer extends React.Component {
                 Zoom:
               </div>
 
-              <div id="mrbottomleft" style={{ position: "absolute", bottom: "0.5%", left: "0.5%" }}>
+              <div id="mrbottomleft" style={{ position: "absolute", bottom: "0.5%", left: "0.5%", whiteSpace: 'pre'}}>
                 WW/WC:
               </div>
 

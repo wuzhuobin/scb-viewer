@@ -10,6 +10,7 @@ const styles = theme => ({
     paddingLeft:8,
     height: 170,
     width: '100%',
+    backgroundColor: theme.palette.secondary.main,
 	},
   demo:{
     height: 170,
