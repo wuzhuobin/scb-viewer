@@ -257,7 +257,7 @@ class Images extends React.Component {
           <Table className={classes.table}>
             <EnhancedTableHead />
             <TableBody >
-              {this.state.patients.map( patient => {return (<Patients patient={patient} onStudyClick={this.handleStudyClick}/>)})}
+              {this.state.patients.map( patient => {return (<Patients patient={patient} onStudyClick={this.handleStudyClick} onStudyDoubleClick={onSelectSeries}/>)})}
             </TableBody>
           </Table>
         </div>
