@@ -110,6 +110,17 @@ class DicomViewer extends React.Component {
       if (this.props.series !== nextProps.series && nextProps.series!=null) {
         console.log(nextProps.series)
       }
+
+      if (this.props.drawerOpen != nextProps.drawerOpen){
+        console.log("drawer open: " + nextProps.drawerOpen)
+        if (nextProps.drawerOpen){
+            this.dicomImage.style.width = 'calc(100vw - 240px - 6px)'
+        }
+        else{
+          this.dicomImage.style.width = 'calc(100vw - 6px)'
+        }
+        cornerstone.resize(this.dicomImage)
+      }
     }
 
   handleClick = event => {
