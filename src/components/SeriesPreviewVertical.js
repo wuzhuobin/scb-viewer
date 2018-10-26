@@ -40,7 +40,7 @@ const styles = theme => ({
   },
   text:{
     color: theme.palette.primary.light,
-    fontSize: '2px',
+    // fontSize: '2px',
   },
   seriesContent:{
     paddingLeft: 5,
@@ -66,28 +66,30 @@ class SeriesPreviewVertical extends React.Component {
 	}
 
 	componentDidMount(){
-		for (let i = 0;i< this.props.series.length; i++)
-		{
-			PACS.serieInfo(this.props.series[i], (json)=>{
-				let serie = createData(
-		            json.MainDicomTags.BodyPartExamined,
-		            json.MainDicomTags.Modality,
-		            json.MainDicomTags.ProtocolName,
-		            json.MainDicomTags.SeriesNumber,
-		            json.MainDicomTags.StationName
-		          );
-		    serie.id = this.props.series[i];
-		    serie.slicesCount = json.Instances.length;
+		if (this.props.series){
+			for (let i = 0;i< this.props.series.length; i++)
+			{
+				PACS.serieInfo(this.props.series[i], (json)=>{
+					let serie = createData(
+			            json.MainDicomTags.BodyPartExamined,
+			            json.MainDicomTags.Modality,
+			            json.MainDicomTags.ProtocolName,
+			            json.MainDicomTags.SeriesNumber,
+			            json.MainDicomTags.StationName
+			          );
+			    serie.id = this.props.series[i];
+			    serie.slicesCount = json.Instances.length;
 
-				const seriesInfo = this.state.seriesInfo.slice();
-				seriesInfo.push(serie);
-				this.setState({seriesInfo: seriesInfo})  
-				PACS.seriesPreview(this.props.series[i], (str)=>{
-			let imgs = this.state.imgs.slice(); 
-			imgs.push(str);
-			this.setState({imgs: imgs});
-		    } );    		
-		});
+					const seriesInfo = this.state.seriesInfo.slice();
+					seriesInfo.push(serie);
+					this.setState({seriesInfo: seriesInfo})  
+					PACS.seriesPreview(this.props.series[i], (str)=>{
+					let imgs = this.state.imgs.slice(); 
+					imgs.push(str);
+					this.setState({imgs: imgs});
+			    } );    		
+			});
+			}
       }
 	}
 

@@ -47,7 +47,10 @@ const styles = theme => ({
     position: 'absolute',
     bottom: theme.spacing.unit * 5,
     right: theme.spacing.unit * 5,
-    backgroundColor: theme.palette.primary.dark
+    backgroundColor: theme.palette.primary.dark,
+    '&:hover': {
+        backgroundColor: theme.palette.primary.main,
+    },
   },
   textField: {
     margin: theme.spacing.unit,

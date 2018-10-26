@@ -88,7 +88,7 @@ const styles = theme=> ({
     // Aligns the content of the button vertically.
       flexDirection: 'column',
       textTransform: 'none',
-      fontSize: '3px',
+      // fontSize: '3px',
       color: theme.palette.primary.contrastText,
       '&:hover': {
           color: theme.palette.secondary.contrastText,
@@ -242,8 +242,8 @@ class DicomViewer extends React.Component {
   }
 
   componentDidMount() {
-    if (this.props.series === null){
-      alert("No image selected!");
+    if (this.state.selectedSeries === null){
+      // alert("No image selected!");
     }
     this.readImage(this.props, this.state, cornerstone).then(res=>this.displayImage()).then(res=>{});
     window.addEventListener('resize', (event)=>{this.handleResize(event, this.dicomImage)})
@@ -301,15 +301,12 @@ class DicomViewer extends React.Component {
 
 
   readImage(props, state, cornerstoneInstance){
-    console.log("in readImage")
-    console.log(props.series)
-
       //Get image path Array first
       const loadingResult = this.getImagePathList(1,1,state.selectedSeries)
       .then((queryList)=>{
         var cacheimagePathArray = [];
         var loaderHint = "";
-        if (props.series[0]){
+        if (state.selectedSeries){
           loaderHint = props.series[0];
         }
         else {

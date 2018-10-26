@@ -52,8 +52,8 @@ class Content extends React.Component {
   	}
 
     onSelectSeries = (event, series)=>{
-      this.setState({page: 2})
       this.setState({series: series})
+      this.setState({page: 2})
     }
 
     render(){

@@ -33,7 +33,7 @@ const styles = theme => ({
   },
   text:{
     color: theme.palette.primary.light,
-    fontSize: '2px',
+    // fontSize: '2px',
   },
   seriesContent:{
     // top: "100%",
