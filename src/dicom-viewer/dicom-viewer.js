@@ -286,13 +286,16 @@ class DicomViewer extends React.Component {
 
 
   readImage(props, state, cornerstoneInstance){
+    console.log("in readImage")
+    console.log(props.series)
+
       //Get image path Array first
-      const loadingResult = this.getImagePathList(1,1,props.series)
+      const loadingResult = this.getImagePathList(1,1,props.series[0])
       .then((queryList)=>{
         var cacheimagePathArray = [];
         var loaderHint = "";
-        if (props.series){
-          loaderHint = props.series;
+        if (props.series[0]){
+          loaderHint = props.series[0];
         }
         else {
           loaderHint = "noImage";
@@ -305,8 +308,8 @@ class DicomViewer extends React.Component {
         // cacheArray.push("assets/Test1/0"+String((i-i%100)/100)+String((i-(i-i%100)-i%10)/10)+String(i%10)+".dcm");
       }
       // console.log('abcd');
-      console.log(cacheimagePathArray);
-      console.log(cacheimageLoaderHintsArray);
+      // console.log(cacheimagePathArray);
+      // console.log(cacheimageLoaderHintsArray);
       // console.log('abcd');
       this.setState(state => ({
         imagePathArray:cacheimagePathArray,
@@ -808,10 +811,9 @@ class DicomViewer extends React.Component {
             </Toolbar>
           </AppBar>
 
-        <SeriesPreviewVertical />
+        <SeriesPreviewVertical series={series}/>
 
         <Paper className={classNames(classes.paper, {[classes.paperDrawerOpen]: this.props.drawerOpen,})}>
-          
           <div
             style={this.props.drawerOpen? {
               // flexGrow: 1,    

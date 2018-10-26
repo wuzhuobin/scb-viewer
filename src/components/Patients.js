@@ -72,7 +72,7 @@ class Patients extends React.Component {
 
     render() {
     	const {open, studies} = this.state
-    	const {patient, onStudyClick, classes} = this.props
+    	const {patient, onStudyClick, onStudyDoubleClick, classes} = this.props
 
     	return(
         <React.Fragment>
@@ -97,7 +97,16 @@ class Patients extends React.Component {
             {this.state.open && (
               this.state.studies.map(study => {
                 return (
-                  <TableRow id={study.id} onClick={event => onStudyClick(event, study.id)} className={classes.study}>
+                  <TableRow id={study.id} 
+                    onClick={event => onStudyClick(event, study.id)} 
+                    onDoubleClick={event => {
+                      PACS.studyInfo(study.id).then((json)=>{
+                        let series = json.Series;
+
+                        onStudyDoubleClick(event, series);
+                      });
+                    }}
+                    className={classes.study}>
                     <TableCell></TableCell>
                     <TableCell></TableCell>
                     <TableCell></TableCell>

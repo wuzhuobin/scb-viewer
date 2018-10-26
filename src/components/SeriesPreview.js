@@ -70,7 +70,6 @@ class SeriesPreview extends React.Component {
 
 	handleSeriesDoubleClick = (event,seriesId)=>{
     this.props.onSelectSeries(event,seriesId)
-
 	}
 
 
@@ -132,7 +131,7 @@ class SeriesPreview extends React.Component {
               >
                 {series.map((serie, index) => (
                   <Grid key={serie.id} item>
-                  <Paper className={classes.paper} onDoubleClick={event => this.handleSeriesDoubleClick(event, serie.id)}>
+                  <Paper className={classes.paper} onDoubleClick={event => this.handleSeriesDoubleClick(event, [serie.id])}>
                     <img src={imgs[index]} height="140px" width="140px"></img>
                     <div className={classes.seriesContent}>
                         <Typography className={classes.text}>
