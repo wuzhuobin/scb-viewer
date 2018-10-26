@@ -43,6 +43,8 @@ import Popover from "@material-ui/core/Popover";
 
 import classNames from 'classnames';
 
+import SeriesPreviewVertical from '../components/SeriesPreviewVertical'
+
 const styles = theme=> ({
     root:{    
         width: '100vw',
@@ -51,7 +53,7 @@ const styles = theme=> ({
         // flexGrow: 1,
     },
     drawerOpen:{
-        width: 'calc(100vw - 240px)',
+        width: 'calc(100vw - 240px - 170px)',
         height: 'calc(100vh - 128px)',
     },
     appBar:{
@@ -71,12 +73,12 @@ const styles = theme=> ({
       borderStyle: "solid",
       borderRadius:"0px",
       marginTop: "64px",
-
+      marginLeft: "170px",
       height: "calc(100vh - 128px - 6px)",
-      width: "calc(100vw - 6px)"
+      width: "calc(100vw - 6px - 170px)"
      },
      paperDrawerOpen:{
-      width: "calc(100vw - 6px - 240px)"
+      width: "calc(100vw - 6px - 240px - 170px)"
      },
 
     label: {
@@ -114,10 +116,10 @@ class DicomViewer extends React.Component {
       if (this.props.drawerOpen != nextProps.drawerOpen){
         console.log("drawer open: " + nextProps.drawerOpen)
         if (nextProps.drawerOpen){
-            this.dicomImage.style.width = 'calc(100vw - 240px - 6px)'
+            this.dicomImage.style.width = 'calc(100vw - 240px - 6px - 170px)'
         }
         else{
-          this.dicomImage.style.width = 'calc(100vw - 6px)'
+          this.dicomImage.style.width = 'calc(100vw - 6px - 170px)'
         }
         cornerstone.resize(this.dicomImage)
       }
@@ -320,10 +322,6 @@ class DicomViewer extends React.Component {
   return loadingResult;
   }
 
-
-
-
-
   dicomImage = null;
 
   displayImage = () => {
@@ -354,6 +352,16 @@ class DicomViewer extends React.Component {
           columnCosine:image.patientOri.slice(3,6),
         });
         document.getElementById("mrtopleft").textContent = `Patient Name: ${image.patientName}`
+      }
+
+      element.style.height = 'calc(100vh - 128px - 6px)'
+      element.style.width = '100%'
+      try{
+          cornerstone.resize(element)          
+      }
+      catch(error)
+      {
+        console.log(error)
       }
 
       this.calculateOrientationMarkers(element, viewport, this.state);
@@ -441,11 +449,6 @@ class DicomViewer extends React.Component {
 
 
   };
-
-
-
-
-
 
   enableTool = (toolName, mouseButtonNumber) => {
     this.disableAllTools();
@@ -564,20 +567,6 @@ class DicomViewer extends React.Component {
     const {series, classes, theme} = this.props
     const { anchorEl } = this.state;
     const open = Boolean(anchorEl)
-
-    // if (this.dicomImage !== null)
-    // {
-    //   console.log("wawawa")
-
-    //   if (this.dicomImage.getElementsByClassName("cornerstone-canvas")[0]){
-    //     this.dicomImage.getElementsByClassName("cornerstone-canvas")[0].style.height = 'calc(100vh - 128px - 6px)'
-    //     this.dicomImage.getElementsByClassName("cornerstone-canvas")[0].style.width = 'calc(100%)'
-
-    //     console.log("resizing canvas...")
-    //     console.log(this.dicomImage.getElementsByClassName("cornerstone-canvas")[0])
-    //   }
-    // }
-    
 
     return (
       <div className={classNames(classes.root, {[classes.drawerOpen]: this.props.drawerOpen,})}>
@@ -819,19 +808,22 @@ class DicomViewer extends React.Component {
             </Toolbar>
           </AppBar>
 
+        <SeriesPreviewVertical />
+
         <Paper className={classNames(classes.paper, {[classes.paperDrawerOpen]: this.props.drawerOpen,})}>
+          
           <div
             style={this.props.drawerOpen? {
               // flexGrow: 1,    
               // display: 'flex',
-              width: "calc(100vw - 240px - 6px)",
+              width: "calc(100vw - 240px - 6px - 170px)",
               height: "calc(100vh - 128px - 6px)",
               position: "relative",
               color: "yellow",
               // margin: 9
             } :
             {
-              width: "calc(100vw - 6px)",
+              width: "calc(100vw - 6px - 170px)",
               height: "calc(100vh - 128px - 6px)",
               position: "relative",
               color: "yellow",
@@ -849,7 +841,7 @@ class DicomViewer extends React.Component {
                 style={{
                   // flexGrow: 1,    
                   // display: 'flex',
-                  width: "100%",
+                  width: "calc(100% - 170px)",
                   height: "calc(100vh - 128px - 6px)",
                   top: 0,
                   left: 0,
