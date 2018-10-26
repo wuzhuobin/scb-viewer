@@ -9,7 +9,6 @@ const styles = theme => ({
 	root:{
 		width: 170,
 		height: 'calc(100vh - 64px - 64px)',
-		// top: 64,
 		position: "relative",
 		float: "left",
 		background: theme.palette.secondary.main,
@@ -20,9 +19,6 @@ const styles = theme => ({
 	},
 	demo:{
 		width: 170,
-		// height: '100%',
-		// justify: "center",
-		// flexWrap: 'nowrap',
 		overflow: "auto",
 		margin: 0,
 	},
@@ -94,20 +90,6 @@ class SeriesPreviewVertical extends React.Component {
 	}
 
 	componentWillReceiveProps(nextProps) {
-		// console.log("willrecieveVertical")
-  //     	// update series info
-		// this.setState({seriesInfo: []})
-		// this.setState({imgs: []})
-
-		// console.log(this.props)
-		// console.log(nextProps)
-
-		
-    }
-
-    handleSelectSeries(event, seriesId){
-    	let id = seriesId
-    	this.props.onSelectSeries(event, id);
     }
 
 	render() {
@@ -128,7 +110,7 @@ class SeriesPreviewVertical extends React.Component {
 		                {seriesInfo.map((serie, index) => (
 		                  <Grid key={serie.id} item>
 		                  <Paper className={classNames(classes.paper, {[classes.paperSelected]: serie.id==this.props.selectedSeries})} 
-		                  onClick={event => this.handleSelectSeries(event, serie.id)}>
+		                  onClick={event => this.props.onSelectSeries(event, serie.id)}>
 		                    <img src={imgs[index]} height="140px" width="140px"></img>
 		                    <div className={classes.seriesContent}>
 		                        <Typography className={classes.text}>

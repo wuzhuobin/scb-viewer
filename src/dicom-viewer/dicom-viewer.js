@@ -455,14 +455,7 @@ class DicomViewer extends React.Component {
       preventZoomOutsideImage: true,
     };
 
-
     cornerstoneTools.zoom.setConfiguration(config);
-
-
-
-
-
-
   };
 
   enableTool = (toolName, mouseButtonNumber) => {

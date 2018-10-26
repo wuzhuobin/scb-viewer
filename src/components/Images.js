@@ -78,7 +78,7 @@ const styles = theme => ({
     overflow: 'auto',
     color: theme.palette.secondary.contrastText,
     backgroundColor: theme.palette.secondary.main,
-    height: 'calc(100% - 171px)'
+    height: 'calc(100% - 172px)'
   },
   tablePagination: {
   },

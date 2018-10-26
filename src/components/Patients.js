@@ -22,7 +22,7 @@ const styles = theme => ({
     backgroundColor: theme.palette.secondary.main,
   },
   study:{
-    '&:hover': {backgroundColor: theme.palette.primary.dark,},
+    '&:hover': {backgroundColor: "#272727"},
   }
 })
 

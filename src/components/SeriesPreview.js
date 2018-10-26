@@ -15,10 +15,9 @@ const styles = theme => ({
   demo:{
     height: 170,
     width: '100%',
-    justify: "center",
     flexWrap: 'nowrap',
-    overflow: "auto",
-    marginTop: 1,
+    overflowY: "auto",
+    alignContent: "center",
   },
   paper:{
     backgroundColor: theme.palette.secondary.main,
@@ -29,7 +28,8 @@ const styles = theme => ({
     borderWidth: '2px',
     '&:hover': {borderColor: theme.palette.primary.light,},
   },
-  item: {
+  xsItem: {
+    
   },
   text:{
     color: theme.palette.primary.light,
@@ -125,7 +125,7 @@ class SeriesPreview extends React.Component {
 
     	return(
     	    <Grid container className={classes.root}>
-            <Grid item xs={12}>
+            <Grid item xs={12} className={classes.xsItem}>
               <Grid
                 container
                 spacing={8}
