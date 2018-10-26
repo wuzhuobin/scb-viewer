@@ -25,7 +25,7 @@ const styles = theme => ({
     height: 140,
     borderStyle: 'solid',
     borderColor: theme.palette.secondary.light,
-    '&:hover': {borderColor: theme.palette.primary.main,},
+    '&:hover': {borderColor: theme.palette.primary.light,},
   },
   item: {
   },

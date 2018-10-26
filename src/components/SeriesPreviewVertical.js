@@ -1,5 +1,5 @@
 import React from "react";
-
+import classNames from 'classnames';
 import {Grid, Paper, CardContent, Typography} from '@material-ui/core';
 import {ExpandMore, ExpandLess} from '@material-ui/icons'
 import { withStyles } from '@material-ui/core/styles';
@@ -18,29 +18,29 @@ const styles = theme => ({
 		width: 170,
 		height: '100%'
 	},
-	  demo:{
-	    width: 170,
-	    height: '100%',
-	    justify: "center",
-	    // flexWrap: 'nowrap',
-	    overflow: "auto",
-	    // marginTop: 1,
-	  },
+	demo:{
+		width: 170,
+		// height: '100%',
+		// justify: "center",
+		// flexWrap: 'nowrap',
+		overflow: "auto",
+		margin: 0,
+	},
   paper:{
     backgroundColor: theme.palette.secondary.main,
     width: 140,
     height: 140,
     borderStyle: 'solid',
     borderColor: theme.palette.secondary.light,
-    '&:hover': {borderColor: theme.palette.primary.main,},
+    '&:hover': {borderColor: theme.palette.primary.light,},
   },
- //  item: {
- //  },
+  paperSelected:{
+    borderColor: theme.palette.primary.main,
+  },
   text:{
     color: "yellow",
   },
   seriesContent:{
-    // top: "100%",
     paddingLeft: 5,
     paddingBottom: 5,
     transform: "translateY(-100%)",
@@ -48,27 +48,67 @@ const styles = theme => ({
   },
 })
 
+let id = 0;
+function createData(bodyPart, modality, protcolName, seriesNumber, stationName) {
+  id += 1;
+  return { id, bodyPart, modality, protcolName, seriesNumber, stationName};
+}
+
 class SeriesPreviewVertical extends React.Component {
 	constructor(props){
     	super(props);
     	this.state={
-    		series: [{id: 1, text: "hello", bodyPart: "head", modality: "CT", protcolName:"0000", slicesCount: 9999},
-    		{id: 2, text: "hello", bodyPart: "head", modality: "CT", protcolName:"0000", slicesCount: 9999},
-    		{id: 3, text: "hello", bodyPart: "head", modality: "CT", protcolName:"0000", slicesCount: 9999},
-    		{id: 4, text: "hello", bodyPart: "head", modality: "CT", protcolName:"0000", slicesCount: 9999},
-    		{id: 5, text: "hello", bodyPart: "head", modality: "CT", protcolName:"0000", slicesCount: 9999},
-    		{id: 6, text: "hello", bodyPart: "head", modality: "CT", protcolName:"0000", slicesCount: 9999},
-    		{id: 7, text: "hello", bodyPart: "head", modality: "CT", protcolName:"0000", slicesCount: 9999},
-    		{id: 8, text: "hello", bodyPart: "head", modality: "CT", protcolName:"0000", slicesCount: 9999},
-    		{id: 9, text: "hello", bodyPart: "head", modality: "CT", protcolName:"0000", slicesCount: 9999},
-    		{id: 10, text: "hello", bodyPart: "head", modality: "CT", protcolName:"0000", slicesCount: 9999},],
+    		seriesInfo: [],
         	imgs: [],
       };
 	}
 
+	componentDidMount(){
+		for (let i = 0;i< this.props.series.length; i++)
+		{
+			PACS.serieInfo(this.props.series[i], (json)=>{
+				let serie = createData(
+		            json.MainDicomTags.BodyPartExamined,
+		            json.MainDicomTags.Modality,
+		            json.MainDicomTags.ProtocolName,
+		            json.MainDicomTags.SeriesNumber,
+		            json.MainDicomTags.StationName
+		          );
+		    serie.id = this.props.series[i];
+		    serie.slicesCount = json.Instances.length;
+
+				const seriesInfo = this.state.seriesInfo.slice();
+				seriesInfo.push(serie);
+				this.setState({seriesInfo: seriesInfo})  
+				PACS.seriesPreview(this.props.series[i], (str)=>{
+			let imgs = this.state.imgs.slice(); 
+			imgs.push(str);
+			this.setState({imgs: imgs});
+		    } );    		
+		});
+      }
+	}
+
+	componentWillReceiveProps(nextProps) {
+		// console.log("willrecieveVertical")
+  //     	// update series info
+		// this.setState({seriesInfo: []})
+		// this.setState({imgs: []})
+
+		// console.log(this.props)
+		// console.log(nextProps)
+
+		
+    }
+
+    handleSelectSeries(event, seriesId){
+    	let id = seriesId
+    	this.props.onSelectSeries(event, id);
+    }
+
 	render() {
-		const {series, imgs} = this.state
-    	const {onSelectSeries, study, classes} = this.props
+		const {seriesInfo, imgs, selectedId} = this.state
+    	const {selectedSeries, selectedSeriesonSelectSeries, study, classes} = this.props
 
 		return(
 			<div className={classes.root}>
@@ -78,12 +118,13 @@ class SeriesPreviewVertical extends React.Component {
 		                container
 		                spacing={8}
 		                className={classes.demo}
-		                // direction="column"
-		                // alignItems='center'
+		                direction="column"
+		                alignItems='center'
 		              >
-		                {series.map((serie, index) => (
+		                {seriesInfo.map((serie, index) => (
 		                  <Grid key={serie.id} item>
-		                  <Paper className={classes.paper} onDoubleClick={event => this.handleSeriesDoubleClick(event, serie.id)}>
+		                  <Paper className={classNames(classes.paper, {[classes.paperSelected]: serie.id==this.props.selectedSeries})} 
+		                  onClick={event => this.handleSelectSeries(event, serie.id)}>
 		                    <img src={imgs[index]} height="140px" width="140px"></img>
 		                    <div className={classes.seriesContent}>
 		                        <Typography className={classes.text}>

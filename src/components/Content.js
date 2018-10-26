@@ -52,8 +52,8 @@ class Content extends React.Component {
   	}
 
     onSelectSeries = (event, series)=>{
-      this.setState({series: series})
       this.setState({page: 2})
+      this.setState({series: series})
     }
 
     render(){
@@ -79,5 +79,3 @@ class Content extends React.Component {
 }
 }
 export default withStyles(styles)(Content);
-
- //<div>Projects</div>}

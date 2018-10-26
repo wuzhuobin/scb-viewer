@@ -88,7 +88,6 @@ const styles = theme=> ({
 })
 
 class DicomViewer extends React.Component {
-
   constructor(props){
     super(props);
     this.state={
@@ -104,6 +103,7 @@ class DicomViewer extends React.Component {
       rowCosine:[1,0,0],
       columnCosine:[0,1,0],
       initialized:false,
+      selectedSeries: null,
     }
   }
 
@@ -228,10 +228,8 @@ class DicomViewer extends React.Component {
     if (this.props.series === null){
       alert("No image selected!");
     }
-
     this.readImage(this.props, this.state, cornerstone).then(res=>this.displayImage()).then(res=>{});
     window.addEventListener('resize', (event)=>{this.handleResize(event, this.dicomImage)})
-    
   }
 
 
@@ -290,7 +288,7 @@ class DicomViewer extends React.Component {
     console.log(props.series)
 
       //Get image path Array first
-      const loadingResult = this.getImagePathList(1,1,props.series[0])
+      const loadingResult = this.getImagePathList(1,1,state.selectedSeries)
       .then((queryList)=>{
         var cacheimagePathArray = [];
         var loaderHint = "";
@@ -337,13 +335,10 @@ class DicomViewer extends React.Component {
         imageIds: this.state.imageLoaderHintsArray
     };
 
-
-
-    // console.log(this.currentstate);
     cornerstone.enable(element);
 
     cornerstone.loadImage(this.state.imageLoaderHintsArray[stack.currentImageIdIndex]).then(image => {
-      cornerstone.displayImage(element, image);
+    cornerstone.displayImage(element, image);
 
       //Orientation Marker
       var viewport = cornerstone.getViewport(element);
@@ -565,9 +560,12 @@ class DicomViewer extends React.Component {
     this.dicomImage = el;
   };
 
+  onSelectSeries = (event, series)=>{
+      this.setState({selectedSeries: series})
+  }
 
   render() {
-    const {series, classes, theme} = this.props
+    const {selectedSeries, series, classes, theme} = this.props
     const { anchorEl } = this.state;
     const open = Boolean(anchorEl)
 
@@ -811,7 +809,7 @@ class DicomViewer extends React.Component {
             </Toolbar>
           </AppBar>
 
-        <SeriesPreviewVertical series={series}/>
+        <SeriesPreviewVertical series={series} selectedSeries={this.state.selectedSeries} onSelectSeries={this.onSelectSeries}/>
 
         <Paper className={classNames(classes.paper, {[classes.paperDrawerOpen]: this.props.drawerOpen,})}>
           <div
