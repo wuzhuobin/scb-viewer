@@ -120,6 +120,9 @@ class DicomViewer extends React.Component {
       columnCosine:[0,1,0],
       initialized:false,
       selectedSeries: null,
+      loader:null,
+      previousLoaderHint:null,
+      dicomImage:null,
     };
 
   }
@@ -225,7 +228,11 @@ class DicomViewer extends React.Component {
     cornerstoneTools.external.cornerstone = cornerstone;
     cornerstoneTools.external.cornerstoneMath = cornerstoneMath;
     cornerstoneTools.external.Hammer = Hammer;
-
+    console.log('willmount');
+    console.log('willmount');
+    console.log('willmount');
+    console.log('willmount');
+    console.log('willmount');
     this.readImage(this.props, this.state, cornerstone).then(res=>this.displayImage())
   }
 
@@ -303,6 +310,12 @@ class DicomViewer extends React.Component {
 
   readImage(props, state, cornerstoneInstance){
       //Get image path Array first
+      console.log(this.state.previousLoaderHint);
+      console.log(this.state.previousLoaderHint);
+      console.log(this.state.previousLoaderHint);
+      console.log(this.state.previousLoaderHint);
+      console.log(this.state.previousLoaderHint);
+      console.log(this.state.previousLoaderHint);
       const loadingResult = this.getImagePathList(1,1,state.selectedSeries)
       .then((queryList)=>{
         var cacheimagePathArray = [];
@@ -316,20 +329,32 @@ class DicomViewer extends React.Component {
         const cacheimageLoaderHintsArray = [...Array(queryList.length).keys()].map(function(number){
           return loaderHint+"://" + String(number);
         });
+        if (this.state.previousLoaderHint && this.state.previousLoaderHint!==loaderHint){
+          for (var j=0;j<this.state.imageLoaderHintsArray.length;j++){
+            try{
+              cornerstone.imageCache.removeImageLoadObject(this.state.imageLoaderHintsArray[j]);
+            }
+            catch(error){
+              console.log(j+"-th image no need to delete, "+ this.state.imageLoaderHintsArray[j]);
+            }
+          }
+        }
+
+
+
+
         for (var i=0;i<queryList.length;i++){
           cacheimagePathArray.push(queryList[i]);
         // cacheArray.push("assets/Test1/0"+String((i-i%100)/100)+String((i-(i-i%100)-i%10)/10)+String(i%10)+".dcm");
       }
-      // console.log('abcd');
-      // console.log(cacheimagePathArray);
-      // console.log(cacheimageLoaderHintsArray);
-      // console.log('abcd');
       this.setState(state => ({
         imagePathArray:cacheimagePathArray,
         imageLoaderHintsArray:cacheimageLoaderHintsArray,
-        hardCodeNumDcm:cacheimagePathArray.length
+        hardCodeNumDcm:cacheimagePathArray.length,
+        previousLoaderHint:loaderHint,
+        loader:dicomLoader(cornerstoneInstance,cacheimagePathArray,loaderHint),
       }));
-      dicomLoader(cornerstoneInstance,cacheimagePathArray,loaderHint);
+      // dicomLoader(cornerstoneInstance,cacheimagePathArray,loaderHint);
     });
 
   console.log('loading result')
@@ -338,7 +363,7 @@ class DicomViewer extends React.Component {
   return loadingResult;
   }
 
-  dicomImage = null;
+  
 
   displayImage = () => {
 
@@ -376,7 +401,9 @@ class DicomViewer extends React.Component {
           columnCosine:image.patientOri.slice(3,6),
         });
         }
-        document.getElementById("mrtopleft").textContent = `Patient Name: ${image.patientName}`
+        if (document.getElementById("mrtopleft")){
+          document.getElementById("mrtopleft").textContent = `Patient Name: ${image.patientName}`
+        }
       }
 
       element.style.height = 'calc(100vh - 128px - 2px)'
@@ -462,10 +489,14 @@ class DicomViewer extends React.Component {
 
 
       //document.getElementById("mrbottomleft").setAttribute('style', 'white-space: pre;');
-      document.getElementById("mrbottomleft").textContent = `Slices: ${stack.currentImageIdIndex+1}/${stack.imageIds.length}`;
-      document.getElementById("mrbottomleft").textContent += "\r\n";
-      document.getElementById("mrbottomleft").textContent += `WW/WC: ${Math.round(viewport.voi.windowWidth)}/${Math.round(viewport.voi.windowCenter)}`;
-      document.getElementById("mrbottomright").textContent = `Zoom: ${viewport.scale.toFixed(2)}`;
+      if (document.getElementById("mrbottomleft")){
+        document.getElementById("mrbottomleft").textContent = `Slices: ${stack.currentImageIdIndex+1}/${stack.imageIds.length}`;
+        document.getElementById("mrbottomleft").textContent += "\r\n";
+        document.getElementById("mrbottomleft").textContent += `WW/WC: ${Math.round(viewport.voi.windowWidth)}/${Math.round(viewport.voi.windowCenter)}`;
+      }
+      if (document.getElementById("mrbottomright")){
+        document.getElementById("mrbottomright").textContent = `Zoom: ${viewport.scale.toFixed(2)}`;
+      }
 
     }
 
