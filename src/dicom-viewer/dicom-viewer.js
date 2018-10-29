@@ -235,7 +235,7 @@ class DicomViewer extends React.Component {
     // })
 
     // return new Promise(function(resolve,reject){
-    //   resolve(['http://192.168.1.108:8080/0100.dcm','http://192.168.1.108:8080/0010.dcm','http://192.168.1.108:8080/1400.dcm','http://192.168.1.108:8080/0250.dcm','http://192.168.1.108:8080/0410.dcm']);
+    //   resolve(['http://192.168.1.108:8080/0002.png']);
     // })
 
     if (Path1===null){
@@ -339,12 +339,14 @@ class DicomViewer extends React.Component {
       //Orientation Marker
       var viewport = cornerstone.getViewport(element);
 
-      console.log(image.patientName);
+      console.log(image.getPixelData());
       if (stack.currentImageIdIndex===parseInt((this.state.imageLoaderHintsArray.length / 2)|0)){
-        this.setState({
+        if (image.patientOri){
+          this.setState({
           rowCosine:image.patientOri.slice(0,3),
           columnCosine:image.patientOri.slice(3,6),
         });
+        }
         document.getElementById("mrtopleft").textContent = `Patient Name: ${image.patientName}`
       }
 

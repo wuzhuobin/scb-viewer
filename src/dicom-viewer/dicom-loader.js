@@ -1,4 +1,5 @@
 import daikon from "daikon";
+import pngjs from "pngjs";
 
 const httpGetAsync = (theUrl, callback) => {
   const xmlHttp = new XMLHttpRequest();
@@ -107,6 +108,17 @@ const dicomLoader = (cs,imageArray, loaderHint) => {
           else {
             const data = new DataView(response);
             const image = daikon.Series.parseImage(data);
+            //Here we judge the data we read as Dicom or png by simply check whether error occur when accessing image.getInterpretedData(),
+            //If error occur, assume it is png, else assume as dicom
+            var isDicom = true;
+            try{
+              image.getInterpretedData();
+            }
+            catch(err){
+              console.log("assumed reading png");
+              isDicom = false;
+            }
+            if (isDicom){
             const spacing = image.getPixelSpacing();
             var imageMin, imageMax, colSpacing=1, rowSpacing=1, imageDir= [1,0,0,0,1,0], imagePos = [0,0,0], name = "";
             if (image.getImageMin() && image.getImageMax()){
@@ -149,6 +161,39 @@ const dicomLoader = (cs,imageArray, loaderHint) => {
             rowPixelSpacing: rowSpacing,
             sizeInBytes: image.getRows() * image.getCols() * 2,
           });
+            }
+            else {
+              var png = new pngjs.PNG({fileterType:4}).parse(response,function(error,data){
+                if (error){
+                  reject(null);
+                }
+                else {
+                  var array = data.data;
+                  const range = getArrayMinMax(array);
+                  console.log(data.data);
+                  console.log(data.height);
+                  console.log(data.width);
+                  resolve({
+                    minPixelValue: range[0],
+                    maxPixelValue: range[1],
+                    getPixelData: () => array,
+                    rows: data.height,
+                    columns: data.width,
+                    height:data.height,
+                    width:data.width,
+                    color: true,
+                    columnPixelSpacing: 1,
+                    rowPixelSpacing: 1,
+                    sizeInBytes: data.width * data.height * 2,
+
+                  })
+                }
+              })
+
+              
+            }
+
+
       } //else(response null) end
     });
 
@@ -264,3 +309,7 @@ const dicomLoader = (cs,imageArray, loaderHint) => {
 };
 
 export default dicomLoader;
+
+
+
+
