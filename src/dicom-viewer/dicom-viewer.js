@@ -303,6 +303,9 @@ class DicomViewer extends React.Component {
       //Get image path Array first
       const loadingResult = this.getImagePathList(1,1,this.state.selectedSeries)
       .then((queryList)=>{
+        console.log(queryList)
+
+        console.log(this.state.selectedSeries)
         var cacheimagePathArray = [];
         var loaderHint = "";
         if (this.state.selectedSeries){
@@ -326,8 +329,7 @@ class DicomViewer extends React.Component {
         imagePathArray:cacheimagePathArray,
         imageLoaderHintsArray:cacheimageLoaderHintsArray,
         hardCodeNumDcm:cacheimagePathArray.length
-      }));
-      dicomLoader(cornerstoneInstance,cacheimagePathArray,loaderHint);
+      }),()=>{dicomLoader(cornerstoneInstance,cacheimagePathArray,loaderHint);});
     });
 
   console.log('loading result')

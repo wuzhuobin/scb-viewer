@@ -123,13 +123,18 @@ const tableHeadStyles = theme => ({
   },
 });
 
+// let patienid = 0;
+// function createPatientData(name, patientId, birthDate, gender) {
+//   id += 1;
+//   return { id, name, patientId, birthDate, gender};
+// }
+
 let id = 0;
-function createPatientData(name, patientId, birthDate, gender) {
+function createStudyData(name, patientId, birthDate, gender, institution, description, requestedProcedure, studyDate, studyID)
+{
   id += 1;
-  return { id, name, patientId, birthDate, gender};
+  return {id, name, patientId, birthDate, gender, institution, description, requestedProcedure, studyDate, studyID}
 }
-
-
 
 class EnhancedTableHead extends React.Component{
     constructor(props){
@@ -178,30 +183,54 @@ class Images extends React.Component {
       startDate: '',
       endDate: '',
       modality: 'all',
-      patients: [],
-      study: null,
+      studies: [],
+      selectedStudy: null,
     }
   }
 
   componentDidMount(){
+
+    let patients = [];
     PACS.allPatients((patientIdjsons) => {
-      let promises = [];
+      let patientPromises = [];
       for (let i = 0; i < patientIdjsons.length; ++i) {
-        promises.push(PACS.patientInfo(patientIdjsons[i]));
-        // PACS.patientInfo(json[i], (json) => {
-        //   let patient = createPatientData(json.MainDicomTags.PatientID, json.MainDicomTags.PatientName, json.MainDicomTags.PatientBirthDate, json.MainDicomTags.PatientSex);
-        //   const patients = this.state.patients.slice();
-        //   patients.push(patient);
-        //   this.setState({patients: patients});
+        patientPromises.push(PACS.patientInfo(patientIdjsons[i]));
       }
-      Promise.all(promises).then((patientInfoJsons)=>{
-        let patients = [];
+
+      let studies = []
+      Promise.all(patientPromises).then((patientInfoJsons)=>{
+        let promises = [];
         for(let i in patientInfoJsons){
-          let patient = createPatientData(patientInfoJsons[i].MainDicomTags.PatientID, patientInfoJsons[i].MainDicomTags.PatientName, patientInfoJsons[i].MainDicomTags.PatientBirthDate, patientInfoJsons[i].MainDicomTags.PatientSex);
-          patient.id = patientIdjsons[i];
-          patients.push(patient);
+          let studiesID = patientInfoJsons[i].Studies; 
+          for(let j in studiesID){
+            promises.push(PACS.studyInfo(studiesID[j]));
+            studies.push(
+              createStudyData(
+                patientInfoJsons[i].MainDicomTags.PatientName,
+                patientInfoJsons[i].MainDicomTags.PatientID,
+                patientInfoJsons[i].MainDicomTags.PatientBirthDate, 
+                patientInfoJsons[i].MainDicomTags.PatientSex,
+                null,
+                null,
+                null,
+                null,
+                null
+              )
+            )
+
+            studies[studies.length-1].id = studiesID[j];
+          }
         }
-        this.setState({patients: patients});
+        Promise.all(promises).then((studiesInfoJsons)=>{
+          for(let i in studiesInfoJsons){
+            studies[i].institution = studiesInfoJsons[i].MainDicomTags.InstitutionName;
+            studies[i].description = studiesInfoJsons[i].MainDicomTags.StudyDescription;
+            studies[i].requestedProcedure =  studiesInfoJsons[i].MainDicomTags.RequestedProcedureDescription;
+            studies[i].studyDate = studiesInfoJsons[i].MainDicomTags.StudyDate;
+            studies[i].studyID = studiesInfoJsons[i].MainDicomTags.StudyID;
+          }
+          this.setState({studies: studies});
+        });
       });
     });
   }
@@ -229,11 +258,11 @@ class Images extends React.Component {
   };
 
   handleStudyClick = (event, study) =>{
-    this.setState({study: study})
+    this.setState({selectedStudy: study})
   }
 
   render() {
-    const {study} = this.state
+    const {selectedStudy, studies} = this.state
     const {onSelectSeries, classes} = this.props
 
     return (
@@ -242,7 +271,7 @@ class Images extends React.Component {
           <TablePagination
               component="div"
               colSpan={20}
-              count={this.state.patients.length}
+              count={this.state.studiesCount}
               rowsPerPage={5}
               page={0}
               onChangePage={this.handleChangePage}
@@ -261,14 +290,35 @@ class Images extends React.Component {
           <Table className={classes.table}>
             <EnhancedTableHead />
             <TableBody >
-              {this.state.patients.map( patient => {return (<Patients patient={patient} onStudyClick={this.handleStudyClick} onStudyDoubleClick={onSelectSeries}/>)})}
+            {this.state.studies.map(study =>{
+              return(
+                <TableRow 
+                    id={study.id} 
+                    className={classes.study}
+                    onClick={event=>{this.handleStudyClick(event, study.id)}}
+                    onDoubleClick={event => {
+                      PACS.studyInfo(study.id).then((json)=>{
+                        let series = json.Series;
+                        onSelectSeries(event, series);
+                      })}}>
+                    <TableCell className={classes.tableCell}>{study.patientId}</TableCell>
+                    <TableCell className={classes.tableCell}>{study.name}</TableCell>
+                    <TableCell className={classes.tableCell}>{study.birthDate}</TableCell>
+                    <TableCell className={classes.tableCell}>{study.gender}</TableCell>
+                    <TableCell className={classes.tableCell}>{study.description}</TableCell>
+                    <TableCell className={classes.tableCell}>{study.institution}</TableCell>
+                    <TableCell className={classes.tableCell}>{study.requestedProcedure}</TableCell>
+                    <TableCell className={classes.tableCell}>{study.studyDate}</TableCell>
+                  </TableRow>
+                )
+            })}
             </TableBody>
           </Table>
         </div>
 
         <Divider className={classes.divider}/>
         <div className={classes.seriesPreview}>
-          <SeriesPreview study={study} onSelectSeries={onSelectSeries}/>
+          <SeriesPreview study={selectedStudy} onSelectSeries={onSelectSeries}/>
         </div>
 
         <Button variant="fab" color="secondary" className={classes.fab} onClick={this.handleUploadOpen}>
@@ -282,61 +332,3 @@ class Images extends React.Component {
 }
 
 export default withStyles(styles)(Images);
-
-
-        // <div className="text">
-        //   <TextField
-        //     id="patient-name"
-        //     label="Patient Name"
-        //     className={classes.textField}
-        //     value={this.state.name}
-        //     onChange={this.handleQueryChange('patientName')}
-        //   />
-        //   <TextField
-        //     id="patient-id"
-        //     label="Patient ID"
-        //     className={classes.textField}
-        //     value={this.state.name}
-        //     onChange={this.handleQueryChange('patientId')}
-        //   />
-        //   <TextField
-        //     id="start-date"
-        //     label="Start Date"
-        //     className={classes.textField}
-        //     type="date"
-        //     defaultValue='1900-01-01'
-        //     onChange={this.handleQueryChange('startDate')}
-        //   />
-        //   <TextField
-        //     id="end-date"
-        //     label="End Date"
-        //     className={classes.textField}
-        //     type="date"
-        //     defaultValue={getToday()}
-        //     onChange={this.handleQueryChange('startDate')}
-        //   />
-
-
-        //     <div>
-        //       <Button variant='outlined' color="primary" className={classes.button}>
-        //         All
-        //       </Button>
-        //       <Button variant='outlined' color="primary" className={classes.button}>
-        //         1y
-        //       </Button>
-        //        <Button variant='outlined' color="primary" className={classes.button}>
-        //         1m
-        //       </Button>
-        //        <Button variant='outlined' color="primary" className={classes.button}>
-        //         1w
-        //       </Button>
-        //        <Button variant='outlined' color="primary" className={classes.button}>
-        //         3d
-        //       </Button>
-        //       <Button variant='outlined' color="primary" className={classes.button}>
-        //         1d
-        //       </Button>
-        //     </div>    
-        // </div>
-
-        // <Divider />
