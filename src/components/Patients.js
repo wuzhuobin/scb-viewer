@@ -36,13 +36,11 @@ class Patients extends React.Component {
 	constructor(props){
     	super(props);
     	this.state={
-        open:false,
-        studies: [createData("sucabot","descript", "procedure", "20180101", "99999999"),]
+        studies: []
       }
 	}
 
-  handleStudyOpen = (event) => {
-    this.setState({ open: !this.state.open });
+  componentDidMount(){
     PACS.patientInfo(this.props.patient.id,
       function (json) {
         let studiesPromises = [];
@@ -79,10 +77,10 @@ class Patients extends React.Component {
              {this.state.studies.map(study => {return(
                   <TableRow 
                     id={study.id} 
+                    onClick={event=>{onStudyClick(event, study.id)}}
                     onDoubleClick={event => {
                       PACS.studyInfo(study.id).then((json)=>{
                         let series = json.Series;
-
                         onStudyDoubleClick(event, series);
                       })}}
                     className={classes.study}>
