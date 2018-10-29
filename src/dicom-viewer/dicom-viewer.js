@@ -40,8 +40,11 @@ import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
 import Popover from "@material-ui/core/Popover";
+import Typography from '@material-ui/core/Typography';
 
 import classNames from 'classnames';
+
+import SeriesPreviewVertical from '../components/SeriesPreviewVertical'
 
 const styles = theme=> ({
     root:{    
@@ -51,7 +54,7 @@ const styles = theme=> ({
         // flexGrow: 1,
     },
     drawerOpen:{
-        width: 'calc(100vw - 240px)',
+        width: 'calc(100vw - 240px - 170px)',
         height: 'calc(100vh - 128px)',
     },
     appBar:{
@@ -70,23 +73,37 @@ const styles = theme=> ({
       borderColor: theme.palette.primary.main,
       borderStyle: "solid",
       borderRadius:"0px",
+      borderWidth:"1px",
       marginTop: "64px",
 
-      height: "calc(100vh - 128px - 6px)",
-      width: "calc(100vw - 6px)"
+      marginLeft: "170px",
+      height: "calc(100vh - 128px - 2px)",
+      width: "calc(100vw - 2px - 170px)"
      },
      paperDrawerOpen:{
-      width: "calc(100vw - 6px - 240px)"
+      width: "calc(100vw - 2px - 240px - 170px)"
      },
 
     label: {
     // Aligns the content of the button vertically.
       flexDirection: 'column',
+      textTransform: 'none',
+      // fontSize: '3px',
+      color: theme.palette.primary.contrastText,
+      '&:hover': {
+          color: theme.palette.secondary.contrastText,
+          },
+    },
+
+    popover:{
+      borderStyle: "solid",
+      borderRadius:"3px",
+      borderWidth:"1px",
+      borderColor: theme.palette.primary.main,
     },
 })
 
 class DicomViewer extends React.Component {
-
   constructor(props){
     super(props);
     this.state={
@@ -102,7 +119,9 @@ class DicomViewer extends React.Component {
       rowCosine:[1,0,0],
       columnCosine:[0,1,0],
       initialized:false,
-    }
+      selectedSeries: null,
+    };
+
   }
 
   componentWillReceiveProps(nextProps) {
@@ -112,6 +131,18 @@ class DicomViewer extends React.Component {
           const element = this.dicomImage;
           cornerstoneTools.stopClip(element, 31);
           this.setState(state=>({playingClip:false}));
+      }
+
+      if (this.props.drawerOpen != nextProps.drawerOpen){
+        console.log("drawer open: " + nextProps.drawerOpen)
+        if (nextProps.drawerOpen){
+            this.dicomImage.style.width = 'calc(100vw - 240px - 2px - 170px)'
+        }
+        else{
+          this.dicomImage.style.width = 'calc(100vw - 2px - 170px)'
+
+        }
+        cornerstone.resize(this.dicomImage)
       }
     }
 
@@ -194,6 +225,8 @@ class DicomViewer extends React.Component {
     cornerstoneTools.external.cornerstone = cornerstone;
     cornerstoneTools.external.cornerstoneMath = cornerstoneMath;
     cornerstoneTools.external.Hammer = Hammer;
+
+    this.readImage(this.props, this.state, cornerstone).then(res=>this.displayImage())
   }
 
   handleResize(event,dicomImage){
@@ -201,7 +234,7 @@ class DicomViewer extends React.Component {
     {
         console.log('updateSize')
 
-        dicomImage.style.height = 'calc(100vh - 128px - 6px)'
+        dicomImage.style.height = 'calc(100vh - 128px - 2px)'
         dicomImage.style.width = '100%'
         try{
             cornerstone.resize(dicomImage)          
@@ -215,15 +248,8 @@ class DicomViewer extends React.Component {
   }
 
   componentDidMount() {
-    if (this.props.series === null){
-      alert("No image selected!");
-    }
-
-    this.readImage(this.props, this.state, cornerstone).then(res=>this.displayImage()).then(res=>{});
     window.addEventListener('resize', (event)=>{this.handleResize(event, this.dicomImage)})
-    
   }
-
 
   getImagePathList(IP,Port,Path1){//sync request for now
     // return ['./assets/Test1/0000.dcm'];
@@ -277,12 +303,12 @@ class DicomViewer extends React.Component {
 
   readImage(props, state, cornerstoneInstance){
       //Get image path Array first
-      const loadingResult = this.getImagePathList(1,1,props.series)
+      const loadingResult = this.getImagePathList(1,1,state.selectedSeries)
       .then((queryList)=>{
         var cacheimagePathArray = [];
         var loaderHint = "";
-        if (props.series){
-          loaderHint = props.series;
+        if (state.selectedSeries){
+          loaderHint = state.selectedSeries;
         }
         else {
           loaderHint = "noImage";
@@ -295,8 +321,8 @@ class DicomViewer extends React.Component {
         // cacheArray.push("assets/Test1/0"+String((i-i%100)/100)+String((i-(i-i%100)-i%10)/10)+String(i%10)+".dcm");
       }
       // console.log('abcd');
-      console.log(cacheimagePathArray);
-      console.log(cacheimageLoaderHintsArray);
+      // console.log(cacheimagePathArray);
+      // console.log(cacheimageLoaderHintsArray);
       // console.log('abcd');
       this.setState(state => ({
         imagePathArray:cacheimagePathArray,
@@ -312,10 +338,6 @@ class DicomViewer extends React.Component {
   return loadingResult;
   }
 
-
-
-
-
   dicomImage = null;
 
   displayImage = () => {
@@ -328,18 +350,25 @@ class DicomViewer extends React.Component {
         imageIds: this.state.imageLoaderHintsArray
     };
 
-
-
-    // console.log(this.currentstate);
-    cornerstone.enable(element);
+    var flagContinue = true;
+    try{
+      cornerstone.enable(element);
+    }
+    catch(error){
+      console.log("cornerstone load abort");
+      flagContinue = false;
+    }
+    if (flagContinue===false){
+      return;
+    }
+    // cornerstone.enable(element);
 
     cornerstone.loadImage(this.state.imageLoaderHintsArray[stack.currentImageIdIndex]).then(image => {
-
       cornerstone.displayImage(element, image);
       //Orientation Marker
       var viewport = cornerstone.getViewport(element);
 
-      console.log(image.getPixelData());
+      // console.log(image.getPixelData());
       if (stack.currentImageIdIndex===parseInt((this.state.imageLoaderHintsArray.length / 2)|0)){
         if (image.patientOri){
           this.setState({
@@ -350,9 +379,15 @@ class DicomViewer extends React.Component {
         document.getElementById("mrtopleft").textContent = `Patient Name: ${image.patientName}`
       }
 
-
-
-
+      element.style.height = 'calc(100vh - 128px - 2px)'
+      element.style.width = '100%'
+      try{
+          cornerstone.resize(element)          
+      }
+      catch(error)
+      {
+        console.log(error)
+      }
 
       this.calculateOrientationMarkers(element, viewport, this.state);
 
@@ -416,13 +451,21 @@ class DicomViewer extends React.Component {
     function onImageRendered(e) {
       const viewport = cornerstone.getViewport(e.target);
 
-      var bottomLeftTag = document.getElementById("mrbottomleft"), bottomRightTag = document.getElementById("mrbottomright");
-      if (bottomLeftTag){
-        bottomLeftTag.textContent = `WW/WC: ${Math.round(viewport.voi.windowWidth)}/${Math.round(viewport.voi.windowCenter)} , Slices: ${stack.currentImageIdIndex+1}/${stack.imageIds.length}`;
-      }
-      if (bottomRightTag){
-        bottomRightTag.textContent = `Zoom: ${viewport.scale.toFixed(2)}`;
-      }
+
+      // var bottomLeftTag = document.getElementById("mrbottomleft"), bottomRightTag = document.getElementById("mrbottomright");
+      // if (bottomLeftTag){
+      //   bottomLeftTag.textContent = `WW/WC: ${Math.round(viewport.voi.windowWidth)}/${Math.round(viewport.voi.windowCenter)} , Slices: ${stack.currentImageIdIndex+1}/${stack.imageIds.length}`;
+      // }
+      // if (bottomRightTag){
+      //   bottomRightTag.textContent = `Zoom: ${viewport.scale.toFixed(2)}`;
+      // }
+
+
+      //document.getElementById("mrbottomleft").setAttribute('style', 'white-space: pre;');
+      document.getElementById("mrbottomleft").textContent = `Slices: ${stack.currentImageIdIndex+1}/${stack.imageIds.length}`;
+      document.getElementById("mrbottomleft").textContent += "\r\n";
+      document.getElementById("mrbottomleft").textContent += `WW/WC: ${Math.round(viewport.voi.windowWidth)}/${Math.round(viewport.voi.windowCenter)}`;
+      document.getElementById("mrbottomright").textContent = `Zoom: ${viewport.scale.toFixed(2)}`;
 
     }
 
@@ -436,20 +479,8 @@ class DicomViewer extends React.Component {
       preventZoomOutsideImage: true,
     };
 
-
     cornerstoneTools.zoom.setConfiguration(config);
-
-
-
-
-
-
   };
-
-
-
-
-
 
   enableTool = (toolName, mouseButtonNumber) => {
     this.disableAllTools();
@@ -563,31 +594,22 @@ class DicomViewer extends React.Component {
     this.dicomImage = el;
   };
 
+  onSelectSeries = (event, series)=>{
+    console.log("onSelectSeries");
+      this.setState({selectedSeries: series}, ()=>
+        this.readImage(this.props, this.state, cornerstone).then(res=>this.displayImage()));
+  }
 
   render() {
-    const {series, classes, theme} = this.props
+    const {selectedSeries, series, classes, theme} = this.props
     const { anchorEl } = this.state;
     const open = Boolean(anchorEl)
-
-    // if (this.dicomImage !== null)
-    // {
-    //   console.log("wawawa")
-
-    //   if (this.dicomImage.getElementsByClassName("cornerstone-canvas")[0]){
-    //     this.dicomImage.getElementsByClassName("cornerstone-canvas")[0].style.height = 'calc(100vh - 128px - 6px)'
-    //     this.dicomImage.getElementsByClassName("cornerstone-canvas")[0].style.width = 'calc(100%)'
-
-    //     console.log("resizing canvas...")
-    //     console.log(this.dicomImage.getElementsByClassName("cornerstone-canvas")[0])
-    //   }
-    // }
-    
 
     return (
       <div className={classNames(classes.root, {[classes.drawerOpen]: this.props.drawerOpen,})}>
           <AppBar className={classes.appBar}>
             <Toolbar>
-                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => { this.enableTool("stackScroll", 1);  cornerstoneTools.stackScrollTouchDrag.activate(this.dicomImage);}}>
+                    <Button classes={{label: classes.label}} color="inherit" onClick={() => { this.enableTool("stackScroll", 1);  cornerstoneTools.stackScrollTouchDrag.activate(this.dicomImage);}}>
                       <NavigationIcon />
                       Navigate
                     </Button>
@@ -667,13 +689,13 @@ class DicomViewer extends React.Component {
                       Play
                     </Button>
 
-                    <Button classes={{label: classes.label}} color="inherit" size="small" aria-owns={open ? "simple-popper" : null} aria-haspopup="true" variant="contained"
+                    <Button classes={{label: classes.label}} color="inherit" size="small" aria-owns={open ? "simple-popper" : null} aria-haspopup="true"
                       onClick={this.handleClick}>
                       <MoreIcon />
                       More
                     </Button>
 
-                    <Popover id="simple-popper" open={open} anchorEl={anchorEl}
+                    <Popover id="simple-popper" classes={classes.popover} open={open} anchorEl={anchorEl}
                         anchorOrigin={{ vertical: "bottom", horizontal: "center"}}
                         transformOrigin={{vertical: "top", horizontal: "center"}}
                         onClose={this.handleClose}
@@ -823,22 +845,24 @@ class DicomViewer extends React.Component {
             </Toolbar>
           </AppBar>
 
+        <SeriesPreviewVertical series={series} selectedSeries={this.state.selectedSeries} onSelectSeries={this.onSelectSeries}/>
+
         <Paper className={classNames(classes.paper, {[classes.paperDrawerOpen]: this.props.drawerOpen,})}>
           <div
             style={this.props.drawerOpen? {
               // flexGrow: 1,    
               // display: 'flex',
-              width: "calc(100vw - 240px - 6px)",
-              height: "calc(100vh - 128px - 6px)",
+              width: "calc(100vw - 240px - 2px - 170px)",
+              height: "calc(100vh - 128px - 2px)",
               position: "relative",
-              color: "yellow",
+              color: "#6fcbff",
               // margin: 9
             } :
             {
-              width: "calc(100vw - 6px)",
-              height: "calc(100vh - 128px - 6px)",
+              width: "calc(100vw - 2px - 170px)",
+              height: "calc(100vh - 128px - 2px)",
               position: "relative",
-              color: "yellow",
+              color: "#6fcbff",
             }
           }
                 onContextMenu={() => false}
@@ -853,8 +877,8 @@ class DicomViewer extends React.Component {
                 style={{
                   // flexGrow: 1,    
                   // display: 'flex',
-                  width: "100%",
-                  height: "calc(100vh - 128px - 6px)",
+                  width: "calc(100% - 170px)",
+                  height: "calc(100vh - 128px - 2px)",
                   top: 0,
                   left: 0,
                   position: "relative",
@@ -873,7 +897,7 @@ class DicomViewer extends React.Component {
                 Zoom:
               </div>
 
-              <div id="mrbottomleft" style={{ position: "absolute", bottom: "0.5%", left: "0.5%" }}>
+              <div id="mrbottomleft" style={{ position: "absolute", bottom: "0.5%", left: "0.5%", whiteSpace: 'pre'}}>
                 WW/WC:
               </div>
 

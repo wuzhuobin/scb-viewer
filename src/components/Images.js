@@ -38,15 +38,19 @@ const styles = theme => ({
     height: 'calc(100vh - 64px)',
     overflow: 'auto',
     backgroundColor: theme.palette.secondary.dark,
-    color: theme.palette.secondary.contrastText
+    color: theme.palette.secondary.contrastText,
     // position: 'relative',
     // display: 'flex',
+    borderColor:theme.palette.primary.dark,
   },
   fab: {
     position: 'absolute',
     bottom: theme.spacing.unit * 5,
     right: theme.spacing.unit * 5,
-    backgroundColor: theme.palette.primary.dark
+    backgroundColor: theme.palette.primary.dark,
+    '&:hover': {
+        backgroundColor: theme.palette.primary.main,
+    },
   },
   textField: {
     margin: theme.spacing.unit,
@@ -73,18 +77,19 @@ const styles = theme => ({
   tableWrapper: {
     overflow: 'auto',
     color: theme.palette.secondary.contrastText,
-    height: 'calc(100% - 171px)'
+    backgroundColor: theme.palette.secondary.main,
+    height: 'calc(100% - 172px)'
   },
   tablePagination: {
   },
   tablePaginationCaption: {
-    color: 'white'
+    color: theme.palette.primary.contrastText
   },
   tablePaginationSelectIcon: {
-    color: 'white'
+    color: theme.palette.primary.contrastText
   },
   tablePaginationSelect: {
-    color: 'white'
+    color: theme.palette.primary.contrastText
   },
   tablePaginationActions: {
     color: 'white',
@@ -94,7 +99,12 @@ const styles = theme => ({
     height: '170px',
   },
   divider:{
-    backgroundColor: theme.palette.secondary.light,
+    backgroundColor: theme.palette.secondary.dark,
+    height:"2px",
+  },
+
+  tableCell:{
+    color: theme.palette.primary.main,
   }
 });
 
@@ -139,17 +149,18 @@ class EnhancedTableHead extends React.Component{
               <TableCell key='patientName' numeric={false} sortDirection='asc'>
                 <TableSortLabel
                   active={true}
-                  style={{color: 'white'}}>
+                  style={{color: '#6fcbff'}}
+                  >
                   Patient ID
                 </TableSortLabel>
               </TableCell>
-              <TableCell style={{color: 'white'}}>Patient Name</TableCell>
-              <TableCell style={{color: 'white'}}>Date of Birth</TableCell>
-              <TableCell style={{color: 'white'}}>Gender</TableCell>
-              <TableCell style={{color: 'white'}}>Study</TableCell>
-              <TableCell style={{color: 'white'}}>Institution</TableCell>
-              <TableCell style={{color: 'white'}}>Requested Procedure</TableCell>
-              <TableCell style={{color: 'white'}}>Study Date</TableCell>
+              <TableCell style={{color: '#6fcbff'}}>Patient Name</TableCell>
+              <TableCell style={{color: '#6fcbff'}}>Date of Birth</TableCell>
+              <TableCell style={{color: '#6fcbff'}}>Gender</TableCell>
+              <TableCell style={{color: '#6fcbff'}}>Study</TableCell>
+              <TableCell style={{color: '#6fcbff'}}>Institution</TableCell>
+              <TableCell style={{color: '#6fcbff'}}>Requested Procedure</TableCell>
+              <TableCell style={{color: '#6fcbff'}}>Study Date</TableCell>
             </TableRow>       
           </TableHead>
           )
@@ -249,7 +260,7 @@ class Images extends React.Component {
           <Table className={classes.table}>
             <EnhancedTableHead />
             <TableBody >
-              {this.state.patients.map( patient => {return (<Patients patient={patient} onStudyClick={this.handleStudyClick}/>)})}
+              {this.state.patients.map( patient => {return (<Patients patient={patient} onStudyClick={this.handleStudyClick} onStudyDoubleClick={onSelectSeries}/>)})}
             </TableBody>
           </Table>
         </div>

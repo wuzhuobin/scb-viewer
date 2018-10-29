@@ -112,13 +112,13 @@ class NavBar extends React.Component {
                             <Menu2
                                 id="menu-appbar"
                                 anchorEl= {this.state.anchorEl}
-                                anchorOrigin={{
-                                    vertical: 'top',
+                                 anchorOrigin={{
+                                    vertical: 'bottom',
                                     horizontal: 'right',
                                 }}
                                 transformOrigin={{
                                     vertical: 'top',
-                                    horizontal: 'right',
+                                    horizontal: 'left',
                                 }}
                                 open={meunOpen}
                                 onClose={this.handleClose}

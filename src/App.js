@@ -13,25 +13,45 @@ import {blue, grey, red} from '@material-ui/core/colors';
 import './App.css';
 
 const MyTheme = createMuiTheme({
-    palette: {
+    // palette: {
+    //     primary: {
+    //       light: '#6fcbff',
+    //       main: '#1d9bff',
+    //       dark: '#006dcb',
+    //       contrastText: "white",
+    //     },
+    //     secondary: {      
+    //       light: '#3d3d3d',
+    //       main: '#2d2d2d',
+    //       dark: '#1b1b1b',
+    //       contrastText: "white",
+    //     },
+    //     error: {
+    //       light: red[400],
+    //       main: red['A700'],
+    //       dark: red[900],
+    //     },
+    // },}
+
+      palette: {
         primary: {
           light: '#6fcbff',
           main: '#1d9bff',
           dark: '#006dcb',
-          contrastText: "white",
+          contrastText: "#aab1bd",
         },
         secondary: {      
-          light: '#3d3d3d',
-          main: '#2d2d2d',
-          dark: '#1b1b1b',
-          contrastText: "white",
+          light: '#151a1f',
+          main: '#0e1216',
+          dark: '#000000',
+          contrastText: '#ffffff',
         },
         error: {
           light: red[400],
           main: red['A700'],
           dark: red[900],
         },
-    },}
+        },}
     )
 
 const styles = theme=> ({
