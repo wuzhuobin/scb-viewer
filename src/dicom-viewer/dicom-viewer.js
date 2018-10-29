@@ -120,7 +120,8 @@ class DicomViewer extends React.Component {
       columnCosine:[0,1,0],
       initialized:false,
       selectedSeries: null,
-    }
+    };
+
   }
 
   componentWillReceiveProps(nextProps) {
@@ -221,6 +222,8 @@ class DicomViewer extends React.Component {
     cornerstoneTools.external.cornerstone = cornerstone;
     cornerstoneTools.external.cornerstoneMath = cornerstoneMath;
     cornerstoneTools.external.Hammer = Hammer;
+
+    this.readImage(this.props, this.state, cornerstone).then(res=>this.displayImage())
   }
 
   handleResize(event,dicomImage){
@@ -242,13 +245,8 @@ class DicomViewer extends React.Component {
   }
 
   componentDidMount() {
-    if (this.state.selectedSeries === null){
-      // alert("No image selected!");
-    }
-    this.readImage(this.props, this.state, cornerstone).then(res=>this.displayImage()).then(res=>{});
     window.addEventListener('resize', (event)=>{this.handleResize(event, this.dicomImage)})
   }
-
 
   getImagePathList(IP,Port,Path1){//sync request for now
     // return ['./assets/Test1/0000.dcm'];
@@ -307,7 +305,7 @@ class DicomViewer extends React.Component {
         var cacheimagePathArray = [];
         var loaderHint = "";
         if (state.selectedSeries){
-          loaderHint = props.series[0];
+          loaderHint = state.selectedSeries;
         }
         else {
           loaderHint = "noImage";
@@ -571,7 +569,8 @@ class DicomViewer extends React.Component {
   };
 
   onSelectSeries = (event, series)=>{
-      this.setState({selectedSeries: series})
+      this.setState({selectedSeries: series}, ()=>
+        this.readImage(this.props, this.state, cornerstone).then(res=>this.displayImage()));
   }
 
   render() {
