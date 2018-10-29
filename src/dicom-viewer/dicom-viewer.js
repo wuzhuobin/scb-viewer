@@ -65,7 +65,7 @@ const styles = theme=> ({
           // display: 'flex',
           height: '64px',
           justifyContent: 'center',
-          background: theme.palette.secondary.main
+          background: theme.palette.secondary.main,
         },
 
      paper:{
