@@ -23,7 +23,7 @@ function getToday(){
 
   if(mm<10) {
       mm = '0'+mm
-  } 
+  }
 
   today = yyyy + '-' + mm + '-' + dd;
   return today
@@ -104,8 +104,15 @@ const styles = theme => ({
   },
 
   tableCell:{
-    color: theme.palette.primary.main,
-  }
+    color: theme.palette.primary.contrastText,
+  },
+
+  study: {
+    // '&:nth-of-type(odd)': {
+    //   backgroundColor: theme.palette.secondary.light,
+    //},
+    '&:hover': {backgroundColor: "#272727"},
+  },
 });
 
 const tableHeadStyles = theme => ({
