@@ -217,7 +217,6 @@ class Images extends React.Component {
                 null
               )
             )
-
             studies[studies.length-1].id = studiesID[j];
           }
         }

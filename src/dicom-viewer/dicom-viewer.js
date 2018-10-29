@@ -246,6 +246,7 @@ class DicomViewer extends React.Component {
   }
 
   componentDidMount() {
+    console.log("did mount")
     window.addEventListener('resize', (event)=>{this.handleResize(event, this.dicomImage)})
   }
 
