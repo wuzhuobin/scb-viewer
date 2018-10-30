@@ -3,6 +3,7 @@ import {List, ListItem, ListItemIcon, ListItemText, Drawer, Divider} from '@mate
 import {withStyles} from '@material-ui/core/styles'
 import Images from './Images';
 import DicomViewer from "../dicom-viewer";
+import DicomViewer3D from "../dicom-viewer/dicom-viewer3D";
 import {Collections, Portrait, Visibility} from '@material-ui/icons'
 import classNames from 'classnames';
 import DrawerMenu from "./DrawerMenu";
@@ -72,7 +73,7 @@ class Content extends React.Component {
               {page === 0 && <Images onSelectSeries={this.onSelectSeries}/>}
               {page === 1 && <Projects />}         
               {page === 2 && <DicomViewer series={this.state.series} drawerOpen={this.props.open}/>}
-              {page === 3 && <Projects />} 
+              {page === 3 && <DicomViewer3D />} 
           </main>
         </div>
     );
