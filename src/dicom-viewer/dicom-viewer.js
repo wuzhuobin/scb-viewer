@@ -65,7 +65,7 @@ const styles = theme=> ({
           // display: 'flex',
           height: '64px',
           justifyContent: 'center',
-          background: theme.palette.secondary.main
+          background: theme.palette.secondary.main,
         },
 
      paper:{
@@ -128,8 +128,6 @@ class DicomViewer extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-      console.log("willrecieve")
-      console.log(nextProps);
       if (nextProps.drawerOpen){
           const element = this.dicomImage;
           cornerstoneTools.stopClip(element, 31);
@@ -143,7 +141,6 @@ class DicomViewer extends React.Component {
         }
         else{
           this.dicomImage.style.width = 'calc(100vw - 2px - 170px)'
-
         }
         cornerstone.resize(this.dicomImage)
       }
@@ -199,7 +196,6 @@ class DicomViewer extends React.Component {
     var rowString = cornerstoneTools.orientation.getOrientationString(state.rowCosine);
     var columnString = cornerstoneTools.orientation.getOrientationString(state.columnCosine);
 
-
     var oppositeRowString = cornerstoneTools.orientation.invertOrientationString(rowString);
     var oppositeColumnString = cornerstoneTools.orientation.invertOrientationString(columnString);
     
@@ -228,11 +224,6 @@ class DicomViewer extends React.Component {
     cornerstoneTools.external.cornerstone = cornerstone;
     cornerstoneTools.external.cornerstoneMath = cornerstoneMath;
     cornerstoneTools.external.Hammer = Hammer;
-    console.log('willmount');
-    console.log('willmount');
-    console.log('willmount');
-    console.log('willmount');
-    console.log('willmount');
     this.readImage(this.props, this.state, cornerstone).then(res=>this.displayImage())
   }
 
@@ -255,6 +246,7 @@ class DicomViewer extends React.Component {
   }
 
   componentDidMount() {
+    console.log("did mount")
     window.addEventListener('resize', (event)=>{this.handleResize(event, this.dicomImage)})
   }
 
@@ -310,18 +302,15 @@ class DicomViewer extends React.Component {
 
   readImage(props, state, cornerstoneInstance){
       //Get image path Array first
-      console.log(this.state.previousLoaderHint);
-      console.log(this.state.previousLoaderHint);
-      console.log(this.state.previousLoaderHint);
-      console.log(this.state.previousLoaderHint);
-      console.log(this.state.previousLoaderHint);
-      console.log(this.state.previousLoaderHint);
       const loadingResult = this.getImagePathList(1,1,state.selectedSeries)
       .then((queryList)=>{
+        console.log(queryList)
+
+        console.log(this.state.selectedSeries)
         var cacheimagePathArray = [];
         var loaderHint = "";
-        if (state.selectedSeries){
-          loaderHint = state.selectedSeries;
+        if (this.state.selectedSeries){
+          loaderHint = this.state.selectedSeries;
         }
         else {
           loaderHint = "noImage";
@@ -626,9 +615,8 @@ class DicomViewer extends React.Component {
   };
 
   onSelectSeries = (event, series)=>{
-    console.log("onSelectSeries");
       this.setState({selectedSeries: series}, ()=>
-        this.readImage(this.props, this.state, cornerstone).then(res=>this.displayImage()));
+        this.readImage(this.props, this.state, cornerstoneTools.external.cornerstone).then(res=>this.displayImage()));
   }
 
   render() {

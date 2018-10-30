@@ -29,7 +29,7 @@ const styles = theme => ({
     '&:hover': {borderColor: theme.palette.primary.light,},
   },
   xsItem: {
-    
+
   },
   text:{
     color: theme.palette.primary.light,
@@ -54,7 +54,6 @@ class SeriesPreview extends React.Component {
 	constructor(props){
     	super(props);
     	this.state={
-        open:false,
         series: [],
         imgs: [],
       };
@@ -65,11 +64,6 @@ class SeriesPreview extends React.Component {
         this.updateSeries(nextProps.study)
       }
     }
-
-	handleSeriesOpen = (event)  => {
-    this.setState({open: !this.state.open})
-    
-	}
 
 	handleSeriesDoubleClick = (event,seriesId)=>{
     this.props.onSelectSeries(event,seriesId)

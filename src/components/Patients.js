@@ -36,13 +36,11 @@ class Patients extends React.Component {
 	constructor(props){
     	super(props);
     	this.state={
-        open:false,
         studies: []
       }
 	}
 
-  handleStudyOpen = (event) => {
-    this.setState({ open: !this.state.open });
+  componentDidMount(){
     PACS.patientInfo(this.props.patient.id,
       function (json) {
         let studiesPromises = [];
@@ -76,53 +74,55 @@ class Patients extends React.Component {
 
     	return(
         <React.Fragment>
-            <TableRow 
-              className={classNames(classes.tableRow, {[classes.tableRowOpen]: open,})}
-              id={patient.id} 
-              onClick={this.handleStudyOpen}
-              >
-              <TableCell padding={'none'} colSpan={0} > 
-                  {this.state.open ? <ExpandLess style={{color: 'white'}} /> : <ExpandMore style={{color: 'white'}} />}    
-              </TableCell>
-              <TableCell className={classes.tableCell}>{patient.name}</TableCell>
-              <TableCell className={classes.tableCell}>{patient.patientId}</TableCell>
-              <TableCell className={classes.tableCell}>{patient.birthDate}</TableCell>
-              <TableCell className={classes.tableCell}>{patient.gender}</TableCell>
-              <TableCell></TableCell>
-              <TableCell></TableCell>
-              <TableCell></TableCell>
-              <TableCell></TableCell>
-            </TableRow>
-
-            {this.state.open && (
-              this.state.studies.map(study => {
-                return (
-                  <TableRow id={study.id} 
-                    onClick={event => onStudyClick(event, study.id)} 
+             {this.state.studies.map(study => {return(
+                  <TableRow 
+                    id={study.id} 
+                    onClick={event=>{onStudyClick(event, study.id)}}
                     onDoubleClick={event => {
                       PACS.studyInfo(study.id).then((json)=>{
                         let series = json.Series;
-
                         onStudyDoubleClick(event, series);
-                      });
-                    }}
+                      })}}
                     className={classes.study}>
-                    <TableCell></TableCell>
-                    <TableCell></TableCell>
-                    <TableCell></TableCell>
-                    <TableCell></TableCell>
-                    <TableCell></TableCell>
+                     <TableCell className={classes.tableCell}>{patient.name}</TableCell>
+                    <TableCell className={classes.tableCell}>{patient.patientId}</TableCell>
+                    <TableCell className={classes.tableCell}>{patient.birthDate}</TableCell>
+                    <TableCell className={classes.tableCell}>{patient.gender}</TableCell>
                     <TableCell className={classes.tableCell}>{study.Description}</TableCell>
                     <TableCell className={classes.tableCell}>{study.Institution}</TableCell>
                     <TableCell className={classes.tableCell}>{study.RequestedProcedure}</TableCell>
                     <TableCell className={classes.tableCell}>{study.StudyDate}</TableCell>
                   </TableRow>
-                  )}))}
+                  )})}
         </React.Fragment>
     	)
     }
-
 }
 
 
 export default withStyles(styles)(Patients);
+
+
+                    
+
+            // {this.state.open && ( this.state.studies.map(study => {
+            //     return (
+            //                 <TableRow id={study.id} onClick={event => onStudyClick(event, study.id)} onDoubleClick={event => {
+            //                     PACS.studyInfo(study.id).then((json)=>{
+            //                       let series = json.Series;
+
+            //                       onStudyDoubleClick(event, series);
+            //                     });
+            //                   }}
+            //                   className={classes.study}>
+            //                   <TableCell className={classes.tableCell}>{patient.name}</TableCell>
+            //                   <TableCell className={classes.tableCell}>{patient.patientId}</TableCell>
+            //                   <TableCell className={classes.tableCell}>{patient.birthDate}</TableCell>
+            //                   <TableCell className={classes.tableCell}>{patient.gender}</TableCell>
+            //                   <TableCell className={classes.tableCell}>{study.Description}</TableCell>
+            //                   <TableCell className={classes.tableCell}>{study.Institution}</TableCell>
+            //                   <TableCell className={classes.tableCell}>{study.RequestedProcedure}</TableCell>
+            //                   <TableCell className={classes.tableCell}>{study.StudyDate}</TableCell>
+            //                 </TableRow>
+            //                 )
+            //   }))}

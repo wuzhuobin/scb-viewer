@@ -65,7 +65,7 @@ class Login extends Component {
 	  	this.setState({showLoginMsg: true});
 	  	axios({
   				method: 'post',
-  				url: 'http://192.168.1.112:5000/handleLogin',
+  				url: 'http://35.220.241.133/api/account',
   				data: {
     			username: this.state.username,
     			password: this.state.password
