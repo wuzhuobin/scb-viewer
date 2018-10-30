@@ -251,6 +251,7 @@ const dicomLoader = (cs,imageArray, loaderHint) => {
     // const height = 256;
 
     function getPixelData() {
+      console.log(imageId);
       const loaderHintLength = cacheLoaderHint.length;
       if (String(imageId).substring(0,loaderHintLength+3) === cacheLoaderHint+"://"){
         const id = parseInt(String(imageId).substring(loaderHintLength+3,String(imageId).length));

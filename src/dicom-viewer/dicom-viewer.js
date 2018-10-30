@@ -227,6 +227,50 @@ class DicomViewer extends React.Component {
     this.readImage(this.props, this.state, cornerstone).then(res=>this.displayImage())
   }
 
+  componentWillUnmount(){
+    console.log("unmount");
+
+    const element  = this.dicomImage;
+    // const stackToolData = cornerstoneTools.getToolState(element, 'stack');
+    // const stackactive = stackToolData.data[0];
+    // cornerstone.disable(this.dicomImage);
+    // cornerstone.disable(this.dicomImage);
+
+    cornerstoneTools.mouseInput.disable(element);
+    cornerstoneTools.mouseWheelInput.disable(element);
+    //cornerstoneTools.touchInput.enable(element);
+    // // Enable all tools we want to use with this element
+    // cornerstoneTools.wwwc.activate(element, 1); // ww/wc is the default tool for left mouse button
+    cornerstoneTools.pan.deactivate(element, 2); // pan is the default tool for middle mouse button
+    cornerstoneTools.zoom.deactivate(element, 4); // zoom is the default tool for right mouse button
+    // cornerstoneTools.zoomWheel.activate(element); // zoom is the default tool for middle mouse wheel
+    cornerstoneTools.probe.disable(element);
+    cornerstoneTools.length.disable(element);
+    cornerstoneTools.ellipticalRoi.disable(element);
+    cornerstoneTools.rectangleRoi.disable(element);
+    cornerstoneTools.simpleAngle.disable(element);
+    cornerstoneTools.highlight.disable(element);
+    cornerstoneTools.arrowAnnotate.disable(element);
+
+    cornerstoneTools.touchInput.disable(element);
+    cornerstoneTools.zoomTouchPinch.deactivate(element);
+    cornerstoneTools.panMultiTouch.deactivate(element);
+    cornerstoneTools.stackScrollTouchDrag.deactivate(element);
+
+    //*****Added Play clip
+
+    // cornerstoneTools.removeStackStateManager(element, ['stack', 'playClip']);
+    // cornerstoneTools.clearToolState(element, 'stack', stackactive);
+    // cornerstoneTools.scrollIndicator.enable(element)
+    cornerstone.disable(element);
+
+    console.log("unmount done");
+
+
+
+
+  }
+
   handleResize(event,dicomImage){
     if (dicomImage)
     {
@@ -378,6 +422,7 @@ class DicomViewer extends React.Component {
     // cornerstone.enable(element);
 
     cornerstone.loadImage(this.state.imageLoaderHintsArray[stack.currentImageIdIndex]).then(image => {
+      console.log(this.state.imageLoaderHintsArray[stack.currentImageIdIndex]);
       cornerstone.displayImage(element, image);
       //Orientation Marker
       var viewport = cornerstone.getViewport(element);
