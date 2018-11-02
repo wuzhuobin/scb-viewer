@@ -596,7 +596,8 @@ class DicomViewer extends React.Component {
   };
 
   onSelectSeries = (event, series)=>{
-      this.setState({selectedSeries: series});
+       this.setState({selectedSeries: series}, ()=>
+        this.readImage(cornerstoneTools.external.cornerstone).then(res=>this.displayImage()));
   }
 
   render() {
