@@ -3,7 +3,7 @@ import Hammer from "hammerjs";
 import * as cornerstone from "cornerstone-core";
 import * as cornerstoneTools from "cornerstone-tools";
 import * as cornerstoneMath from "cornerstone-math";
-import dicomLoader from "./dicom-loader";
+import * as dcmLoader from "./dcmLoader";
 import {withStyles} from '@material-ui/core/styles'
 // import exampleImageIdLoader from "./exampleImageIdLoader";
 import AppBar from '@material-ui/core/AppBar';
@@ -224,7 +224,10 @@ class DicomViewer extends React.Component {
     cornerstoneTools.external.cornerstone = cornerstone;
     cornerstoneTools.external.cornerstoneMath = cornerstoneMath;
     cornerstoneTools.external.Hammer = Hammer;
-    this.readImage(this.props, this.state, cornerstone).then(res=>this.displayImage())
+    var newLoader = dcmLoader.GlobalDcmLoadManager;
+    newLoader.cs = cornerstone;
+    this.setState({loader:newLoader});
+    this.readImage(this.props, this.state, cornerstone).then(res=>this.displayImage());
   }
 
   componentWillUnmount(){
@@ -373,19 +376,26 @@ class DicomViewer extends React.Component {
           }
         }
 
-
-
-
         for (var i=0;i<queryList.length;i++){
           cacheimagePathArray.push(queryList[i]);
         // cacheArray.push("assets/Test1/0"+String((i-i%100)/100)+String((i-(i-i%100)-i%10)/10)+String(i%10)+".dcm");
       }
+      const stateLoader = this.state.loader;
+      console.log(cacheimagePathArray);
+      console.log(cacheimagePathArray);
+      console.log(cacheimagePathArray);
+      console.log(cacheimagePathArray);
+      console.log(loaderHint);
+      console.log(loaderHint);
+      console.log(loaderHint);
+      console.log(loaderHint);
+      stateLoader.loadSeries(cacheimagePathArray, loaderHint);
       this.setState(state => ({
         imagePathArray:cacheimagePathArray,
         imageLoaderHintsArray:cacheimageLoaderHintsArray,
         hardCodeNumDcm:cacheimagePathArray.length,
         previousLoaderHint:loaderHint,
-        loader:dicomLoader(cornerstoneInstance,cacheimagePathArray,loaderHint),
+        loader:stateLoader,
       }));
       // dicomLoader(cornerstoneInstance,cacheimagePathArray,loaderHint);
     });
@@ -423,6 +433,7 @@ class DicomViewer extends React.Component {
 
     cornerstone.loadImage(this.state.imageLoaderHintsArray[stack.currentImageIdIndex]).then(image => {
       console.log(this.state.imageLoaderHintsArray[stack.currentImageIdIndex]);
+      console.log(this.state.loader.loadedBuffer)
       cornerstone.displayImage(element, image);
       //Orientation Marker
       var viewport = cornerstone.getViewport(element);

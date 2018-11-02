@@ -1,68 +1,61 @@
 import daikon from "daikon";
 import pngjs from "pngjs";
 
+
+
 function getArrayMinMax(a){
-  const dataArray = a;
-  var min = dataArray[0];
-  var max = dataArray[0];
-  for (var i=0;i<dataArray.length;i++){
-    if (min>dataArray[i]){
-      min = dataArray[i];
-    }
-    if (max<dataArray[i]){
-      max = dataArray[i];
-    }
-  }
-  return [min,max];
+	const dataArray = a;
+	var min = dataArray[0];
+	var max = dataArray[0];
+	for (var i=0;i<dataArray.length;i++){
+		if (min>dataArray[i]){
+			min = dataArray[i];
+		}
+		if (max<dataArray[i]){
+			max = dataArray[i];
+		}
+	}
+	return [min,max];
 };
 
 function centerRange(center, numElement, exclusiveMax){
-  var returnArray = [];
-  for (var i=0;i<numElement;i++){
-    const j = parseInt(((i+1)/2)|0);
-    if (i%2){
-      if (center+j<exclusiveMax){
-        returnArray.push(center+j);
-      }
-    }
-    else {
-      if (center-j>=0){
-        returnArray.push(center-j);
-      }
-    }
-  }
-  return returnArray;
+	var returnArray = [];
+	for (var i=0;i<numElement;i++){
+		const j = parseInt(((i+1)/2)|0);
+		if (i%2){
+			if (center+j<exclusiveMax){
+				returnArray.push(center+j);
+			}
+		}
+		else {
+			if (center-j>=0){
+				returnArray.push(center-j);
+			}
+		}
+	}
+	return returnArray;
 }
 
 
-function httpFetch(url, requestMethod, inputHeader, inputContentBody){
-  const fetch = require('node-fetch');
-  var responseHeader = null;
-  var output;
+function httpFetch(url, requestMethod){
+	// const fetch = require('node-fetch');
+	var output;
 
-  output = fetch(url,{
-    method:requestMethod,
-    // method:"POST",
-    mode:"no-cors",
-    cache:"no-cache",
-    headers:inputHeader,
-    redirect:"follow",
-    referrer: "no-referrer",
-    body:inputContentBody,
-  }).then(response=>{responseHeader = response.headers; return response.json()}).then(res=>{return {header:responseHeader, body:res};});
-
-  return output;
+	output = fetch(url)
+	.then(response=> response.arrayBuffer())
+	.catch(error=>null);
+	return output;
 }
 
 
-class dcmLoader(){
+class dcmLoader{
 	constructor(inputCs, inputImagePathArray, inputLoaderHint){
-		this.numDcm = inputImageArray.length;
+		this.numDcm = inputImagePathArray.length;
 		this.imagePathArray = inputImagePathArray;
 		this.cs = inputCs;
 		this.loaderHint = inputLoaderHint;
 		this.maxQueriedId = 0;
-		this.minQueriedId = inputImageArray.length;
+		this.minQueriedId = inputImagePathArray.length;
 		this.imageSeries = [];
 		for (var i=0;i<this.numDcm;i++){
 			this.imageSeries.push(null);
@@ -71,20 +64,22 @@ class dcmLoader(){
 		this.onceReadSeries = [];
 		this.bufferSize = 30;
 		this.cacheBuffer = 5;
+  		this.BatchLoadImage(centerRange(parseInt((inputImagePathArray.length/2)|0),this.bufferSize, inputImagePathArray.length));
 	}
 
-	function BatchLoadImage(inputArray){//The input array is expected to contain only number, corresponding to the n-th slice of the required
+	BatchLoadImage(inputArray){//The input array is expected to contain only number, corresponding to the n-th slice of the required
 		const self = this;
 		for (var i=0;i<inputArray.length;i++){
 			const imageId = inputArray[i];
-			onceReadSeries.push(imageId);
+			this.onceReadSeries.push(imageId);
 
 			this.failedSeries = this.failedSeries.filter(item=>item!==imageId);
 			if (this.imageSeries[imageId]!== null){
 				console.log("rewriting " + imageId + " -th image to null");
 				this.imageSeries[imageId] = null;
 			}
-			this.imageSeries[imageId] = httpFetch(this.imagePathArray[imageId],"GET",null,"")
+			this.imageSeries[imageId] = new Promise(function (resolve, reject){
+			httpFetch(self.imagePathArray[imageId])
 			.then(response=>{
 				if (response===null){
 					this.failedSeries.push(imageId);
@@ -140,7 +135,7 @@ class dcmLoader(){
 							columns: image.getCols,
 							height: image.getCols(),
 							width: image.getRows(),
-							color:fakse,
+							color:false,
 							columnPixelSpacing: colSpacing,
 							rowPixelSpacing: rowSpacing,
 							sizeInBytes: image.getRows()*image.getCols()*2,
@@ -172,7 +167,9 @@ class dcmLoader(){
 						})
 					}//else (isDicom) end
 				}//else (response null) end
+			})//then() end
 			});
+
 		}//for(imageSeries) end
 	}//function BatchLoadImage() end
 
@@ -181,10 +178,10 @@ class dcmLoader(){
 		const numFailed = this.failedSeries.length;
 		if (numFailed){
 			console.log(numFailed+" image(s) is not loaded properly");
-			BatchLoadImage(failedSeries);
+			this.BatchLoadImage(this.failedSeries);
 		}
 		if (this.onceReadSeries.length){
-			var minMax = getArrayMinMax(onceReadSeries);
+			var minMax = getArrayMinMax(this.onceReadSeries);
 			if (this.maxQueriedId > minMax[1] - this.cacheBuffer){
 				const currentMaxRead = minMax[1];
 				const numAdditionalRead = Math.min(this.numDcm-1-currentMaxRead, this.bufferSize);
@@ -193,7 +190,7 @@ class dcmLoader(){
 					toReadArray.push(currentMaxRead+j+1);
 				}
 				if (numAdditionalRead){
-					BatchLoadImage(toReadArray);
+					this.BatchLoadImage(toReadArray);
 				}
 			}
 			else if (this.minQueriedId<minMax[0]+this.cacheBuffer){
@@ -204,7 +201,7 @@ class dcmLoader(){
 					toReadArray.push(currentMinRead-j-1);
 				}
 				if (numAdditionalRead){
-					BatchLoadImage(toReadArray);
+					this.BatchLoadImage(toReadArray);
 				}
 			}
 		}
@@ -222,8 +219,8 @@ class dcmLoader(){
 		if (sliceId<this.minQueriedId){
 			this.minQueriedId = sliceId;
 		}
-		if (this.failedSeries.includes(id)){
-			alert("The " + id + "-th image is not loaded");
+		if (this.failedSeries.includes(sliceId)){
+			alert("The " + sliceId + "-th image is not loaded");
 		}
 		this.UpdateImagesData(sliceId);
 		return this.imageSeries[sliceId];
@@ -231,20 +228,14 @@ class dcmLoader(){
 }
 
 
-
-
-
-
-
-
-class dcmManager(){
-	//The manage should store some instances of dcmLoader, relative to its hint
+export class dcmManager{
 	constructor(cornerStone){
 		this.loadedBuffer = [];
 		this.cs = cornerStone;
 	}
 
 	loadSeries(inputImagePathArray, inputLoaderHint){
+		const self = this;
 		if (this.findSeries(inputLoaderHint)){
 			console.log('The series '+inputLoaderHint+' is already loaded');
 			return;
@@ -255,7 +246,7 @@ class dcmManager(){
 				loaderHint: inputLoaderHint,
 				dcmLoader: new dcmLoader(this.cs, inputImagePathArray,inputLoaderHint),
 			});
-			this.cs.registerImageLoader(inputLoaderHint, getImage);
+			this.cs.registerImageLoader(inputLoaderHint, self.getImage);
 		}
 	}
 	findSeries(inputLoaderHint){
@@ -275,14 +266,13 @@ class dcmManager(){
 			console.log("no need to delete");
 		}
 		else {
-			this.loadedBuffer[i].dcmLoader.callForDestructor();
-			this.loadedBuffer = this.loadedBuffer.splice(i,1);
+			this.loadedBuffer[hitIndex].dcmLoader.callForDestructor();
+			this.loadedBuffer = this.loadedBuffer.splice(hitIndex,1);
 		}
 	}
 
 	getImage(imageId){
 		function getPixelData(){
-			console.log(imageId);
 			const signatureLocation1 = String(imageId).indexOf("://");
 			if (signatureLocation1 === -1 ){
 				console.log("failed to locate");
@@ -290,20 +280,67 @@ class dcmManager(){
 			}
 			const currentId = parseInt(String(imageId).substring(signatureLocation1+3, String(imageId).length));
 			const currentLoaderHint = String(imageId).substring(0,signatureLocation1)
-			const currentIndex = findSeries(currentLoaderHint);
+			const currentIndex = GlobalDcmLoadManager.findSeries(currentLoaderHint);
 			console.log("Accessing " + currentId + "-th image of "+ currentLoaderHint);
 			if (currentIndex === null){
 				console.log("Load series first");
 			}
 			else {
-				return {
-					promise: this.loadedBuffer[currentIndex].getSlice(currentId),
-					cancelFn: undefined
-				};
+				return GlobalDcmLoadManager.loadedBuffer[currentIndex].dcmLoader.getSlice(currentId);
 			}
+		}
+
+
+		return {
+			promise: new Promise(resolve => getPixelData()
+				.then(pixelData => {
+					console.log(pixelData.height);
+					console.log(pixelData.width);
+					console.log({
+						minPixelValue: 0,
+						maxPixelValue: 500,
+						slope: 1.0,
+						intercept: 0,
+						windowCenter: 127,
+						windowWidth: 256,
+						rows: 128,
+						columns: 128,
+						height:128,
+						width:128,
+						color: false,
+						columnPixelSpacing: 0.8984375,
+						rowPixelSpacing: 0.8984375,
+						// sizeInBytes: width * height * 2,
+						getPixelData: pixelData.getPixelData,
+						...pixelData
+					});
+					console.log(pixelData.maxPixelValue);
+					console.log(pixelData.getPixelData());
+					resolve({
+						minPixelValue: 0,
+						maxPixelValue: 500,
+						slope: 1.0,
+						intercept: 0,
+						windowCenter: 127,
+						windowWidth: 256,
+						rows: 128,
+						columns: 128,
+						height:128,
+						width:128,
+						color: false,
+						columnPixelSpacing: 1,
+						rowPixelSpacing: 1,
+						sizeInBytes: 128 * 128 * 2,
+						getPixelData: pixelData.getPixelData,
+						...pixelData
+					})
+				})),
+			cancelFn: undefined,
 		}
 	}
 
 
 
 }
+
+export var GlobalDcmLoadManager = new dcmManager()
