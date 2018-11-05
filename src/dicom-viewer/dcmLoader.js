@@ -132,7 +132,7 @@ class dcmLoader{
 							windowWidth: image.getWindowWidth(),
 							getPixelData: () => image.getInterpretedData(),
 							rows: image.getRows(),
-							columns: image.getCols,
+							columns: image.getCols(),
 							height: image.getCols(),
 							width: image.getRows(),
 							color:false,
@@ -294,44 +294,23 @@ export class dcmManager{
 		return {
 			promise: new Promise(resolve => getPixelData()
 				.then(pixelData => {
-					console.log(pixelData.height);
-					console.log(pixelData.width);
-					console.log({
-						minPixelValue: 0,
-						maxPixelValue: 500,
-						slope: 1.0,
-						intercept: 0,
-						windowCenter: 127,
-						windowWidth: 256,
-						rows: 128,
-						columns: 128,
-						height:128,
-						width:128,
-						color: false,
-						columnPixelSpacing: 0.8984375,
-						rowPixelSpacing: 0.8984375,
-						// sizeInBytes: width * height * 2,
-						getPixelData: pixelData.getPixelData,
-						...pixelData
-					});
-					console.log(pixelData.maxPixelValue);
-					console.log(pixelData.getPixelData());
 					resolve({
+			            imageId,
 						minPixelValue: 0,
 						maxPixelValue: 500,
 						slope: 1.0,
 						intercept: 0,
 						windowCenter: 127,
 						windowWidth: 256,
-						rows: 128,
-						columns: 128,
-						height:128,
-						width:128,
+						rows: pixelData.height,
+						columns: pixelData.width,
+						height:512,
+						width:512,
 						color: false,
-						columnPixelSpacing: 1,
-						rowPixelSpacing: 1,
-						sizeInBytes: 128 * 128 * 2,
-						getPixelData: pixelData.getPixelData,
+						// columnPixelSpacing: 1,
+						// rowPixelSpacing: 1,
+						// sizeInBytes: 128 * 128 * 2,
+						// getPixelData: pixelData.getPixelData,
 						...pixelData
 					})
 				})),

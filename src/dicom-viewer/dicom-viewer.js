@@ -381,14 +381,6 @@ class DicomViewer extends React.Component {
         // cacheArray.push("assets/Test1/0"+String((i-i%100)/100)+String((i-(i-i%100)-i%10)/10)+String(i%10)+".dcm");
       }
       const stateLoader = this.state.loader;
-      console.log(cacheimagePathArray);
-      console.log(cacheimagePathArray);
-      console.log(cacheimagePathArray);
-      console.log(cacheimagePathArray);
-      console.log(loaderHint);
-      console.log(loaderHint);
-      console.log(loaderHint);
-      console.log(loaderHint);
       stateLoader.loadSeries(cacheimagePathArray, loaderHint);
       this.setState(state => ({
         imagePathArray:cacheimagePathArray,
@@ -432,8 +424,8 @@ class DicomViewer extends React.Component {
     // cornerstone.enable(element);
 
     cornerstone.loadImage(this.state.imageLoaderHintsArray[stack.currentImageIdIndex]).then(image => {
-      console.log(this.state.imageLoaderHintsArray[stack.currentImageIdIndex]);
-      console.log(this.state.loader.loadedBuffer)
+      console.log(image)
+      // cornerstone.displayImage(element, {width:512, height: 512});
       cornerstone.displayImage(element, image);
       //Orientation Marker
       var viewport = cornerstone.getViewport(element);
