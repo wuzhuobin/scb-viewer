@@ -242,7 +242,6 @@ class DicomViewer extends React.Component {
           console.log(error)
         }
     }
-
   }
 
   componentDidMount() {
