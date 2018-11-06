@@ -1,6 +1,8 @@
 import daikon from "daikon";
 import pngjs from "pngjs";
-
+import * as cornerstone from "cornerstone-core";
+import * as cornerstoneTools from "cornerstone-tools";
+import * as cornerstoneMath from "cornerstone-math";
 
 
 function getArrayMinMax(a){
@@ -24,12 +26,12 @@ function centerRange(center, numElement, exclusiveMax){
 		const j = parseInt(((i+1)/2)|0);
 		if (i%2){
 			if (center+j<exclusiveMax){
-				returnArray.push(center+j);
+				returnArray.push(center+j-1);
 			}
 		}
 		else {
 			if (center-j>=0){
-				returnArray.push(center-j);
+				returnArray.push(center-j-1);
 			}
 		}
 	}
@@ -62,7 +64,7 @@ class dcmLoader{
 		}
 		this.failedSeries = [];
 		this.onceReadSeries = [];
-		this.bufferSize = 30;
+		this.bufferSize = this.numDcm;
 		this.cacheBuffer = 5;
   		this.BatchLoadImage(centerRange(parseInt((inputImagePathArray.length/2)|0),this.bufferSize, inputImagePathArray.length));
 	}
@@ -123,7 +125,7 @@ class dcmLoader{
 							name = image.getPatientName();
 						}
 						resolve({
-							minPixelValue:imageMin,
+							minPixelValue: imageMin,
 							maxPixelValue: imageMax,
 							patientPos: imagePos,
 							patientOri: imageDir,
@@ -261,13 +263,18 @@ export class dcmManager{
 	}
 
 	removeSeries(inputLoaderHint){
-		const hitIndex = this.findSeries
+		var self = this
+		const hitIndex = self.findSeries(inputLoaderHint)
 		if (hitIndex === null){
 			console.log("no need to delete");
 		}
 		else {
-			this.loadedBuffer[hitIndex].dcmLoader.callForDestructor();
-			this.loadedBuffer = this.loadedBuffer.splice(hitIndex,1);
+			console.log(hitIndex)
+			console.log(self.loadedBuffer)
+			self.loadedBuffer[hitIndex].dcmLoader.callForDestructor();
+			self.loadedBuffer = self.loadedBuffer.splice(hitIndex,1);
+			console.log(self.loadedBuffer)
+			console.log(self)
 		}
 	}
 
@@ -322,4 +329,4 @@ export class dcmManager{
 
 }
 
-export var GlobalDcmLoadManager = new dcmManager()
+export var GlobalDcmLoadManager = new dcmManager(cornerstone)
