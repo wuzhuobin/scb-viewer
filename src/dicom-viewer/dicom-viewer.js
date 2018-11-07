@@ -909,7 +909,7 @@ class DicomViewer extends React.Component {
 
         <Paper className={classNames(classes.paper, {[classes.paperDrawerOpen]: this.props.drawerOpen,})}>
           <div
-            style={this.props.drawerOpen? {
+            style={this.props.drawerOpen? { 
               // flexGrow: 1,    
               // display: 'flex',
               width: "calc(100vw - 240px - 2px - 170px)",
