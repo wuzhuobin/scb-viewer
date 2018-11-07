@@ -6,6 +6,7 @@ import {AppBar,Toolbar, Button, Grid, Paper}  from '@material-ui/core';
 import SeriesPreviewVertical from '../components/SeriesPreviewVertical'
 import {NavigationOutlined} from '@material-ui/icons';
 import MprViewer from './MprViewer'
+import ThreeDViewer from './threeDViewer'
 
 const styles = theme=> ({
     root:{    
@@ -82,7 +83,7 @@ class DicomViewer3D extends React.Component {
                 <MprViewer orientation={"Sagittal"} drawerOpen={drawerOpen}/>
               </Grid>
               <Grid item xs={6}>
-                3D Viewer Here
+                <ThreeDViewer orientation={"3D"} drawerOpen={drawerOpen}/>
               </Grid>
               <Grid item xs={6}>
                 <MprViewer orientation={"Coronal"} drawerOpen={drawerOpen}/>
