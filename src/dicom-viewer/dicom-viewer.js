@@ -225,7 +225,6 @@ class DicomViewer extends React.Component {
     cornerstoneTools.external.cornerstoneMath = cornerstoneMath;
     cornerstoneTools.external.Hammer = Hammer;
     // this.setState({loader:dcmLoader.GlobalDcmLoadManager});
-    this.readImage(this.props, this.state, cornerstone).then(res=>this.displayImage());
   }
 
   componentWillUnmount(){
@@ -265,6 +264,14 @@ class DicomViewer extends React.Component {
     // cornerstoneTools.scrollIndicator.enable(element)
     cornerstone.disable(element);
 
+    console.log(dcmLoader.GlobalDcmLoadManager)
+    console.log(this.state.previousLoaderHint)
+    dcmLoader.GlobalDcmLoadManager.removeSeries(this.state.previousLoaderHint)
+    this.setState((state) =>{
+        return{
+        loader: state.loader.removeSeries(state.previousLoaderHint),
+      }});
+
     console.log("unmount done");
 
 
@@ -273,6 +280,7 @@ class DicomViewer extends React.Component {
   }
 
   handleResize(event,dicomImage){
+    console.log(dcmLoader.GlobalDcmLoadManager)
     if (dicomImage)
     {
         console.log('updateSize')
@@ -293,6 +301,7 @@ class DicomViewer extends React.Component {
   componentDidMount() {
     console.log("did mount")
     cornerstone.enable(this.dicomImage)
+    this.readImage(this.props, this.state, cornerstone).then(res=>this.displayImage());
     window.addEventListener('resize', (event)=>{this.handleResize(event, this.dicomImage)})
   }
 
@@ -361,16 +370,7 @@ class DicomViewer extends React.Component {
         const cacheimageLoaderHintsArray = [...Array(queryList.length).keys()].map(function(number){
           return loaderHint+"://" + String(number);
         });
-        // if (this.state.previousLoaderHint && this.state.previousLoaderHint!==loaderHint){
-        //   for (var j=0;j<this.state.imageLoaderHintsArray.length;j++){
-        //     try{
-        //       cornerstone.imageCache.removeImageLoadObject(this.state.imageLoaderHintsArray[j]);
-        //     }
-        //     catch(error){
-        //       console.log(j+"-th image no need to delete, "+ this.state.imageLoaderHintsArray[j]);
-        //     }
-        //   }
-        // }
+
 
         for (var i=0;i<queryList.length;i++){
           cacheimagePathArray.push(queryList[i]);

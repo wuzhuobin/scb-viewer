@@ -22,16 +22,16 @@ function getArrayMinMax(a){
 
 function centerRange(center, numElement, exclusiveMax){
 	var returnArray = [];
-	for (var i=0;i<numElement;i++){
+	for (var i=0;i<=numElement;i++){
 		const j = parseInt(((i+1)/2)|0);
 		if (i%2){
 			if (center+j<exclusiveMax){
-				returnArray.push(center+j-1);
+				returnArray.push(center+j);
 			}
 		}
 		else {
 			if (center-j>=0){
-				returnArray.push(center-j-1);
+				returnArray.push(center-j);
 			}
 		}
 	}
@@ -66,6 +66,7 @@ class dcmLoader{
 		this.onceReadSeries = [];
 		this.bufferSize = this.numDcm;
 		this.cacheBuffer = 5;
+		this.numLoaded = 0;
   		this.BatchLoadImage(centerRange(parseInt((inputImagePathArray.length/2)|0),this.bufferSize, inputImagePathArray.length));
 	}
 
@@ -124,6 +125,7 @@ class dcmLoader{
 						if (image.getPatientName()){
 							name = image.getPatientName();
 						}
+						self.numLoaded++;
 						resolve({
 							minPixelValue: imageMin,
 							maxPixelValue: imageMax,
@@ -152,6 +154,7 @@ class dcmLoader{
 							else {
 								var array = data.data;
 								const range = getArrayMinMax(array);
+								self.numLoaded++;
 								resolve({
 									minPixelValue:range[0],
 									maxPixelValue:range[1],
@@ -236,9 +239,21 @@ export class dcmManager{
 		this.cs = cornerStone;
 	}
 
+	getProgress(inputLoaderHint){
+		const self = this;
+		const hitIndex = self.findSeries(inputLoaderHint)
+		if (hitIndex!==null){
+			return (self.loadedBuffer[hitIndex].dcmLoader.numLoaded) / self.loadedBuffer[hitIndex].dcmLoader.numDcm;
+		}
+		else {
+			console.log("can't find loader hint "+ inputLoaderHint)
+			return 0
+		}
+	}
+
 	loadSeries(inputImagePathArray, inputLoaderHint){
 		const self = this;
-		if (this.findSeries(inputLoaderHint)){
+		if (this.findSeries(inputLoaderHint)!== null){
 			console.log('The series '+inputLoaderHint+' is already loaded');
 			return;
 		}
@@ -263,6 +278,7 @@ export class dcmManager{
 	}
 
 	removeSeries(inputLoaderHint){
+		console.log('remove')
 		var self = this
 		const hitIndex = self.findSeries(inputLoaderHint)
 		if (hitIndex === null){
@@ -271,8 +287,9 @@ export class dcmManager{
 		else {
 			console.log(hitIndex)
 			console.log(self.loadedBuffer)
+			console.log(self.loadedBuffer[hitIndex])
 			self.loadedBuffer[hitIndex].dcmLoader.callForDestructor();
-			self.loadedBuffer = self.loadedBuffer.splice(hitIndex,1);
+			self.loadedBuffer.splice(hitIndex,1);
 			console.log(self.loadedBuffer)
 			console.log(self)
 		}
