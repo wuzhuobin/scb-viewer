@@ -89,7 +89,7 @@ class App extends Component {
   constructor(props){
         super(props);
         this.state = {
-            auth: false,
+            auth: true,
             open: false,
         };
     }

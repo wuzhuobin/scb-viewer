@@ -295,7 +295,6 @@ class DicomViewer extends React.Component {
           console.log(error)
         }
     }
-
   }
 
   componentDidMount() {
@@ -376,6 +375,7 @@ class DicomViewer extends React.Component {
           cacheimagePathArray.push(queryList[i]);
         // cacheArray.push("assets/Test1/0"+String((i-i%100)/100)+String((i-(i-i%100)-i%10)/10)+String(i%10)+".dcm");
       }
+
       // const stateLoader = this.state.loader;
       // stateLoader.loadSeries(cacheimagePathArray, loaderHint);
       this.setState((state) =>{
@@ -387,6 +387,7 @@ class DicomViewer extends React.Component {
         loader: dcmLoader.GlobalDcmLoadManager.loadSeries(cacheimagePathArray, loaderHint),
       }});
       // dicomLoader(cornerstoneInstance,cacheimagePathArray,loaderHint);
+
     });
 
   // console.log('loading result')

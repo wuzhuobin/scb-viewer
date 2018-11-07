@@ -62,12 +62,6 @@ class DrawerMenu extends React.Component {
                 </ListItemIcon>
                 <ListItemText primary={<Typography variant="h6" style={{ color: 'white' }}>Images</Typography>} />
               </ListItem>
-              <ListItem button onClick={() => {onChangePage(1);}} className={classes.button}>
-                <ListItemIcon className={classes.button}>
-                  <Portrait />
-                </ListItemIcon>
-                <ListItemText primary={<Typography variant="h6" style={{ color: 'white' }}>Project</Typography>} />
-              </ListItem>
             </List>
             <Divider className={classes.divider} />
             <List>
@@ -75,13 +69,13 @@ class DrawerMenu extends React.Component {
                 <ListItemIcon>
                   <Visibility className={classes.button} />
                 </ListItemIcon>
-                <ListItemText primary={<Typography variant="h6" style={{ color: 'white' }}>2D Viewer</Typography>} />
+                <ListItemText primary={<Typography variant="h6" style={{ color: 'white' }}>Planar Viewer</Typography>} />
                 </ListItem>
                 <ListItem button onClick={() => {onChangePage(3);}} className={classes.button}>
                 <ListItemIcon>
                   <ThreeDRotation className={classes.button} />
                 </ListItemIcon>
-                <ListItemText primary={<Typography variant="h6" style={{ color: 'white' }}>3D Viewer</Typography>} />
+                <ListItemText primary={<Typography variant="h6" style={{ color: 'white' }}>MPR Viewer</Typography>} />
                 </ListItem>
             </List>
           </Drawer>
