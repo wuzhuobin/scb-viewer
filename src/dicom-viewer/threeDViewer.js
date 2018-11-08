@@ -43,7 +43,7 @@ class ThreeDViewer extends React.Component {
     const imageId = 'example://1';
 
     this.setState({
-      dicomImage: document.getElementById('dicomImageAxial')},
+      dicomImage: document.getElementById('dicomImageThreeD')},
       ()=>{
         var element = this.state.dicomImage
         cornerstone.enable(element);
