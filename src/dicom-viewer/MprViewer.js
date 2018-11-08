@@ -140,7 +140,7 @@ class MprViewer extends React.Component {
       const {drawerOpen, orientation, classes} = this.props
 
     	return(
-          <Paper className={classes.paper}>
+          <div className={classes.paper}>
             {orientation === "Axial" 
               && <div id="dicomImageAxial" 
               className={classNames(classes.dcmViewer, {[classes.drawerOpenDicomViewer]: this.props.drawerOpen})}/>}
@@ -150,7 +150,7 @@ class MprViewer extends React.Component {
             {orientation === "Coronal" 
               && <div id="dicomImageCoronal" 
               className={classNames(classes.dicomViewer, {[classes.drawerOpenDicomViewer]: this.props.drawerOpen})}/>}
-          </Paper>            
+          </div>            
         );
     };
 }

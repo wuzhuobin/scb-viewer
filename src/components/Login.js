@@ -30,7 +30,8 @@ const styles = theme=> ({
     padding: `${theme.spacing.unit * 2}px ${theme.spacing.unit * 3}px ${theme.spacing.unit * 3}px`,
   },
   button: {
-    margin: theme.spacing.unit,
+    //margin: theme.spacing.unit,
+    color: theme.palette.secondary.contrastText,
   },
   avatar: {
     margin: theme.spacing.unit,
@@ -38,6 +39,7 @@ const styles = theme=> ({
   },
   submit: {
     marginTop: theme.spacing.unit * 3,
+    color: theme.palette.secondary.contrastText,
   },
 })
 

@@ -41,7 +41,7 @@ import CardContent from '@material-ui/core/CardContent';
 import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
 import Popover from "@material-ui/core/Popover";
 import Typography from '@material-ui/core/Typography';
-
+import ProgressDialog from "./progressDialog";
 import classNames from 'classnames';
 
 import SeriesPreviewVertical from '../components/SeriesPreviewVertical'
@@ -123,6 +123,7 @@ class DicomViewer extends React.Component {
       loader:dcmLoader.GlobalDcmLoadManager,
       previousLoaderHint:null,
       dicomImage:null,
+      loading: 100,
     };
 
   }
@@ -656,8 +657,12 @@ class DicomViewer extends React.Component {
   };
 
   onSelectSeries = (event, series)=>{
+      this.setState({loading: 0})
       this.setState({selectedSeries: series}, ()=>
-        this.readImage(this.props, this.state).then(res=>this.displayImage()));
+        this.readImage(this.props, this.state).then(
+          res=>{
+            this.displayImage();
+          }));
   }
 
   render() {
@@ -909,7 +914,7 @@ class DicomViewer extends React.Component {
 
         <Paper className={classNames(classes.paper, {[classes.paperDrawerOpen]: this.props.drawerOpen,})}>
           <div
-            style={this.props.drawerOpen? {
+            style={this.props.drawerOpen? { 
               // flexGrow: 1,    
               // display: 'flex',
               width: "calc(100vw - 240px - 2px - 170px)",
@@ -990,3 +995,5 @@ export default withStyles(styles)(DicomViewer);
 
 
 //<div class="orientationMarkers" style={{borderStyle:"solid", borderColor:"red",position: "absolute", top: "0%", left: "0%", width: viewerWidth, height: viewerHeight}}>
+
+//<ProgressDialog open={this.state.loading <100}/>
