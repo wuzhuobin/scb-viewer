@@ -7,6 +7,7 @@ import exampleImageIdLoader from "./exampleImageIdLoader";
 import * as cornerstone from "cornerstone-core";
 import * as cornerstoneTools from "cornerstone-tools";
 import * as cornerstoneMath from "cornerstone-math";
+import dcmViewer from "./dcmViewer"
 
 const styles = theme=> ({
     root:{    
@@ -42,16 +43,37 @@ class MprViewer extends React.Component {
 
     const imageId = 'example://1';
 
+    const viewer = new dcmViewer(document.getElementById('dicomImageAxial'))
+    viewer.loadImageFromPacs("4e8739a-f032e726-38354e44-9e636c11-648b3306").then(res=>{
+      console.log('done')
+      viewer.displayImage();
+    })
+
+
+
+
     if (this.props.orientation === "Axial")
     {
+      // const viewerA = document.getElementById('dicomImageAxial');
+      // console.log(viewerA);
+      // viewerA = new dcmViewer()
+      // viewerA.loadImageFromPacs("4e8739a-f032e726-38354e44-9e636c11-648b3306").then(res=>viewerA.displayImage())
+
+
       this.setState({
         dicomImage: document.getElementById('dicomImageAxial')},
         ()=>{
-          var element = this.state.dicomImage
-          cornerstone.enable(element);
-          cornerstone.loadImage(imageId).then(function(image) {
-            cornerstone.displayImage(element, image);
-          })
+            // const viewer = new dcmViewer(this.state.dicomImage)
+            // viewer.loadImageFromPacs("4e8739a-f032e726-38354e44-9e636c11-648b3306").then(res=>viewer.displayImage())
+
+
+          // var element = this.state.dicomImage
+          // cornerstone.enable(element);
+          // cornerstone.loadImage(imageId).then(function(image) {
+          //   cornerstone.displayImage(element, image);
+          // })
+          // console.log(this.state.dicomImage)
+          // this.state.dicomImage.readImage(null,'')
         })
     }
     else if (this.props.orientation === "Sagittal")
@@ -91,7 +113,7 @@ class MprViewer extends React.Component {
         else{
           this.state.dicomImage.style.width = 'calc(50vw - 85px)'
         }
-        cornerstone.resize(this.state.dicomImage)
+        // cornerstone.resize(this.state.dicomImage)
       }
     }
     }
@@ -121,7 +143,7 @@ class MprViewer extends React.Component {
           <Paper className={classes.paper}>
             {orientation === "Axial" 
               && <div id="dicomImageAxial" 
-              className={classNames(classes.dicomViewer, {[classes.drawerOpenDicomViewer]: this.props.drawerOpen})}/>}
+              className={classNames(classes.dcmViewer, {[classes.drawerOpenDicomViewer]: this.props.drawerOpen})}/>}
             {orientation === "Sagittal" 
               && <div id="dicomImageSagittal" 
               className={classNames(classes.dicomViewer, {[classes.drawerOpenDicomViewer]: this.props.drawerOpen})}/>}
