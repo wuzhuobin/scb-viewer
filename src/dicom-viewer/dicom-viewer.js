@@ -33,6 +33,7 @@ import SaveIcon from '@material-ui/icons/SaveAlt';
 import TextIcon from '@material-ui/icons/Title';
 import FreeFormIcon from '@material-ui/icons/RoundedCorner';
 import PlayIcon from '@material-ui/icons/PlayArrowOutlined';
+import InfoIcon from '@material-ui/icons/Info';
 
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
