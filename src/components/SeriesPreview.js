@@ -66,7 +66,7 @@ class SeriesPreview extends React.Component {
     }
 
 	handleSeriesDoubleClick = (event,seriesId)=>{
-    this.props.onSelectSeries(event,seriesId)
+    this.props.onSelectSeries(event,seriesId, "planar")
 	}
 
 
