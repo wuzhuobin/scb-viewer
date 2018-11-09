@@ -6,6 +6,7 @@ import * as cornerstoneMath from "cornerstone-math";
 import * as dcmLoader from "./dcmLoader";
 import {withStyles} from '@material-ui/core/styles'
 // import exampleImageIdLoader from "./exampleImageIdLoader";
+import {Snackbar} from '@material-ui/core';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Button from '@material-ui/core/Button';
@@ -53,6 +54,7 @@ const styles = theme=> ({
     root:{    
         width: '100vw',
         height: 'calc(100vh - 128px)',
+        backgroundColor: "black",
         // overflow: 'auto',
         // flexGrow: 1,
     },
@@ -75,21 +77,21 @@ const styles = theme=> ({
         paddingLeft:'0px',
     },
 
-     paper:{
-      padding: 0,
-      borderColor: theme.palette.primary.main,
-      borderStyle: "solid",
-      borderRadius:"0px",
-      borderWidth:"1px",
-      marginTop: "64px",
+   paper:{
+    padding: 0,
+    borderColor: theme.palette.primary.main,
+    borderStyle: "solid",
+    borderRadius:"0px",
+    borderWidth:"1px",
+    marginTop: "64px",
 
-      marginLeft: "170px",
-      height: "calc(100vh - 128px - 2px)",
-      width: "calc(100vw - 2px - 170px)"
-     },
-     paperDrawerOpen:{
-      width: "calc(100vw - 2px - 240px - 170px)"
-     },
+    marginLeft: "170px",
+    height: "calc(100vh - 128px - 2px)",
+    width: "calc(100vw - 2px - 170px)"
+   },
+   paperDrawerOpen:{
+    width: "calc(100vw - 2px - 240px - 170px)"
+   },
 
     label: {
     // Aligns the content of the button vertically.
@@ -132,7 +134,7 @@ class DicomViewer extends React.Component {
       loader:dcmLoader.GlobalDcmLoadManager,
       previousLoaderHint:null,
       dicomImage:null,
-      loading: 100,
+      loadingProgress: 100,
       infoDialog:false,
     };
 
@@ -671,7 +673,7 @@ class DicomViewer extends React.Component {
   };
 
   onSelectSeries = (event, series)=>{
-      this.setState({loading: 0})
+      this.setState({loadingProgress: 0})
       this.setState({selectedSeries: series}, ()=>
         this.readImage(this.props, this.state).then(
           res=>{
@@ -941,6 +943,7 @@ class DicomViewer extends React.Component {
               height: "calc(100vh - 128px - 2px)",
               position: "relative",
               color: "#6fcbff",
+              backgroundColor: "black"
               // margin: 9
             } :
             {
@@ -948,6 +951,7 @@ class DicomViewer extends React.Component {
               height: "calc(100vh - 128px - 2px)",
               position: "relative",
               color: "#6fcbff",
+              backgroundColor: "black"
             }
           }
                 onContextMenu={() => false}
@@ -1003,8 +1007,19 @@ class DicomViewer extends React.Component {
               </div>
 
             </div>
-        </Paper>
+            <Snackbar
+              anchorOrigin={{vertical:'bottom',horizontal:'right'}}
+              open={this.state.loadingProgress < 100}
+              // open={true}
+              ContentProps={{
+                'aria-describedby': 'message-id',
+              }}
 
+              message={<span id="message-id">
+                Loading: {this.state.loadingProgress}% 
+                </span>}
+            />
+        </Paper>
       </div>
 
     );

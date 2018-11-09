@@ -15,6 +15,7 @@ const drawerWidth = 240;
 const styles = theme=> ({
   root: {
     display: 'flex',
+    backgroundColor: "black"
   },
   drawerPaper: {
     position: 'relative',
@@ -44,7 +45,7 @@ class Content extends React.Component {
     constructor(props){
         super(props);
         this.state = {
-            page: 3,
+            page: 2,
             series: null,
             sessionId: null,
         };
