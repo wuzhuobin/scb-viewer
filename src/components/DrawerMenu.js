@@ -60,7 +60,7 @@ class DrawerMenu extends React.Component {
                 <ListItemIcon className={classes.button}>
                   <Collections />
                 </ListItemIcon>
-                <ListItemText primary={<Typography variant="h6" style={{ color: 'white' }}>Images</Typography>} />
+                <ListItemText primary={<Typography variant="h6" style={{ color: 'white' }}>PACS</Typography>} />
               </ListItem>
             </List>
             <Divider className={classes.divider} />
