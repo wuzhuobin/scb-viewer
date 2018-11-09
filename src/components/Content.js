@@ -52,9 +52,14 @@ class Content extends React.Component {
     	this.setState({page: value});
   	}
 
-    onSelectSeries = (event, series)=>{
+    onSelectSeries = (event, series, viewer)=>{
       this.setState({series: series})
-      this.setState({page: 2})
+      if (viewer === "planar"){
+        this.setState({page: 2})
+      }
+      else if (viewer === "mpr"){
+        this.setState({page: 3})
+      }
     }
 
     render(){

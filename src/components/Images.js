@@ -1,8 +1,8 @@
 import React from "react";
 
 import {Button, Divider, Typography, TextField, Table, TableBody, TableCell, TableHead, TableRow, TablePagination,
-TableSortLabel, IconButton,} from '@material-ui/core';
-import {CloudUpload, ExpandMore, LastPage, FirstPage, KeyboardArrowRight, KeyboardArrowLeft} from '@material-ui/icons'
+TableSortLabel, IconButton, Menu, MenuItem} from '@material-ui/core';
+import {CloudUpload, ExpandMore, LastPage, FirstPage, KeyboardArrowRight, KeyboardArrowLeft, MoreVert} from '@material-ui/icons'
 
 import { withStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
@@ -31,7 +31,6 @@ function getToday(){
 
 const styles = theme => ({
   root: {
-
     // flexGrow: 1,
     // zIndex: 1,
     // width: '100%',
@@ -106,7 +105,7 @@ const styles = theme => ({
   tableCell:{
     color: theme.palette.primary.contrastText,
     borderWidth:'0px',
-  
+    padding: 0,
   },
 
   study: {
@@ -158,9 +157,16 @@ class EnhancedTableHead extends React.Component{
       const {classes} = this.props
       
       return(
+<<<<<<< HEAD
         <TableHead style={{}}>
             <TableRow style={{borderWidth:'0px', height:'10px'}}>
               <TableCell key='patientName' numeric={false} sortDirection='asc' style={{color: '#6fcbff', fontWeight: 'bold', borderColor:'#151a1f'}}>
+=======
+        <TableHead >
+            <TableRow>
+              <TableCell />
+              <TableCell key='patientName' numeric={false} sortDirection='asc'>
+>>>>>>> 58247e57ee38837fb63419c88d7bba87f5544c28
                 <TableSortLabel
                   active={true}
                   style={{color: '#6fcbff', fontWeight: 'bold'}}
@@ -195,11 +201,12 @@ class Images extends React.Component {
       modality: 'all',
       studies: [],
       selectedStudy: null,
+      menuOpen: false,
+      menuAnchorEl: null,
     }
   }
 
   componentDidMount(){
-
     let patients = [];
     PACS.allPatients((patientIdjsons) => {
       let patientPromises = [];
@@ -270,8 +277,19 @@ class Images extends React.Component {
     this.setState({selectedStudy: study})
   }
 
+  handleStudyMenuClick = (event, study) =>{
+    console.log("study menu click")
+    event.preventDefault();
+    this.setState({menuOpen: true});
+    this.setState({menuAnchorEl: event.currentTarget})
+  }
+
+  handleStudyMenuClose = () =>{
+    this.setState({menuOpen: false})
+  }
+
   render() {
-    const {selectedStudy, studies} = this.state
+    const {menuAnchorEl, menuOpen, selectedStudy, studies} = this.state
     const {onSelectSeries, classes} = this.props
 
     return (
@@ -308,8 +326,15 @@ class Images extends React.Component {
                     onDoubleClick={event => {
                       PACS.studyInfo(study.id).then((json)=>{
                         let series = json.Series;
-                        onSelectSeries(event, series);
-                      })}}>
+                        onSelectSeries(event, series, "planar");
+                      })}}
+                    onContextMenu={event=>{event.preventDefault()}}
+                    >
+                    <TableCell className={classes.tableCell} >
+                      <IconButton color="inherit" onClick={(event)=>{this.handleStudyMenuClick(event, study.id)}}>
+                        <MoreVert />
+                      </IconButton>
+                    </TableCell>
                     <TableCell className={classes.tableCell}>{study.patientId}</TableCell>
                     <TableCell className={classes.tableCell}>{study.name}</TableCell>
                     <TableCell className={classes.tableCell}>{study.birthDate}</TableCell>
@@ -321,6 +346,36 @@ class Images extends React.Component {
                   </TableRow>
                 )
             })}
+            <Menu
+              id="study-menu"
+              anchorOrigin={{
+                vertical: 'top',
+                horizontal: 'right',
+              }}
+              transformOrigin={{
+                vertical: 'top',
+                horizontal: 'left',
+              }}
+              anchorEl={menuAnchorEl}
+              open={menuOpen}
+              onClose={this.handleStudyMenuClose}
+              onContextMenu={(event)=>{event.preventDefault();this.handleStudyMenuClose()}}
+            >
+              <MenuItem onClick={(event)=>{
+                PACS.studyInfo(this.state.selectedStudy).then((json)=>{
+                  let series = json.Series;
+                  onSelectSeries(event, series, "planar");
+                  })}}>
+                Open in Planar Viewer
+                </MenuItem>
+              <MenuItem onClick={(event)=>{
+                PACS.studyInfo(this.state.selectedStudy).then((json)=>{
+                  let series = json.Series;
+                  onSelectSeries(event, series, "mpr");
+                  })}}>
+                Open in MPR Viewer
+              </MenuItem>
+            </Menu>
             </TableBody>
           </Table>
         </div>
