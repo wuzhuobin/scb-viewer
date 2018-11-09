@@ -105,12 +105,15 @@ const styles = theme => ({
 
   tableCell:{
     color: theme.palette.primary.contrastText,
+    borderWidth:'0px',
+  
   },
 
   study: {
-    // '&:nth-of-type(odd)': {
-    //   backgroundColor: theme.palette.secondary.light,
-    //},
+    height:'40px',
+    '&:nth-of-type(odd)': {
+      backgroundColor: theme.palette.secondary.dark,
+    },
     '&:hover': {backgroundColor: "#272727"},
   },
 });
@@ -155,23 +158,23 @@ class EnhancedTableHead extends React.Component{
       const {classes} = this.props
       
       return(
-        <TableHead >
-            <TableRow>
-              <TableCell key='patientName' numeric={false} sortDirection='asc'>
+        <TableHead style={{}}>
+            <TableRow style={{borderWidth:'0px', height:'10px'}}>
+              <TableCell key='patientName' numeric={false} sortDirection='asc' style={{color: '#6fcbff', fontWeight: 'bold', borderColor:'#151a1f'}}>
                 <TableSortLabel
                   active={true}
-                  style={{color: '#6fcbff'}}
+                  style={{color: '#6fcbff', fontWeight: 'bold'}}
                   >
                   Patient ID
                 </TableSortLabel>
               </TableCell>
-              <TableCell style={{color: '#6fcbff'}}>Patient Name</TableCell>
-              <TableCell style={{color: '#6fcbff'}}>Date of Birth</TableCell>
-              <TableCell style={{color: '#6fcbff'}}>Gender</TableCell>
-              <TableCell style={{color: '#6fcbff'}}>Study</TableCell>
-              <TableCell style={{color: '#6fcbff'}}>Institution</TableCell>
-              <TableCell style={{color: '#6fcbff'}}>Requested Procedure</TableCell>
-              <TableCell style={{color: '#6fcbff'}}>Study Date</TableCell>
+              <TableCell style={{color: '#6fcbff', fontWeight: 'bold', borderColor:'#151a1f'}}>Patient Name</TableCell>
+              <TableCell style={{color: '#6fcbff', fontWeight: 'bold', borderColor:'#151a1f'}}>Date of Birth</TableCell>
+              <TableCell style={{color: '#6fcbff', fontWeight: 'bold', borderColor:'#151a1f'}}>Gender</TableCell>
+              <TableCell style={{color: '#6fcbff', fontWeight: 'bold', borderColor:'#151a1f'}}>Study</TableCell>
+              <TableCell style={{color: '#6fcbff', fontWeight: 'bold', borderColor:'#151a1f'}}>Institution</TableCell>
+              <TableCell style={{color: '#6fcbff', fontWeight: 'bold', borderColor:'#151a1f'}}>Requested Procedure</TableCell>
+              <TableCell style={{color: '#6fcbff', fontWeight: 'bold', borderColor:'#151a1f'}}>Study Date</TableCell>
             </TableRow>       
           </TableHead>
           )

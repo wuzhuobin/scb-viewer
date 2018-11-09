@@ -43,7 +43,7 @@ class Content extends React.Component {
     constructor(props){
         super(props);
         this.state = {
-            page: 3,
+            page: 0,
             series: null,
         };
     }
@@ -73,7 +73,7 @@ class Content extends React.Component {
               {page === 0 && <Images onSelectSeries={this.onSelectSeries}/>}
               {page === 1 && <Projects />}         
               {page === 2 && <DicomViewer series={this.state.series} drawerOpen={this.props.open}/>}
-              {page === 3 && <DicomViewer3D series={this.state.series} drawerOpen={this.props.open}/>} 
+              {page === 3 && <DicomViewer3D />} 
           </main>
         </div>
     );

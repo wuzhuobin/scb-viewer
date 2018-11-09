@@ -16,7 +16,7 @@ const styles = theme => ({
 	gridContainer1:{
 		width: 170,
 		height: '100%',
-
+		
 	},
 	demo:{
 		width: 170,
