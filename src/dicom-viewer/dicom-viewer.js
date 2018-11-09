@@ -3,7 +3,7 @@ import Hammer from "hammerjs";
 import * as cornerstone from "cornerstone-core";
 import * as cornerstoneTools from "cornerstone-tools";
 import * as cornerstoneMath from "cornerstone-math";
-import dicomLoader from "./dicom-loader";
+import * as dcmLoader from "./dcmLoader";
 import {withStyles} from '@material-ui/core/styles'
 // import exampleImageIdLoader from "./exampleImageIdLoader";
 import AppBar from '@material-ui/core/AppBar';
@@ -41,7 +41,7 @@ import CardContent from '@material-ui/core/CardContent';
 import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
 import Popover from "@material-ui/core/Popover";
 import Typography from '@material-ui/core/Typography';
-
+import ProgressDialog from "./progressDialog";
 import classNames from 'classnames';
 
 import SeriesPreviewVertical from '../components/SeriesPreviewVertical'
@@ -120,6 +120,10 @@ class DicomViewer extends React.Component {
       columnCosine:[0,1,0],
       initialized:false,
       selectedSeries: null,
+      loader:dcmLoader.GlobalDcmLoadManager,
+      previousLoaderHint:null,
+      dicomImage:null,
+      loading: 100,
     };
 
   }
@@ -218,16 +222,66 @@ class DicomViewer extends React.Component {
 
 
   componentWillMount() {
-    console.log("will mount")
-
     cornerstoneTools.external.cornerstone = cornerstone;
     cornerstoneTools.external.cornerstoneMath = cornerstoneMath;
     cornerstoneTools.external.Hammer = Hammer;
+    // this.setState({loader:dcmLoader.GlobalDcmLoadManager});
+  }
 
-    this.readImage(cornerstoneTools.external.cornerstone).then(res=>this.displayImage())
+  componentWillUnmount(){
+    console.log("unmount");
+
+    const element  = this.dicomImage;
+    // const stackToolData = cornerstoneTools.getToolState(element, 'stack');
+    // const stackactive = stackToolData.data[0];
+    // cornerstone.disable(this.dicomImage);
+    // cornerstone.disable(this.dicomImage);
+
+    cornerstoneTools.mouseInput.disable(element);
+    cornerstoneTools.mouseWheelInput.disable(element);
+    //cornerstoneTools.touchInput.enable(element);
+    // // Enable all tools we want to use with this element
+    // cornerstoneTools.wwwc.activate(element, 1); // ww/wc is the default tool for left mouse button
+    cornerstoneTools.pan.deactivate(element, 2); // pan is the default tool for middle mouse button
+    cornerstoneTools.zoom.deactivate(element, 4); // zoom is the default tool for right mouse button
+    // cornerstoneTools.zoomWheel.activate(element); // zoom is the default tool for middle mouse wheel
+    cornerstoneTools.probe.disable(element);
+    cornerstoneTools.length.disable(element);
+    cornerstoneTools.ellipticalRoi.disable(element);
+    cornerstoneTools.rectangleRoi.disable(element);
+    cornerstoneTools.simpleAngle.disable(element);
+    cornerstoneTools.highlight.disable(element);
+    cornerstoneTools.arrowAnnotate.disable(element);
+
+    cornerstoneTools.touchInput.disable(element);
+    cornerstoneTools.zoomTouchPinch.deactivate(element);
+    cornerstoneTools.panMultiTouch.deactivate(element);
+    cornerstoneTools.stackScrollTouchDrag.deactivate(element);
+
+    //*****Added Play clip
+
+    // cornerstoneTools.removeStackStateManager(element, ['stack', 'playClip']);
+    // cornerstoneTools.clearToolState(element, 'stack', stackactive);
+    // cornerstoneTools.scrollIndicator.enable(element)
+    cornerstone.disable(element);
+
+    console.log(dcmLoader.GlobalDcmLoadManager)
+    console.log(this.state.previousLoaderHint)
+    dcmLoader.GlobalDcmLoadManager.removeSeries(this.state.previousLoaderHint)
+    this.setState((state) =>{
+        return{
+        loader: state.loader.removeSeries(state.previousLoaderHint),
+      }});
+
+    console.log("unmount done");
+
+
+
+
   }
 
   handleResize(event,dicomImage){
+    console.log(dcmLoader.GlobalDcmLoadManager)
     if (dicomImage)
     {
         console.log('updateSize')
@@ -246,6 +300,8 @@ class DicomViewer extends React.Component {
 
   componentDidMount() {
     console.log("did mount")
+    cornerstone.enable(this.dicomImage)
+    this.readImage(this.props, this.state, cornerstone).then(res=>this.displayImage());
     window.addEventListener('resize', (event)=>{this.handleResize(event, this.dicomImage)})
   }
 
@@ -299,13 +355,10 @@ class DicomViewer extends React.Component {
 } 
 
 
-  readImage(cornerstoneInstance){
+  readImage(props, state){
       //Get image path Array first
-      const loadingResult = this.getImagePathList(1,1,this.state.selectedSeries)
+      const loadingResult = this.getImagePathList(1,1,state.selectedSeries)
       .then((queryList)=>{
-        console.log(queryList)
-
-        console.log(this.state.selectedSeries)
         var cacheimagePathArray = [];
         var loaderHint = "";
         if (this.state.selectedSeries){
@@ -317,31 +370,37 @@ class DicomViewer extends React.Component {
         const cacheimageLoaderHintsArray = [...Array(queryList.length).keys()].map(function(number){
           return loaderHint+"://" + String(number);
         });
+
+
         for (var i=0;i<queryList.length;i++){
           cacheimagePathArray.push(queryList[i]);
         // cacheArray.push("assets/Test1/0"+String((i-i%100)/100)+String((i-(i-i%100)-i%10)/10)+String(i%10)+".dcm");
       }
-      // console.log('abcd');
-      // console.log(cacheimagePathArray);
-      // console.log(cacheimageLoaderHintsArray);
-      // console.log('abcd');
-      this.setState({
+
+      // const stateLoader = this.state.loader;
+      // stateLoader.loadSeries(cacheimagePathArray, loaderHint);
+      this.setState((state) =>{
+        return{
         imagePathArray: cacheimagePathArray,
-        imageLoaderHintsArray:cacheimageLoaderHintsArray,
-        hardCodeNumDcm:cacheimagePathArray.length
-      },()=>{dicomLoader(cornerstoneInstance,cacheimagePathArray,loaderHint);});
+        imageLoaderHintsArray: cacheimageLoaderHintsArray,
+        hardCodeNumDcm: cacheimagePathArray.length,
+        previousLoaderHint: loaderHint,
+        loader: dcmLoader.GlobalDcmLoadManager.loadSeries(cacheimagePathArray, loaderHint),
+      }});
+      // dicomLoader(cornerstoneInstance,cacheimagePathArray,loaderHint);
+
     });
 
-  console.log('loading result')
-  console.log(loadingResult)
+  // console.log('loading result')
+  // console.log(loadingResult)
 
   return loadingResult;
   }
 
-  dicomImage = null;
+  
 
   displayImage = () => {
-
+    console.log("display!!!!!!!!!!!!")
     const element = this.dicomImage;
 
 
@@ -351,19 +410,16 @@ class DicomViewer extends React.Component {
     };
 
     var flagContinue = true;
-    try{
-      cornerstone.enable(element);
-    }
-    catch(error){
-      console.log("cornerstone load abort");
-      flagContinue = false;
-    }
+
+
     if (flagContinue===false){
       return;
     }
     // cornerstone.enable(element);
 
     cornerstone.loadImage(this.state.imageLoaderHintsArray[stack.currentImageIdIndex]).then(image => {
+      console.log(image)
+      // cornerstone.displayImage(element, {width:512, height: 512});
       cornerstone.displayImage(element, image);
       //Orientation Marker
       var viewport = cornerstone.getViewport(element);
@@ -376,7 +432,9 @@ class DicomViewer extends React.Component {
           columnCosine:image.patientOri.slice(3,6),
         });
         }
-        document.getElementById("mrtopleft").textContent = `Patient Name: ${image.patientName}`
+        if (document.getElementById("mrtopleft")){
+          document.getElementById("mrtopleft").textContent = `Patient Name: ${image.patientName}`
+        }
       }
 
       element.style.height = 'calc(100vh - 128px - 2px)'
@@ -462,10 +520,14 @@ class DicomViewer extends React.Component {
 
 
       //document.getElementById("mrbottomleft").setAttribute('style', 'white-space: pre;');
-      document.getElementById("mrbottomleft").textContent = `Slices: ${stack.currentImageIdIndex+1}/${stack.imageIds.length}`;
-      document.getElementById("mrbottomleft").textContent += "\r\n";
-      document.getElementById("mrbottomleft").textContent += `WW/WC: ${Math.round(viewport.voi.windowWidth)}/${Math.round(viewport.voi.windowCenter)}`;
-      document.getElementById("mrbottomright").textContent = `Zoom: ${viewport.scale.toFixed(2)}`;
+      if (document.getElementById("mrbottomleft")){
+        document.getElementById("mrbottomleft").textContent = `Slices: ${stack.currentImageIdIndex+1}/${stack.imageIds.length}`;
+        document.getElementById("mrbottomleft").textContent += "\r\n";
+        document.getElementById("mrbottomleft").textContent += `WW/WC: ${Math.round(viewport.voi.windowWidth)}/${Math.round(viewport.voi.windowCenter)}`;
+      }
+      if (document.getElementById("mrbottomright")){
+        document.getElementById("mrbottomright").textContent = `Zoom: ${viewport.scale.toFixed(2)}`;
+      }
 
     }
 
@@ -595,8 +657,12 @@ class DicomViewer extends React.Component {
   };
 
   onSelectSeries = (event, series)=>{
-       this.setState({selectedSeries: series}, ()=>
-        this.readImage(cornerstoneTools.external.cornerstone).then(res=>this.displayImage()));
+      this.setState({loading: 0})
+      this.setState({selectedSeries: series}, ()=>
+        this.readImage(this.props, this.state).then(
+          res=>{
+            this.displayImage();
+          }));
   }
 
   render() {
@@ -848,7 +914,7 @@ class DicomViewer extends React.Component {
 
         <Paper className={classNames(classes.paper, {[classes.paperDrawerOpen]: this.props.drawerOpen,})}>
           <div
-            style={this.props.drawerOpen? {
+            style={this.props.drawerOpen? { 
               // flexGrow: 1,    
               // display: 'flex',
               width: "calc(100vw - 240px - 2px - 170px)",
@@ -929,3 +995,5 @@ export default withStyles(styles)(DicomViewer);
 
 
 //<div class="orientationMarkers" style={{borderStyle:"solid", borderColor:"red",position: "absolute", top: "0%", left: "0%", width: viewerWidth, height: viewerHeight}}>
+
+//<ProgressDialog open={this.state.loading <100}/>
