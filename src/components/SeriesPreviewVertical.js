@@ -12,10 +12,12 @@ const styles = theme => ({
 		position: "relative",
 		float: "left",
 		background: theme.palette.secondary.main,
+		overflow: 'auto',
 	},
 	gridContainer1:{
 		width: 170,
 		height: '100%',
+		display:'unset',
 		
 	},
 	demo:{

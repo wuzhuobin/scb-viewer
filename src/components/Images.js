@@ -157,19 +157,13 @@ class EnhancedTableHead extends React.Component{
       const {classes} = this.props
       
       return(
-<<<<<<< HEAD
-        <TableHead style={{}}>
-            <TableRow style={{borderWidth:'0px', height:'10px'}}>
-              <TableCell key='patientName' numeric={false} sortDirection='asc' style={{color: '#6fcbff', fontWeight: 'bold', borderColor:'#151a1f'}}>
-=======
         <TableHead >
             <TableRow>
-              <TableCell />
-              <TableCell key='patientName' numeric={false} sortDirection='asc'>
->>>>>>> 58247e57ee38837fb63419c88d7bba87f5544c28
+              <TableCell style={{color: '#6fcbff', fontWeight: 'bold', borderColor:'#151a1f'}}/>
+              <TableCell key='patientName' numeric={false} sortDirection='asc' style={{color: '#6fcbff', fontWeight: 'bold', borderColor:'#151a1f'}}>
                 <TableSortLabel
                   active={true}
-                  style={{color: '#6fcbff', fontWeight: 'bold'}}
+                  style={{color: '#6fcbff', fontWeight: 'bold', borderColor:'#151a1f'}}
                   >
                   Patient ID
                 </TableSortLabel>

@@ -78,7 +78,7 @@ class Content extends React.Component {
               {page === 0 && <Images onSelectSeries={this.onSelectSeries}/>}
               {page === 1 && <Projects />}         
               {page === 2 && <DicomViewer series={this.state.series} drawerOpen={this.props.open}/>}
-              {page === 3 && <DicomViewer3D />} 
+              {page === 3 && <DicomViewer3D series={this.state.series} drawerOpen={this.props.open}/>} 
           </main>
         </div>
     );
