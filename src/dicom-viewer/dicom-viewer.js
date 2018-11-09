@@ -133,6 +133,7 @@ class DicomViewer extends React.Component {
       previousLoaderHint:null,
       dicomImage:null,
       loading: 100,
+      infoDialog:false,
     };
 
   }
@@ -283,9 +284,6 @@ class DicomViewer extends React.Component {
 
     console.log("unmount done");
 
-
-
-
   }
 
   handleResize(event,dicomImage){
@@ -304,6 +302,14 @@ class DicomViewer extends React.Component {
           console.log(error)
         }
     }
+  }
+
+  handleInfoDialogOpen = () => {
+    this.setState({infoDialog: true});
+  }
+
+  handleInfoDialogClose = () =>{
+    this.setState({infoDialog:false});
   }
 
   componentDidMount() {
@@ -762,8 +768,8 @@ class DicomViewer extends React.Component {
                       Play
                     </Button>
 
-                    <DicomHeaderDialog id='dicomHeaderDialog' />
-                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {console.log(document.getElementById('dicomHeaderDialog'))}}>
+                    <DicomHeaderDialog id='dicomHeaderDialog' open={this.state.infoDialog} onClose={this.handleInfoDialogClose}/>
+                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={this.handleInfoDialogOpen}>
                       <InfoIcon />
                       Info
                     </Button>
