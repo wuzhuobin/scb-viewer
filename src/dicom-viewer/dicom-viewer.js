@@ -33,18 +33,21 @@ import SaveIcon from '@material-ui/icons/SaveAlt';
 import TextIcon from '@material-ui/icons/Title';
 import FreeFormIcon from '@material-ui/icons/RoundedCorner';
 import PlayIcon from '@material-ui/icons/PlayArrowOutlined';
+import InfoIcon from '@material-ui/icons/Info';
 
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
+import ToggleButton from '@material-ui/lab/ToggleButton';
 import Popover from "@material-ui/core/Popover";
 import Typography from '@material-ui/core/Typography';
 import ProgressDialog from "./progressDialog";
 import classNames from 'classnames';
 
 import SeriesPreviewVertical from '../components/SeriesPreviewVertical'
+import DicomHeaderDialog from './dicomHeaderDialog'
 
 const styles = theme=> ({
     root:{    
@@ -68,6 +71,10 @@ const styles = theme=> ({
           background: theme.palette.secondary.main,
         },
 
+    toolbar:{
+        paddingLeft:'0px',
+    },
+
      paper:{
       padding: 0,
       borderColor: theme.palette.primary.main,
@@ -86,6 +93,8 @@ const styles = theme=> ({
 
     label: {
     // Aligns the content of the button vertically.
+      width: '55px',
+      height: '40px',
       flexDirection: 'column',
       textTransform: 'none',
       // fontSize: '3px',
@@ -158,7 +167,6 @@ class DicomViewer extends React.Component {
       anchorEl: null
     });
   };
-
 
     rotateMarker(div, rotation) {
     var rotationCSS = {
@@ -673,18 +681,18 @@ class DicomViewer extends React.Component {
     return (
       <div className={classNames(classes.root, {[classes.drawerOpen]: this.props.drawerOpen,})}>
           <AppBar className={classes.appBar}>
-            <Toolbar>
-                    <Button classes={{label: classes.label}} color="inherit" onClick={() => { this.enableTool("stackScroll", 1);  cornerstoneTools.stackScrollTouchDrag.activate(this.dicomImage);}}>
+            <Toolbar className={classes.toolbar}>          
+                    <Button classes={{label: classes.label}} value="1" color="inherit" onClick={() => { this.enableTool("stackScroll", 1);  cornerstoneTools.stackScrollTouchDrag.activate(this.dicomImage);}}>
                       <NavigationIcon />
                       Navigate
                     </Button>
 
-                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => { this.enableTool("wwwc", 1);  cornerstoneTools.wwwcTouchDrag.activate(this.dicomImage); }}>
+                    <Button classes={{label: classes.label}} value="2" color="inherit" size="small" onClick={() => { this.enableTool("wwwc", 1);  cornerstoneTools.wwwcTouchDrag.activate(this.dicomImage); }}>
                       <Brightness6Icon />
                       Levels
                     </Button>
 
-                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {this.enableTool("pan", 3);  cornerstoneTools.panTouchDrag.activate(this.dicomImage); }}>
+                    <Button classes={{label: classes.label}} value="3" color="inherit" size="small" onClick={() => {this.enableTool("pan", 3);  cornerstoneTools.panTouchDrag.activate(this.dicomImage); }}>
                       <OpenWithIcon />
                       Pan
                     </Button>
@@ -752,6 +760,12 @@ class DicomViewer extends React.Component {
                       >
                       <PlayIcon />
                       Play
+                    </Button>
+
+                    <DicomHeaderDialog id='dicomHeaderDialog' />
+                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {console.log(document.getElementById('dicomHeaderDialog'))}}>
+                      <InfoIcon />
+                      Info
                     </Button>
 
                     <Button classes={{label: classes.label}} color="inherit" size="small" aria-owns={open ? "simple-popper" : null} aria-haspopup="true"
@@ -906,7 +920,7 @@ class DicomViewer extends React.Component {
                         <ReplayIcon />
                         Reset
                       </Button>
-                    </Popover>             
+                    </Popover>           
             </Toolbar>
           </AppBar>
 

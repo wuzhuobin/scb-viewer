@@ -163,7 +163,7 @@ class MprViewer extends React.Component {
 
   componentWillReceiveProps(nextProps) {
       if (this.state.dicomImage){
-        if (this.props.drawerOpen != nextProps.drawerOpen){
+        if (this.props.drawerOpen != nextProps.drawerOpen){          
         if (nextProps.drawerOpen){
             this.state.dicomImage.style.width = 'calc(50vw - 120px - 85px - 3px)'
         }
@@ -171,7 +171,7 @@ class MprViewer extends React.Component {
           this.state.dicomImage.style.width = 'calc(50vw - 85px - 3px)'
         }
         cornerstone.resize(this.state.dicomImage)
-      }
+      } 
     }
     }
 
