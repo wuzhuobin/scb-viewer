@@ -98,20 +98,20 @@ class MprViewer extends React.Component {
 
 
   handleResize(event,dicomImage){
-    // if (dicomImage)
-    // {
-    //     console.log('updateSize')
+    if (dicomImage)
+    {
+        console.log('updateSize')
 
-    //     dicomImage.style.height = 'calc(50vh - 32px - 32px)'
-    //     dicomImage.style.width = 'calc(50vw - 85px)'
-    //     try{
-    //         cornerstone.resize(dicomImage)          
-    //     }
-    //     catch(error)
-    //     {
-    //       console.log(error)
-    //     }
-    // }
+        dicomImage.style.height = 'calc(50vh - 32px - 32px)'
+        dicomImage.style.width = 'calc(50vw - 85px)'
+        try{
+            cornerstone.resize(dicomImage)          
+        }
+        catch(error)
+        {
+          console.log(error)
+        }
+    }
   }
 
     render() {
