@@ -13,19 +13,20 @@ const styles = theme=> ({
     root:{    
         // width: '100vw',
     },
-    paper: {
-      height: 'calc(50vh - 32px - 32px)',
-      textAlign: 'center',
-      color: theme.palette.text.secondary,
-      borderRadius: 0,
+    dicomViewer: {
+      height: 'calc(50vh - 32px - 32px - 3px)', // last term is 2*borderWidth + large frame boarderWidth
+      width: 'calc(50vw - 85px - 3px)',
+      borderColor: "gray",
+      borderStyle: "solid",
+      borderWidth: 1, 
       background: "black"
     },
-    dicomViewer:{
-      height: 'calc(50vh - 32px - 32px)',
-      width: 'calc(50vw - 85px)'
-    },
+    // dicomViewer:{
+    //   height: 'calc(50vh - 32px - 32px)',
+    //   width: 'calc(50vw - 85px)'
+    // },
     drawerOpenDicomViewer:{
-        width: 'calc(50vw - 85px - 120px - 2px)',
+        width: 'calc(50vw - 85px - 120px - 3px)',
     },
 })
 
@@ -114,12 +115,6 @@ class MprViewer extends React.Component {
   return loadingResult;
   }
 
-
-
-
-
-
-
   componentDidMount(){
     this.readImage(null,null,this.props.orientation).then(res=>{
     // const imageId = 'example://1';
@@ -170,32 +165,32 @@ class MprViewer extends React.Component {
       if (this.state.dicomImage){
         if (this.props.drawerOpen != nextProps.drawerOpen){
         if (nextProps.drawerOpen){
-            this.state.dicomImage.style.width = 'calc(50vw - 120px - 85px - 1px)'
+            this.state.dicomImage.style.width = 'calc(50vw - 120px - 85px - 3px)'
         }
         else{
-          this.state.dicomImage.style.width = 'calc(50vw - 85px)'
+          this.state.dicomImage.style.width = 'calc(50vw - 85px - 3px)'
         }
-        // cornerstone.resize(this.state.dicomImage)
+        cornerstone.resize(this.state.dicomImage)
       }
     }
     }
 
 
   handleResize(event,dicomImage){
-    // if (dicomImage)
-    // {
-    //     console.log('updateSize')
+    if (dicomImage)
+    {
+        console.log('updateSize')
 
-    //     dicomImage.style.height = 'calc(50vh - 32px - 32px)'
-    //     dicomImage.style.width = 'calc(50vw - 85px)'
-    //     try{
-    //         cornerstone.resize(dicomImage)          
-    //     }
-    //     catch(error)
-    //     {
-    //       console.log(error)
-    //     }
-    // }
+        dicomImage.style.height = 'calc(50vh - 32px - 32px - 3px)'
+        dicomImage.style.width = 'calc(50vw - 85px - 3px)'
+        try{
+            cornerstone.resize(dicomImage)          
+        }
+        catch(error)
+        {
+          console.log(error)
+        }
+    }
   }
 
     render() {

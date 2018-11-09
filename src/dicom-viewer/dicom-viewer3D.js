@@ -2,7 +2,7 @@ import React from "react";
 import Hammer from "hammerjs";
 import classNames from 'classnames';
 import {withStyles} from '@material-ui/core/styles'
-import {AppBar,Toolbar, Button, Grid, Paper}  from '@material-ui/core';
+import {AppBar,Toolbar, Button, Grid}  from '@material-ui/core';
 import SeriesPreviewVertical from '../components/SeriesPreviewVertical'
 import {NavigationOutlined} from '@material-ui/icons';
 import MprViewer from './MprViewer'
@@ -37,16 +37,14 @@ const styles = theme=> ({
           },
     },
     gridRoot: {
-      width: 'calc(100vw - 170px - 1px)',
+      width: 'calc(100vw - 170px)',
+      height: 'calc(100vh - 64px - 64px)',
+      borderColor: theme.palette.primary.main,
+      borderStyle: "solid",
+      borderWidth: 1,
     },
     drawerOpenGrid:{
-        width: 'calc(100vw - 240px - 170px)',
-    },
-    paper: {
-      height: 'calc(50vh - 32px - 32px)',
-      textAlign: 'center',
-      color: theme.palette.text.secondary,
-      borderRadius: 0,
+      width: 'calc(100vw - 240px - 170px)',
     },
 })
 
@@ -74,27 +72,25 @@ class DicomViewer3D extends React.Component {
           </AppBar>
 
           <SeriesPreviewVertical series={series} selectedSeries={this.state.selectedSeries} />
-          <Grid container className={classNames(classes.gridRoot, {[classes.drawerOpenGrid]: this.props.drawerOpen,})}>
-            <Grid container spacing={0}>
-              <Grid item xs={6}>
-                <MprViewer orientation={"Axial"} drawerOpen={drawerOpen}/>
-              </Grid>
-              <Grid item xs={6}>
-                <MprViewer orientation={"Sagittal"} drawerOpen={drawerOpen}/>
-              </Grid>
-              <Grid item xs={6}>
-                <ThreeDViewer orientation={"3D"} drawerOpen={drawerOpen}/>
-              </Grid>
-              <Grid item xs={6}>
-                <MprViewer orientation={"Coronal"} drawerOpen={drawerOpen}/>
+            <Grid container className={classNames(classes.gridRoot, {[classes.drawerOpenGrid]: this.props.drawerOpen,})}>
+              <Grid container spacing={0}>
+                <Grid item xs={6}>
+                  <MprViewer orientation={"Axial"} drawerOpen={drawerOpen}/>
+                </Grid>
+                <Grid item xs={6}>
+                  <MprViewer orientation={"Sagittal"} drawerOpen={drawerOpen}/>
+                </Grid>
+                <Grid item xs={6}>
+                  <ThreeDViewer drawerOpen={drawerOpen}/>
+                </Grid>
+                <Grid item xs={6}>
+                  <MprViewer orientation={"Coronal"} drawerOpen={drawerOpen}/>
+                </Grid>
               </Grid>
             </Grid>
-          </Grid>
         </div>
         );
     };
 }
 
 export default withStyles(styles)(DicomViewer3D);
-
-                              
