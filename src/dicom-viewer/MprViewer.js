@@ -21,22 +21,18 @@ const styles = theme=> ({
       borderWidth: 1, 
       background: "black"
     },
-    // dicomViewer:{
-    //   height: 'calc(50vh - 32px - 32px)',
-    //   width: 'calc(50vw - 85px)'
-    // },
     canvas: {
       height: 'calc(50vh - 32px - 32px - 3px)', // last term is 2*borderWidth + large frame boarderWidth
       width: 'calc(50vw - 85px - 3px)',
-      backgroundColor: "red",
+      backgroundColor: "transparent",
       position: "fixed",
-      borderColor: "transparent",
-      borderStyle: "solid",
-      borderWidth: 1,
     },
     drawerOpenDicomViewer:{
-        width: 'calc(50vw - 85px - 120px - 3px)',
+      width: 'calc(50vw - 85px - 120px - 3px)',
     },
+    drawerOpenCanvas:{
+      width: 'calc(50vw - 85px - 120px - 3px)',
+    }
 })
 
 class MprViewer extends React.Component {
@@ -45,6 +41,8 @@ class MprViewer extends React.Component {
     super(props);
     this.state = {
       dicomImage: null,
+      cursorViewportX: 0.5,
+      cursorViewportY: 0.5,
    	};
   }
   getImagePathList(IP,Port,Path1){//sync request for now
@@ -127,47 +125,19 @@ class MprViewer extends React.Component {
   componentDidMount(){
     this.readImage(null,null,this.props.orientation).then(res=>{
     // const imageId = 'example://1';
-    console.log(dcmLoader.GlobalDcmLoadManager)
+    // console.log(dcmLoader.GlobalDcmLoadManager)
     if (this.props.orientation === "Axial")
     {
       this.setState({
         dicomImage: document.getElementById('dicomImageAxial')},
         ()=>{
           var element = this.state.dicomImage
-
-          console.log(element)
-          var canvas = document.getElementById("canvasAxial")
-          console.log(canvas)
-
-          canvas.style.width = element.width
-          canvas.style.height = element.height
-          var ctx = canvas.getContext('2d');
-          console.log(element.width, element.height)
-          console.log(canvas.width, canvas.height)
-
-          ctx.clearRect(0, 0, element.width, element.height);
-
-          // H 
-          ctx.beginPath();
-          ctx.strokeStyle = "green";
-          ctx.lineWidth = 10;
-          ctx.moveTo(0, element.height/2);
-          ctx.lineTo(500, element.height/2);
-          ctx.stroke();
-
-          // V
-          ctx.beginPath();
-          ctx.moveTo(element.width/2, 0);
-          ctx.lineTo(element.width/2, 500);
-          ctx.stroke();
-
           cornerstone.enable(element);
           cornerstone.loadImage('Axial://0').then(function(image) {
             cornerstone.displayImage(element, image);
-            cornerstone.resize(element)
+            // cornerstone.resize(element)
           })
-
-          
+          this.setCursor()
         })
     }
     else if (this.props.orientation === "Sagittal")
@@ -181,6 +151,7 @@ class MprViewer extends React.Component {
             cornerstone.displayImage(element, image);
           })
         })
+      this.setCursor()
     }
     else if (this.props.orientation === "Coronal")
     {
@@ -193,24 +164,64 @@ class MprViewer extends React.Component {
             cornerstone.displayImage(element, image);
           })
         })
+      this.setCursor()
     }
 
     window.addEventListener('resize', (event)=>{this.handleResize(event, this.state.dicomImage)})
     })
   }
 
+  setCursor = () =>{
+    var canvas;
+    var element = this.state.dicomImage
+    if (this.props.orientation === "Axial"){
+      canvas = document.getElementById("canvasAxial")
+    }
+    else if (this.props.orientation === "Sagittal"){
+      canvas = document.getElementById("canvasSagittal")
+    }
+    else if (this.props.orientation === "Coronal"){
+      canvas = document.getElementById("canvasCoronal")
+    }
+    var ctx = canvas.getContext('2d');
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    canvas.width = element.clientWidth
+    canvas.height = element.clientHeight
+
+    ctx.lineWidth = 2;
+
+    // horizontal
+    ctx.beginPath();
+    ctx.strokeStyle = "green";
+    ctx.moveTo(0, canvas.height*this.state.cursorViewportY);
+    ctx.lineTo(canvas.width, canvas.height*this.state.cursorViewportY);
+    ctx.stroke();
+
+    // vertical
+    ctx.beginPath();
+    ctx.strokeStyle = "blue";
+    ctx.moveTo(canvas.width*this.state.cursorViewportX, 0);
+    ctx.lineTo(canvas.width*this.state.cursorViewportX, canvas.height);
+    ctx.stroke();    
+  }
+
   componentWillReceiveProps(nextProps) {
       if (this.state.dicomImage){
         if (this.props.drawerOpen != nextProps.drawerOpen){          
-        if (nextProps.drawerOpen){
-            this.state.dicomImage.style.width = 'calc(50vw - 120px - 85px - 3px)'
-        }
-        else{
-          this.state.dicomImage.style.width = 'calc(50vw - 85px - 3px)'
-        }
-        cornerstone.resize(this.state.dicomImage)
-      } 
-    }
+          if (nextProps.drawerOpen){
+              this.state.dicomImage.style.width = 'calc(50vw - 120px - 85px - 3px)'
+          }
+          else{
+            this.state.dicomImage.style.width = 'calc(50vw - 85px - 3px)'
+          }
+          cornerstone.resize(this.state.dicomImage)
+
+          // need to setCursor again
+          this.setCursor()
+        } 
+      }
     }
 
 
@@ -228,30 +239,59 @@ class MprViewer extends React.Component {
         {
           console.log(error)
         }
+
+        this.setCursor()
     }
+  }
+
+  handleCursorClick(event, orientation){
+    if (orientation === "Axial"){
+      var canvas = document.getElementById("canvasAxial")
+    }
+    else if (orientation === "Sagittal"){
+      var canvas = document.getElementById("canvasSagittal")
+    }
+    else if (orientation === "Coronal"){
+      var canvas = document.getElementById("canvasCoronal")
+    }
+
+    var rect = canvas.getBoundingClientRect();
+    this.setState({cursorViewportX: (event.clientX - rect.left)/canvas.width, cursorViewportY: (event.clientY - rect.top)/canvas.height},()=>{
+      this.setCursor()
+    })
   }
 
     render() {
       const {drawerOpen, orientation, classes} = this.props
+      const {canvasWidth, canvasHeight} = this.state
 
     	return(
           <div className={classes.paper}>
             {orientation === "Axial" 
-              && <div >
+              && 
                 <div id="dicomImageAxial" 
-                  className={classNames(classes.dicomViewer, {[classes.drawerOpenDicomViewer]: this.props.drawerOpen})}/>
-                <canvas id="canvasAxial" 
-                  width={999}
-                  height={999}
-                  className={classes.canvas} />
+                  className={classNames(classes.dicomViewer, {[classes.drawerOpenDicomViewer]: this.props.drawerOpen})}>
+                  <canvas id="canvasAxial" 
+                    className={classNames(classes.canvas, {[classes.drawerOpenCanvas]: this.props.drawerOpen})} 
+                    onClick={(event)=>{this.handleCursorClick(event, orientation)}} />
                 </div>
             }
             {orientation === "Sagittal" 
               && <div id="dicomImageSagittal" 
-              className={classNames(classes.dicomViewer, {[classes.drawerOpenDicomViewer]: this.props.drawerOpen})}/>}
+                  className={classNames(classes.dicomViewer, {[classes.drawerOpenDicomViewer]: this.props.drawerOpen})}>
+                  <canvas id="canvasSagittal" 
+                  className={classNames(classes.canvas, {[classes.drawerOpenCanvas]: this.props.drawerOpen})} 
+                  onClick={(event)=>{this.handleCursorClick(event, orientation)}}/>
+                </div>
+            }
             {orientation === "Coronal" 
               && <div id="dicomImageCoronal" 
-              className={classNames(classes.dicomViewer, {[classes.drawerOpenDicomViewer]: this.props.drawerOpen})}/>}
+                  className={classNames(classes.dicomViewer, {[classes.drawerOpenDicomViewer]: this.props.drawerOpen})}>
+                  <canvas id="canvasCoronal" 
+                  className={classNames(classes.canvas, {[classes.drawerOpenCanvas]: this.props.drawerOpen})} 
+                  onClick={(event)=>{this.handleCursorClick(event, orientation)}}/>
+                </div>
+            }
           </div>            
         );
     };

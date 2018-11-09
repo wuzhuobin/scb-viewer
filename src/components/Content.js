@@ -80,7 +80,6 @@ class Content extends React.Component {
 
         return(
         <div className={classes.root}>
-
           <DrawerMenu open={open} onDrawerClose={onDrawerClose} onChangePage={this.handleChangePage}/>
           <main 
               className={classNames(classes.content,{

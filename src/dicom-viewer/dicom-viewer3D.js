@@ -59,7 +59,7 @@ class DicomViewer3D extends React.Component {
 
     render() {
       const {drawerOpen, series, classes} = this.props
-      console.log('drawerOpen:' + drawerOpen)
+
     	return(
         <div className={classNames(classes.root, {[classes.drawerOpen]: this.props.drawerOpen,})}>
             <AppBar className={classes.appBar}>
