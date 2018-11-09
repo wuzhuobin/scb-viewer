@@ -86,6 +86,7 @@ class DicomViewer3D extends React.Component {
                 <Grid item xs={6}>
                   <MprViewer orientation={"Coronal"} drawerOpen={drawerOpen}/>
                 </Grid>
+                
               </Grid>
             </Grid>
         </div>

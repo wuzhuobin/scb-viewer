@@ -73,7 +73,7 @@ class Content extends React.Component {
       }
       ) 
     }
-
+ 
     render(){
         const {series, open, onDrawerClose, classes} = this.props
         const {page} = this.state

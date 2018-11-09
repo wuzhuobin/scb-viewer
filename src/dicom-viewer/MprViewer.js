@@ -25,6 +25,15 @@ const styles = theme=> ({
     //   height: 'calc(50vh - 32px - 32px)',
     //   width: 'calc(50vw - 85px)'
     // },
+    canvas: {
+      height: 'calc(50vh - 32px - 32px - 3px)', // last term is 2*borderWidth + large frame boarderWidth
+      width: 'calc(50vw - 85px - 3px)',
+      backgroundColor: "red",
+      position: "fixed",
+      borderColor: "transparent",
+      borderStyle: "solid",
+      borderWidth: 1,
+    },
     drawerOpenDicomViewer:{
         width: 'calc(50vw - 85px - 120px - 3px)',
     },
@@ -125,11 +134,40 @@ class MprViewer extends React.Component {
         dicomImage: document.getElementById('dicomImageAxial')},
         ()=>{
           var element = this.state.dicomImage
+
+          console.log(element)
+          var canvas = document.getElementById("canvasAxial")
+          console.log(canvas)
+
+          canvas.style.width = element.width
+          canvas.style.height = element.height
+          var ctx = canvas.getContext('2d');
+          console.log(element.width, element.height)
+          console.log(canvas.width, canvas.height)
+
+          ctx.clearRect(0, 0, element.width, element.height);
+
+          // H 
+          ctx.beginPath();
+          ctx.strokeStyle = "green";
+          ctx.lineWidth = 10;
+          ctx.moveTo(0, element.height/2);
+          ctx.lineTo(500, element.height/2);
+          ctx.stroke();
+
+          // V
+          ctx.beginPath();
+          ctx.moveTo(element.width/2, 0);
+          ctx.lineTo(element.width/2, 500);
+          ctx.stroke();
+
           cornerstone.enable(element);
           cornerstone.loadImage('Axial://0').then(function(image) {
             cornerstone.displayImage(element, image);
             cornerstone.resize(element)
           })
+
+          
         })
     }
     else if (this.props.orientation === "Sagittal")
@@ -199,8 +237,15 @@ class MprViewer extends React.Component {
     	return(
           <div className={classes.paper}>
             {orientation === "Axial" 
-              && <div id="dicomImageAxial" 
-              className={classNames(classes.dicomViewer, {[classes.drawerOpenDicomViewer]: this.props.drawerOpen})}/>}
+              && <div >
+                <div id="dicomImageAxial" 
+                  className={classNames(classes.dicomViewer, {[classes.drawerOpenDicomViewer]: this.props.drawerOpen})}/>
+                <canvas id="canvasAxial" 
+                  width={999}
+                  height={999}
+                  className={classes.canvas} />
+                </div>
+            }
             {orientation === "Sagittal" 
               && <div id="dicomImageSagittal" 
               className={classNames(classes.dicomViewer, {[classes.drawerOpenDicomViewer]: this.props.drawerOpen})}/>}
