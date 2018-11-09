@@ -43,6 +43,7 @@ class MprViewer extends React.Component {
       dicomImage: null,
       cursorViewportX: 0.5,
       cursorViewportY: 0.5,
+      isMouseDown: false,
    	};
   }
   getImagePathList(IP,Port,Path1){//sync request for now
@@ -244,7 +245,11 @@ class MprViewer extends React.Component {
     }
   }
 
-  handleCursorClick(event, orientation){
+  handleCursorDrag(event, orientation){
+    if (! this.state.isMouseDown){
+      return;
+    }
+
     if (orientation === "Axial"){
       var canvas = document.getElementById("canvasAxial")
     }
@@ -273,7 +278,11 @@ class MprViewer extends React.Component {
                   className={classNames(classes.dicomViewer, {[classes.drawerOpenDicomViewer]: this.props.drawerOpen})}>
                   <canvas id="canvasAxial" 
                     className={classNames(classes.canvas, {[classes.drawerOpenCanvas]: this.props.drawerOpen})} 
-                    onClick={(event)=>{this.handleCursorClick(event, orientation)}} />
+                    // onClick={(event)=>{this.handleCursorClick(event, orientation)}} 
+                    onMouseDown={(event)=>{this.setState({isMouseDown:true})}}
+                    onMouseUp={(event)=>{this.setState({isMouseDown:false})}}
+                    onMouseMove={(event)=>{this.handleCursorDrag(event, orientation)}}
+                  />
                 </div>
             }
             {orientation === "Sagittal" 
@@ -281,7 +290,11 @@ class MprViewer extends React.Component {
                   className={classNames(classes.dicomViewer, {[classes.drawerOpenDicomViewer]: this.props.drawerOpen})}>
                   <canvas id="canvasSagittal" 
                   className={classNames(classes.canvas, {[classes.drawerOpenCanvas]: this.props.drawerOpen})} 
-                  onClick={(event)=>{this.handleCursorClick(event, orientation)}}/>
+                  // onClick={(event)=>{this.handleCursorClick(event, orientation)}}
+                  onMouseDown={(event)=>{this.setState({isMouseDown:true})}}
+                  onMouseUp={(event)=>{this.setState({isMouseDown:false})}}
+                  onMouseMove={(event)=>{this.handleCursorDrag(event, orientation)}}
+                  />
                 </div>
             }
             {orientation === "Coronal" 
@@ -289,7 +302,11 @@ class MprViewer extends React.Component {
                   className={classNames(classes.dicomViewer, {[classes.drawerOpenDicomViewer]: this.props.drawerOpen})}>
                   <canvas id="canvasCoronal" 
                   className={classNames(classes.canvas, {[classes.drawerOpenCanvas]: this.props.drawerOpen})} 
-                  onClick={(event)=>{this.handleCursorClick(event, orientation)}}/>
+                  // onClick={(event)=>{this.handleCursorClick(event, orientation)}}
+                  onMouseDown={(event)=>{this.setState({isMouseDown:true})}}
+                  onMouseUp={(event)=>{this.setState({isMouseDown:false})}}
+                  onMouseMove={(event)=>{this.handleCursorDrag(event, orientation)}}
+                  />
                 </div>
             }
           </div>            
