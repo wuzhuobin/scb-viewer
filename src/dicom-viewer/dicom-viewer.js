@@ -47,6 +47,7 @@ import ProgressDialog from "./progressDialog";
 import classNames from 'classnames';
 
 import SeriesPreviewVertical from '../components/SeriesPreviewVertical'
+import DicomHeaderDialog from './dicomHeaderDialog'
 
 const styles = theme=> ({
     root:{    
@@ -166,7 +167,6 @@ class DicomViewer extends React.Component {
       anchorEl: null
     });
   };
-
 
     rotateMarker(div, rotation) {
     var rotationCSS = {
@@ -760,6 +760,12 @@ class DicomViewer extends React.Component {
                       >
                       <PlayIcon />
                       Play
+                    </Button>
+
+                    <DicomHeaderDialog id='dicomHeaderDialog' />
+                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {console.log(document.getElementById('dicomHeaderDialog'))}}>
+                      <InfoIcon />
+                      Info
                     </Button>
 
                     <Button classes={{label: classes.label}} color="inherit" size="small" aria-owns={open ? "simple-popper" : null} aria-haspopup="true"
