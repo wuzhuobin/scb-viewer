@@ -112,6 +112,9 @@ const styles = theme=> ({
       borderWidth:"1px",
       borderColor: theme.palette.primary.main,
     },
+    loadingProgressSnackbar:{
+      minWidth: 100
+    }
 })
 
 class DicomViewer extends React.Component {
@@ -1009,10 +1012,11 @@ class DicomViewer extends React.Component {
             </div>
             <Snackbar
               anchorOrigin={{vertical:'bottom',horizontal:'right'}}
-              open={this.state.loadingProgress < 100}
-              // open={true}
+              // open={this.state.loadingProgress < 100}
+              open={true}
               ContentProps={{
                 'aria-describedby': 'message-id',
+                className: classes.loadingProgressSnackbar
               }}
 
               message={<span id="message-id">
