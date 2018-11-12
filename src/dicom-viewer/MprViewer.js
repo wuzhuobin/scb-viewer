@@ -300,13 +300,24 @@ class MprViewer extends React.Component {
                     onMouseMove={(event)=>{this.handleCursorDrag(event, orientation)}}
                     onWheel={(event)=>{this.handleWheelChange(event, orientation)}}
                     onContextMenu={event=>{event.preventDefault()}}
+                    onMouseLeave={(event)=>{
+                      if (this.state.isMouseDown){
+                        this.setState({leaveCanvasOnDown:true})
+                      }
+                      else {
+                        this.setState({leaveCanvasOnDown:false})
+                      }}}
                     onMouseEnter={(event)=>{
                       if (event.buttons === 1){
-                        this.setState({isMouseDown: true})
-                      } else{
+                        if (this.state.leaveCanvasOnDown){
+                          this.setState({isMouseDown: true})
+                        }
+                        else{
+                          this.setState({isMouseDown: false})
+                        }
+                      } else {
                         this.setState({isMouseDown: false})
-                      }
-                    }}
+                      }}}
                   />
                 </div>
             }
@@ -324,10 +335,22 @@ class MprViewer extends React.Component {
                   onMouseMove={(event)=>{this.handleCursorDrag(event, orientation)}}
                   onWheel={(event)=>{this.handleWheelChange(event, orientation)}}
                   onContextMenu={event=>{event.preventDefault()}}
+                  onMouseLeave={(event)=>{
+                      if (this.state.isMouseDown){
+                        this.setState({leaveCanvasOnDown:true})
+                      }
+                      else {
+                        this.setState({leaveCanvasOnDown:false})
+                      }}}
                   onMouseEnter={(event)=>{
                       if (event.buttons === 1){
-                        this.setState({isMouseDown: true})
-                      } else{
+                        if (this.state.leaveCanvasOnDown){
+                          this.setState({isMouseDown: true})
+                        }
+                        else{
+                          this.setState({isMouseDown: false})
+                        }
+                      } else {
                         this.setState({isMouseDown: false})
                       }}}
                   />
@@ -347,13 +370,24 @@ class MprViewer extends React.Component {
                   onMouseMove={(event)=>{this.handleCursorDrag(event, orientation)}}
                   onWheel={(event)=>{this.handleWheelChange(event, orientation)}}
                   onContextMenu={event=>{event.preventDefault()}}
+                  onMouseLeave={(event)=>{
+                      if (this.state.isMouseDown){
+                        this.setState({leaveCanvasOnDown:true})
+                      }
+                      else {
+                        this.setState({leaveCanvasOnDown:false})
+                      }}}
                   onMouseEnter={(event)=>{
                       if (event.buttons === 1){
-                        this.setState({isMouseDown: true})
-                      } else{
+                        if (this.state.leaveCanvasOnDown){
+                          this.setState({isMouseDown: true})
+                        }
+                        else{
+                          this.setState({isMouseDown: false})
+                        }
+                      } else {
                         this.setState({isMouseDown: false})
-                      }
-                    }}
+                      }}}
                   />
                 </div>
             }
