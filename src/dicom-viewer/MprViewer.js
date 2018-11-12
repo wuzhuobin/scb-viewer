@@ -48,6 +48,9 @@ class MprViewer extends React.Component {
       leaveCanvasOnDown: false,
       slice: 255,
    	};
+    //Delibrately not using it as React state variable
+    console.log('aaa');
+    this.singleViewer = new pngViewer(null);
   }
   
   getImagePathList(IP,Port,Path1){//sync request for now
@@ -135,6 +138,17 @@ class MprViewer extends React.Component {
     // console.log(dcmLoader.GlobalDcmLoadManager)
     if (this.props.orientation === "Axial")
     {
+      const axialElement = document.getElementById('dicomImageAxial');
+      if (axialElement!==null){
+        if (this.singleViewer.element === null){
+          this.singleViewer.element = document.getElementById('dicomImageAxial');
+          this.singleViewer.name = 'Axial';
+          this.viewerLoadImage();
+        }
+      }
+      else {
+        console.log('element not rendered')
+      }
       this.setState({
         dicomImage: document.getElementById('dicomImageAxial')},
         ()=>{
@@ -149,33 +163,59 @@ class MprViewer extends React.Component {
     }
     else if (this.props.orientation === "Sagittal")
     {
+      const sagittalElement = document.getElementById('dicomImageSagittal');
+      if (sagittalElement!==null){
+        if (this.singleViewer.element === null){
+          this.singleViewer.element = document.getElementById('dicomImageSagittal');
+          this.singleViewer.name = 'Sagittal';
+          this.viewerLoadImage();
+        }
+      }
+      else {
+        console.log('element not rendered')
+      }
       this.setState({
         dicomImage: document.getElementById('dicomImageSagittal')},
         ()=>{
-          var element = this.state.dicomImage
-          cornerstone.enable(element);
-          cornerstone.loadImage('Sagittal://0').then(function(image) {
-            cornerstone.displayImage(element, image);
-          })
+          // var element = this.state.dicomImage
+          // cornerstone.enable(element);
+          // cornerstone.loadImage('Sagittal://0').then(function(image) {
+          //   cornerstone.displayImage(element, image);
+          // })
         })
       this.setCursor()
     }
     else if (this.props.orientation === "Coronal")
     {
+      const coronalElement = document.getElementById('dicomImageCoronal');
+      if (coronalElement!==null){
+        if (this.singleViewer.element === null){
+          this.singleViewer.element = document.getElementById('dicomImageCoronal');
+          this.singleViewer.name = 'Coronal';
+          this.viewerLoadImage();
+        }
+      }
+      else {
+        console.log('element not rendered')
+      }
       this.setState({
         dicomImage: document.getElementById('dicomImageCoronal')},
         ()=>{
-          var element = this.state.dicomImage
-          cornerstone.enable(element);
-          cornerstone.loadImage('Coronal://0').then(function(image) {
-            cornerstone.displayImage(element, image);
-          })
+          // var element = this.state.dicomImage
+          // cornerstone.enable(element);
+          // cornerstone.loadImage('Coronal://0').then(function(image) {
+          //   cornerstone.displayImage(element, image);
+          // })
         })
       this.setCursor()
     }
 
     window.addEventListener('resize', (event)=>{this.handleResize(event, this.state.dicomImage)})
-    })
+  }
+
+  componentWillUnmount(){
+    console.log('unmount');
+    this.singleViewer = null;
   }
 
   setCursor = () =>{
@@ -296,9 +336,10 @@ class MprViewer extends React.Component {
 
 
   handleResize(event,dicomImage){
+    console.log('handleResize');
     if (dicomImage)
     {
-        console.log('updateSize')
+      console.log('updateSize')
 
         dicomImage.style.height = 'calc(50vh - 32px - 32px - 3px)'
         dicomImage.style.width = 'calc(50vw - 85px - 3px)'

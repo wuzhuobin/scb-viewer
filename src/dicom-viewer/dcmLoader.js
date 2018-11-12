@@ -67,7 +67,7 @@ class dcmLoader{
 		this.bufferSize = this.numDcm;
 		this.cacheBuffer = 5;
 		this.numLoaded = 0;
-  		this.BatchLoadImage(centerRange(parseInt((inputImagePathArray.length/2)|0),this.bufferSize, inputImagePathArray.length));
+		this.BatchLoadImage(centerRange(parseInt((inputImagePathArray.length/2)|0),this.bufferSize, inputImagePathArray.length));
 	}
 
 	BatchLoadImage(inputArray){//The input array is expected to contain only number, corresponding to the n-th slice of the required
@@ -82,70 +82,70 @@ class dcmLoader{
 				this.imageSeries[imageId] = null;
 			}
 			this.imageSeries[imageId] = new Promise(function (resolve, reject){
-			httpFetch(self.imagePathArray[imageId])
-			.then(response=>{
-				if (response===null){
-					this.failedSeries.push(imageId);
-					reject("Get image failed");
-				}
-				else {
-					const data = new DataView(response);
-					const image = daikon.Series.parseImage(data);
-					var isDicom = true;
-					try{
-						image.getInterpretedData();
-					}
-					catch(err){
-						console.log("assumed reading png");
-						isDicom = false;
-					}
-					if (isDicom){
-						const spacing = image.getPixelSpacing();
-						const imageData = image.getInterpretedData();
-						var imageMin, imageMax, colSpacing = 1, rowSpacing = 1, imageDir = [1,0,0,0,1,0], imagePos = [0,0,0], name = '';
-						if (image.getImageMin() && image.getImageMax()){
-							imageMin = image.getImageMin();
-							imageMax = image.getImageMax();
-						}
-						else {
-							const range = getArrayMinMax(imageData);
-							imageMin = range[0];
-							imageMax = range[1];
-						}
-						if (spacing){
-							colSpacing = spacing[1];
-							rowSpacing = spacing[0];
-						}
-						if (image.getImageDirections()){
-							imageDir = image.getImageDirections();
-						}
-						if (image.getImagePosition()){
-							imagePos = image.getImagePosition();
-						}
-						if (image.getPatientName()){
-							name = image.getPatientName();
-						}
-						self.numLoaded++;
-						resolve({
-							minPixelValue: imageMin,
-							maxPixelValue: imageMax,
-							patientPos: imagePos,
-							patientOri: imageDir,
-							patientName:name,
-							windowCenter: image.getWindowCenter(),
-							windowWidth: image.getWindowWidth(),
-							getPixelData: () => image.getInterpretedData(),
-							rows: image.getRows(),
-							columns: image.getCols(),
-							height: image.getCols(),
-							width: image.getRows(),
-							color:false,
-							columnPixelSpacing: colSpacing,
-							rowPixelSpacing: rowSpacing,
-							sizeInBytes: image.getRows()*image.getCols()*2,
-						});
+				httpFetch(self.imagePathArray[imageId])
+				.then(response=>{
+					if (response===null){
+						this.failedSeries.push(imageId);
+						reject("Get image failed");
 					}
 					else {
+						const data = new DataView(response);
+						const image = daikon.Series.parseImage(data);
+						var isDicom = true;
+						try{
+							image.getInterpretedData();
+						}
+						catch(err){
+							console.log("assumed reading png");
+							isDicom = false;
+						}
+						if (isDicom){
+							const spacing = image.getPixelSpacing();
+							const imageData = image.getInterpretedData();
+							var imageMin, imageMax, colSpacing = 1, rowSpacing = 1, imageDir = [1,0,0,0,1,0], imagePos = [0,0,0], name = '';
+							if (image.getImageMin() && image.getImageMax()){
+								imageMin = image.getImageMin();
+								imageMax = image.getImageMax();
+							}
+							else {
+								const range = getArrayMinMax(imageData);
+								imageMin = range[0];
+								imageMax = range[1];
+							}
+							if (spacing){
+								colSpacing = spacing[1];
+								rowSpacing = spacing[0];
+							}
+							if (image.getImageDirections()){
+								imageDir = image.getImageDirections();
+							}
+							if (image.getImagePosition()){
+								imagePos = image.getImagePosition();
+							}
+							if (image.getPatientName()){
+								name = image.getPatientName();
+							}
+							self.numLoaded++;
+							resolve({
+								minPixelValue: imageMin,
+								maxPixelValue: imageMax,
+								patientPos: imagePos,
+								patientOri: imageDir,
+								patientName:name,
+								windowCenter: image.getWindowCenter(),
+								windowWidth: image.getWindowWidth(),
+								getPixelData: () => image.getInterpretedData(),
+								rows: image.getRows(),
+								columns: image.getCols(),
+								height: image.getCols(),
+								width: image.getRows(),
+								color:false,
+								columnPixelSpacing: colSpacing,
+								rowPixelSpacing: rowSpacing,
+								sizeInBytes: image.getRows()*image.getCols()*2,
+							});
+						}
+						else {
 						//we shall assume it is png
 						var png = new pngjs.PNG().parse(response,function(error,data){
 							if (error){
@@ -319,7 +319,7 @@ export class dcmManager{
 			promise: new Promise(resolve => getPixelData()
 				.then(pixelData => {
 					resolve({
-			            imageId,
+						imageId,
 						minPixelValue: 0,
 						maxPixelValue: 500,
 						slope: 1.0,

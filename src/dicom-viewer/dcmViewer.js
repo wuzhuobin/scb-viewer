@@ -1,26 +1,24 @@
 import * as cornerstone from "cornerstone-core";
 import * as cornerstoneTools from "cornerstone-tools";
-import * as cornerstoneMath from "cornerstone-math";
 import * as dcmLoader from "./dcmLoader";
-
 
 
 export default class dcmViewer{
 	constructor(inputElement){
-        console.log("abc");
-		this.imagePathArray=[];
-		this.imageLoaderHintArray=[];
+		// this.imagePathArray=[];
+		// this.imageLoaderHintArray=[];
 		this.currentInteractionMode=1;
 		this.rowCosine=[1,0,0];
 		this.columnCosine=[0,1,0];
 		this.currentLoaderHint="noImage";
-        this.element = inputElement
-		cornerstone.enable(this.element)
+        this.element = inputElement;
+        this.stack = [];
 	}
-	displayImage(){
-        console.log("display!")
-		cornerstone.loadImage(this.imageLoaderHintArray[ parseInt((this.imageLoaderHintsArray.length / 2)|0)])
+	displayImage(inputLoaderHint){
+        console.log(inputLoaderHint)
+		cornerstone.loadImage(inputLoaderHint)
         .then(image => {
+            cornerstone.enable(this.element)
             cornerstone.displayImage(this.element,image);
         })
 	}
@@ -33,7 +31,7 @@ export default class dcmViewer{
           return loaderHint+"://" + String(number);
         });
         dcmLoader.GlobalDcmLoadManager.loadSeries(inputOrderedImageList, loaderHint);
-        this.imagePathArray = inputOrderedImageList
+        // this.imagePathArray = inputOrderedImageList
         this.currentLoaderHint = inputLoaderHint
 	}
     seriesImages(id){
@@ -49,60 +47,77 @@ export default class dcmViewer{
         })
     }
     getImagePathList(IP,Port,Path1){
-        return new Promise(function(resolve,reject){
-            resolve(['http://192.168.1.108:8080/0002.png']);
-        })
+        // return new Promise(function(resolve,reject){
+        //     resolve(['http://192.168.1.108:8080/0002.png']);
+        // })
 
         return new Promise(function(resolve,reject){
-            var queryResult =   fetch("http://223.255.146.2:8042/orthanc/series/" + Path1+ "/ordered-slices")
-            .then((res)=>{return res.json();})
+            var queryResult = fetch("http://223.255.146.2:8042/orthanc/series/" + Path1+ "/ordered-slices")
+            .then((reso)=>{
+                return reso.json();
+            })
             .then((json)=>{
-                let cacheImagePathArray = [];
-                for (let i=0;i<json.Dicom.length;++i){
-                    let path = "http://223.255.146.2:8042/orthanc" + json.Dicom[i]; 
-                    cacheImagePathArray.push(path);
-                }
-            return cacheImagePathArray
+                    let cacheImagePathArray = [];
+                    for (let i=0;i<json.Dicom.length;++i){
+                        let path = "http://223.255.146.2:8042/orthanc" + json.Dicom[i]; 
+                        cacheImagePathArray.push(path);
+                    }
+                return cacheImagePathArray;
+            })
+            .catch(error => {
+                console.log(error);
+                resolve(null);
             })
             resolve(queryResult);
         })
     }
-    loadImageFromPacs(inputSeries){
-        console.log(inputSeries)
-        const self = this
-        const returningPromise = new Promise(function(resolve,reject){
-            const cacheInputSeries = inputSeries;
-            self.getImagePathList(1,1,cacheInputSeries)
-            .then((queryList)=>{
-                var cacheImagePathArray = [];
-                var loaderHint = cacheInputSeries;
-                if (queryList === null){
-                    loaderHint = "noImage";
-                }
-                const cacheimageLoaderHintsArray = [...Array(queryList.length).keys()].map(function(number){
-                    return loaderHint+"://" + String(number);
-                });
-                for (let i=0;i<queryList.length;i++){
-                    cacheImagePathArray.push(queryList[i]);
-                }
-                self.imagePathArray = cacheImagePathArray;
-                self.imageLoaderHintArray = cacheimageLoaderHintsArray;
-                console.log(cacheImagePathArray)
-                console.log(loaderHint)
-                console.log(cacheimageLoaderHintsArray)
-                console.log(queryList)
-                console.log(self)
-                dcmLoader.GlobalDcmLoadManager.loadSeries(cacheImagePathArray,loaderHint);
-            })
-        })
-        return returningPromise;
+    initialiseSeries(inputSeries){
+        const self = this;
+        const cacheInputSeries = inputSeries;
+
+          this.getImagePathList(1,1,cacheInputSeries)
+        .then((queryList)=>{
+            var cacheImagePathArray = [];
+            var loaderHint = cacheInputSeries;
+            if (!queryList){
+                loaderHint = "noImage";
+                queryList = ['http://223.255.146.2:8042/orthanc/instances/e24b90b6-a1f5ec14-9a4d7922-e7061ba6-cb87193c/file'];
+            }
+            const cacheimageLoaderHintsArray = [...Array(queryList.length).keys()].map(function(number){
+                return loaderHint+"://" + String(number);
+            });
+            for (let i=0;i<queryList.length;i++){
+                cacheImagePathArray.push(queryList[i]);
+            }
+            // this.imagePathArray = cacheImagePathArray;
+            // this.imageLoaderHintArray = cacheimageLoaderHintsArray;
+            dcmLoader.GlobalDcmLoadManager.loadSeries(cacheImagePathArray,loaderHint);
+            const middleIndex = parseInt((cacheimageLoaderHintsArray.length / 2)|0);
+            this.displayImage(cacheimageLoaderHintsArray[middleIndex]);
+            this.stack = {
+                currentImageIdIndex : middleIndex,
+                imageIds: cacheimageLoaderHintsArray
+            }
+            this.internalInitializeViewer();
+            this.toNavigateMode();
+        })  
+    }
+    internalInitializeViewer(){
+        // Now we start enable cornerstoneTools
+        const currentElement = this.element;
+        console.log(this.element);
+        cornerstoneTools.mouseInput.enable(currentElement);
+        cornerstoneTools.mouseWheelInput.enable(currentElement);
+        const stack = this.stack;
+        cornerstoneTools.addStackStateManager(currentElement, ['stack']);
+        cornerstoneTools.addToolState(currentElement, 'stack', this.stack);
+    }
+    disableAllMode(){
+
+    }
+    toNavigateMode(){
+        cornerstoneTools.stackScroll.activate(this.element,1);
     }
 
-
-
-
-
-
-
-
 }
+
