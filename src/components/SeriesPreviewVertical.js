@@ -1,6 +1,6 @@
 import React from "react";
 import classNames from 'classnames';
-import {Grid, Paper, CardContent, Typography} from '@material-ui/core';
+import {Grid,GridList, GridListTile, Paper, CardContent, Typography} from '@material-ui/core';
 import {ExpandMore, ExpandLess} from '@material-ui/icons'
 import { withStyles } from '@material-ui/core/styles';
 import PACS from "orthanc";
@@ -12,10 +12,13 @@ const styles = theme => ({
 		position: "relative",
 		float: "left",
 		background: theme.palette.secondary.main,
+		overflow: 'auto',
 	},
 	gridContainer1:{
 		width: 170,
-		height: '100%'
+		height: '100%',
+		display:'unset',
+		
 	},
 	demo:{
 		width: 170,
@@ -97,44 +100,71 @@ class SeriesPreviewVertical extends React.Component {
     	const {selectedSeries, selectedSeriesonSelectSeries, study, classes} = this.props
 
 		return(
-			<div className={classes.root}>
-				<Grid container className={classes.gridContainer1}>
-		            <Grid item xs={12}>
-		              <Grid
-		                container
-		                spacing={8}
-		                className={classes.demo}
-		                direction="column"
-		                alignItems='center'
-		              >
-		                {seriesInfo.map((serie, index) => (
-		                  <Grid key={serie.id} item>
-		                  <Paper className={classNames(classes.paper, {[classes.paperSelected]: serie.id==this.props.selectedSeries})} 
-		                  onClick={event => this.props.onSelectSeries(event, serie.id)}>
-		                    <img src={imgs[index]} height="140px" width="140px"></img>
-		                    <div className={classes.seriesContent}>
-		                        <Typography className={classes.text}>
-		                          {serie.bodyPart}
-		                        </Typography>
-		                        <Typography className={classes.text}>
-		                          {serie.modality}
-		                        </Typography>
-		                        <Typography className={classes.text}>
-		                          {serie.protcolName}
-		                        </Typography>
-		                        <Typography className={classes.text}>
-		                          Slices: {serie.slicesCount}
-		                        </Typography>
-		                      </div>
-		                    </Paper>
-		                  </Grid>
-		                ))}
-		             </Grid> 
-		            </Grid>
-		          </Grid>
-			</div>
+		    <div className={classes.root}>
+		      <GridList cellHeight={160} className={classes.gridContainer1} cols={1}>
+				{seriesInfo.map((serie, index) => (
+                  <GridListTile key={serie.id} item>
+	                  <Paper className={classNames(classes.paper, {[classes.paperSelected]: serie.id==this.props.selectedSeries})} 
+	                  onClick={event => this.props.onSelectSeries(event, serie.id)}>
+	                    <img src={imgs[index]} height="140px" width="140px"></img>
+	                    <div className={classes.seriesContent}>
+	                        <Typography className={classes.text}>
+	                          {serie.bodyPart}
+	                        </Typography>
+	                        <Typography className={classes.text}>
+	                          {serie.modality}
+	                        </Typography>
+	                        <Typography className={classes.text}>
+	                          {serie.protcolName}
+	                        </Typography>
+	                        <Typography className={classes.text}>
+	                          Slices: {serie.slicesCount}
+	                        </Typography>
+	                      </div>
+	                    </Paper>
+                  </GridListTile>
+		        ))}
+		      </GridList>
+		    </div>
 		)
 	}
 }
 
 export default withStyles(styles)(SeriesPreviewVertical);
+
+			// <div className={classes.root}>
+			// 	<Grid container className={classes.gridContainer1}>
+		 //            <Grid item xs={12}>
+		 //              <Grid
+		 //                container
+		 //                spacing={8}
+		 //                className={classes.demo}
+		 //                direction="column"
+		 //                alignItems='center'
+		 //              >
+		 //                {seriesInfo.map((serie, index) => (
+		 //                  <Grid key={serie.id} item>
+		 //                  <Paper className={classNames(classes.paper, {[classes.paperSelected]: serie.id==this.props.selectedSeries})} 
+		 //                  onClick={event => this.props.onSelectSeries(event, serie.id)}>
+		 //                    <img src={imgs[index]} height="140px" width="140px"></img>
+		 //                    <div className={classes.seriesContent}>
+		 //                        <Typography className={classes.text}>
+		 //                          {serie.bodyPart}
+		 //                        </Typography>
+		 //                        <Typography className={classes.text}>
+		 //                          {serie.modality}
+		 //                        </Typography>
+		 //                        <Typography className={classes.text}>
+		 //                          {serie.protcolName}
+		 //                        </Typography>
+		 //                        <Typography className={classes.text}>
+		 //                          Slices: {serie.slicesCount}
+		 //                        </Typography>
+		 //                      </div>
+		 //                    </Paper>
+		 //                  </Grid>
+		 //                ))}
+		 //             </Grid> 
+		 //            </Grid>
+		 //          </Grid>
+			// </div>

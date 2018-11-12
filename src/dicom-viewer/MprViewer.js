@@ -13,19 +13,20 @@ const styles = theme=> ({
     root:{    
         // width: '100vw',
     },
-    paper: {
-      height: 'calc(50vh - 32px - 32px)',
-      textAlign: 'center',
-      color: theme.palette.text.secondary,
-      borderRadius: 0,
+    dicomViewer: {
+      height: 'calc(50vh - 32px - 32px - 3px)', // last term is 2*borderWidth + large frame boarderWidth
+      width: 'calc(50vw - 85px - 3px)',
+      borderColor: "gray",
+      borderStyle: "solid",
+      borderWidth: 1, 
       background: "black"
     },
-    dicomViewer:{
-      height: 'calc(50vh - 32px - 32px)',
-      width: 'calc(50vw - 85px)'
-    },
+    // dicomViewer:{
+    //   height: 'calc(50vh - 32px - 32px)',
+    //   width: 'calc(50vw - 85px)'
+    // },
     drawerOpenDicomViewer:{
-        width: 'calc(50vw - 85px - 120px - 2px)',
+        width: 'calc(50vw - 85px - 120px - 3px)',
     },
 })
 
@@ -56,6 +57,39 @@ class MprViewer extends React.Component {
 
   }
 
+
+  // readImage(props, state, hardCodeHint){
+  //     //Get image path Array first
+  //     const loadingResult = this.getImagePathList(1,1,hardCodeHint)
+  //     .then((queryList)=>{
+  //       var cacheimagePathArray = [];
+  //       var loaderHint = hardCodeHint;
+
+  //       const cacheimageLoaderHintsArray = [...Array(queryList.length).keys()].map(function(number){
+  //         return loaderHint+"://" + String(number);
+  //       });
+
+
+  //       for (var i=0;i<queryList.length;i++){
+  //         cacheimagePathArray.push(queryList[i]);
+  //       // cacheArray.push("assets/Test1/0"+String((i-i%100)/100)+String((i-(i-i%100)-i%10)/10)+String(i%10)+".dcm");
+  //     }
+
+  //     // const stateLoader = this.state.loader;
+  //     // stateLoader.loadSeries(cacheimagePathArray, loaderHint);
+  //     dcmLoader.GlobalDcmLoadManager.loadSeries(cacheimagePathArray, loaderHint)
+  //     // this.setState((state) =>{
+  //     //   return{
+  //     //   imagePathArray: cacheimagePathArray,
+  //     //   imageLoaderHintsArray: cacheimageLoaderHintsArray,
+  //     //   hardCodeNumDcm: cacheimagePathArray.length,
+  //     //   previousLoaderHint: loaderHint,
+  //     //   loader: dcmLoader.GlobalDcmLoadManager.loadSeries(cacheimagePathArray, loaderHint),
+  //     // }});
+
+  //   });
+  // return loadingResult;
+  // }
 
   componentDidMount(){
     const self = this;
@@ -117,34 +151,34 @@ class MprViewer extends React.Component {
 
   componentWillReceiveProps(nextProps) {
       if (this.state.dicomImage){
-        if (this.props.drawerOpen != nextProps.drawerOpen){
+        if (this.props.drawerOpen != nextProps.drawerOpen){          
         if (nextProps.drawerOpen){
-            this.state.dicomImage.style.width = 'calc(50vw - 120px - 85px - 1px)'
+            this.state.dicomImage.style.width = 'calc(50vw - 120px - 85px - 3px)'
         }
         else{
-          this.state.dicomImage.style.width = 'calc(50vw - 85px)'
+          this.state.dicomImage.style.width = 'calc(50vw - 85px - 3px)'
         }
-        // cornerstone.resize(this.state.dicomImage)
-      }
+        cornerstone.resize(this.state.dicomImage)
+      } 
     }
     }
 
 
   handleResize(event,dicomImage){
-    // if (dicomImage)
-    // {
-    //     console.log('updateSize')
+    if (dicomImage)
+    {
+        console.log('updateSize')
 
-    //     dicomImage.style.height = 'calc(50vh - 32px - 32px)'
-    //     dicomImage.style.width = 'calc(50vw - 85px)'
-    //     try{
-    //         cornerstone.resize(dicomImage)          
-    //     }
-    //     catch(error)
-    //     {
-    //       console.log(error)
-    //     }
-    // }
+        dicomImage.style.height = 'calc(50vh - 32px - 32px - 3px)'
+        dicomImage.style.width = 'calc(50vw - 85px - 3px)'
+        try{
+            cornerstone.resize(dicomImage)          
+        }
+        catch(error)
+        {
+          console.log(error)
+        }
+    }
   }
 
     render() {

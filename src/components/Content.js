@@ -8,6 +8,7 @@ import {Collections, Portrait, Visibility} from '@material-ui/icons'
 import classNames from 'classnames';
 import DrawerMenu from "./DrawerMenu";
 import Projects from './Projects';
+import socketIOClient from "socket.io-client";
 
 const drawerWidth = 240;
 
@@ -43,8 +44,9 @@ class Content extends React.Component {
     constructor(props){
         super(props);
         this.state = {
-            page: 3,
+            page: 0,
             series: null,
+            sessionId: null,
         };
     }
 
@@ -52,9 +54,24 @@ class Content extends React.Component {
     	this.setState({page: value});
   	}
 
-    onSelectSeries = (event, series)=>{
+    onSelectSeries = (event, series, viewer)=>{
       this.setState({series: series})
-      this.setState({page: 2})
+      if (viewer === "planar"){
+        this.setState({page: 2})
+      }
+      else if (viewer === "mpr"){
+        this.setState({page: 3})
+      }
+    }
+
+    componentDidMount(){
+      // websocket to mpr backend
+      var endPoint = "http://192.168.1.112:8080"
+      const socket = socketIOClient(endPoint)
+      socket.on('connect', ()=>{
+        this.setState({sessionId: socket.id});
+      }
+      ) 
     }
 
     render(){
