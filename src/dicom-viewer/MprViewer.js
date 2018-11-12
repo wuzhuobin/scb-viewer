@@ -44,10 +44,11 @@ class MprViewer extends React.Component {
       cursorViewportX: 0.5,
       cursorViewportY: 0.5,
       isMouseDown: false,
+      leaveCanvasOnDown: false,
    	};
   }
+  
   getImagePathList(IP,Port,Path1){//sync request for now
-
     if (Path1 == 'Axial'){
       return new Promise(function(resolve,reject){
         resolve(['http://192.168.1.112:8080/api/getReslice/2/255']);
@@ -261,9 +262,21 @@ class MprViewer extends React.Component {
     }
 
     var rect = canvas.getBoundingClientRect();
+
     this.setState({cursorViewportX: (event.clientX - rect.left)/canvas.width, cursorViewportY: (event.clientY - rect.top)/canvas.height},()=>{
       this.setCursor()
     })
+  }
+
+  handleWheelChange(event, orientation){
+    if (event.deltaY < 0 ){
+      // mouse wheel up
+      console.log("wheel up")
+    }
+    if (event.deltaY > 0){
+      // mouse wheel down
+      console.log("wheel down")
+    }
   }
 
     render() {
@@ -279,9 +292,21 @@ class MprViewer extends React.Component {
                   <canvas id="canvasAxial" 
                     className={classNames(classes.canvas, {[classes.drawerOpenCanvas]: this.props.drawerOpen})} 
                     // onClick={(event)=>{this.handleCursorClick(event, orientation)}} 
-                    onMouseDown={(event)=>{this.setState({isMouseDown:true})}}
+                    onMouseDown={(event)=>{
+                      if (event.button === 0){
+                        this.setState({isMouseDown:true})
+                      }}}
                     onMouseUp={(event)=>{this.setState({isMouseDown:false})}}
                     onMouseMove={(event)=>{this.handleCursorDrag(event, orientation)}}
+                    onWheel={(event)=>{this.handleWheelChange(event, orientation)}}
+                    onContextMenu={event=>{event.preventDefault()}}
+                    onMouseEnter={(event)=>{
+                      if (event.buttons === 1){
+                        this.setState({isMouseDown: true})
+                      } else{
+                        this.setState({isMouseDown: false})
+                      }
+                    }}
                   />
                 </div>
             }
@@ -291,9 +316,20 @@ class MprViewer extends React.Component {
                   <canvas id="canvasSagittal" 
                   className={classNames(classes.canvas, {[classes.drawerOpenCanvas]: this.props.drawerOpen})} 
                   // onClick={(event)=>{this.handleCursorClick(event, orientation)}}
-                  onMouseDown={(event)=>{this.setState({isMouseDown:true})}}
+                  onMouseDown={(event)=>{
+                    if (event.button === 0){
+                      this.setState({isMouseDown:true})
+                    }}}
                   onMouseUp={(event)=>{this.setState({isMouseDown:false})}}
                   onMouseMove={(event)=>{this.handleCursorDrag(event, orientation)}}
+                  onWheel={(event)=>{this.handleWheelChange(event, orientation)}}
+                  onContextMenu={event=>{event.preventDefault()}}
+                  onMouseEnter={(event)=>{
+                      if (event.buttons === 1){
+                        this.setState({isMouseDown: true})
+                      } else{
+                        this.setState({isMouseDown: false})
+                      }}}
                   />
                 </div>
             }
@@ -303,9 +339,21 @@ class MprViewer extends React.Component {
                   <canvas id="canvasCoronal" 
                   className={classNames(classes.canvas, {[classes.drawerOpenCanvas]: this.props.drawerOpen})} 
                   // onClick={(event)=>{this.handleCursorClick(event, orientation)}}
-                  onMouseDown={(event)=>{this.setState({isMouseDown:true})}}
+                  onMouseDown={(event)=>{
+                    if (event.button === 0){
+                      this.setState({isMouseDown:true})
+                    }}}
                   onMouseUp={(event)=>{this.setState({isMouseDown:false})}}
                   onMouseMove={(event)=>{this.handleCursorDrag(event, orientation)}}
+                  onWheel={(event)=>{this.handleWheelChange(event, orientation)}}
+                  onContextMenu={event=>{event.preventDefault()}}
+                  onMouseEnter={(event)=>{
+                      if (event.buttons === 1){
+                        this.setState({isMouseDown: true})
+                      } else{
+                        this.setState({isMouseDown: false})
+                      }
+                    }}
                   />
                 </div>
             }
