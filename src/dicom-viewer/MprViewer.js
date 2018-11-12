@@ -7,7 +7,7 @@ import * as cornerstone from "cornerstone-core";
 import * as cornerstoneTools from "cornerstone-tools";
 import * as cornerstoneMath from "cornerstone-math";
 import dcmViewer from "./dcmViewer"
-import * as dcmLoader from "./dcmLoader";
+// import * as dcmLoader from "./dcmLoader";
 
 const styles = theme=> ({
     root:{    
@@ -36,134 +36,83 @@ class MprViewer extends React.Component {
     this.state = {
       dicomImage: null,
    	};
-  }
-  getImagePathList(IP,Port,Path1){//sync request for now
-
-    if (Path1 == 'Axial'){
-      return new Promise(function(resolve,reject){
-        resolve(['http://192.168.1.112:8080/api/getReslice/2/255']);
-      })   
-    }
-    if (Path1 == 'Sagittal'){
-      return new Promise(function(resolve,reject){
-        resolve(['http://192.168.1.112:8080/api/getReslice/1/255']);
-      })   
-    }
-    if (Path1 == 'Coronal'){
-      return new Promise(function(resolve,reject){
-        resolve(['http://192.168.1.112:8080/api/getReslice/0/255']);
-      })   
-    }
-    
-    return new Promise(function(resolve,reject){
-      resolve(['http://192.168.1.108:8080/0002.png']);
-    })
-
-    // if (Path1===null){
-    //   return new Promise(function(resolve,reject){resolve(["http://223.255.146.2:8042/orthanc/instances/fedab2d3-b15265e7-fa7f9b03-55568349-ef5d91ad/file"])});
-    // }
-    // else{
-    //   return new Promise(function(resolve,reject){
-    //     var queryResult =   fetch("http://223.255.146.2:8042/orthanc/series/" + Path1+ "/ordered-slices").then(
-    //       (res)=>{return res.json();}).then((json)=>{ 
-    //         let cacheImagePathArray = [];
-    //         for(let i = 0; i < json.Dicom.length; ++i){
-    //           let path = "http://223.255.146.2:8042/orthanc" + json.Dicom[i]; 
-    //           cacheImagePathArray.push(path);
-    //         }
-    //     // console.log(cacheImagePathArray);
-    //     return cacheImagePathArray;
-    //   });
-    //       resolve(queryResult);
-
-    //     });
-    // }
-
+    //Delibrately not using it as React state variable
+    this.singleViewer = new dcmViewer(null)
   }
 
-  readImage(props, state, hardCodeHint){
-      //Get image path Array first
-      const loadingResult = this.getImagePathList(1,1,hardCodeHint)
-      .then((queryList)=>{
-        var cacheimagePathArray = [];
-        var loaderHint = hardCodeHint;
+  viewerLoadImage(){
+    const self = this;
 
-        const cacheimageLoaderHintsArray = [...Array(queryList.length).keys()].map(function(number){
-          return loaderHint+"://" + String(number);
-        });
+    if (this.singleViewer.element!==null){
+      this.singleViewer.initialiseSeries("139de8e7-ad0fb5df-be841b43-590380a5+935e427f")
+      // .then(res=>{
+      //   console.log(self)
+      //   console.log(this);
+      //   console.log(self.singleViewer);
+      //   console.log(this.singleViewer);
+      //   this.singleViewer.displayImage();
+      // })
+    }
 
-
-        for (var i=0;i<queryList.length;i++){
-          cacheimagePathArray.push(queryList[i]);
-        // cacheArray.push("assets/Test1/0"+String((i-i%100)/100)+String((i-(i-i%100)-i%10)/10)+String(i%10)+".dcm");
-      }
-
-      // const stateLoader = this.state.loader;
-      // stateLoader.loadSeries(cacheimagePathArray, loaderHint);
-      dcmLoader.GlobalDcmLoadManager.loadSeries(cacheimagePathArray, loaderHint)
-      // this.setState((state) =>{
-      //   return{
-      //   imagePathArray: cacheimagePathArray,
-      //   imageLoaderHintsArray: cacheimageLoaderHintsArray,
-      //   hardCodeNumDcm: cacheimagePathArray.length,
-      //   previousLoaderHint: loaderHint,
-      //   loader: dcmLoader.GlobalDcmLoadManager.loadSeries(cacheimagePathArray, loaderHint),
-      // }});
-
-    });
-  return loadingResult;
   }
-
-
-
-
-
 
 
   componentDidMount(){
-    this.readImage(null,null,this.props.orientation).then(res=>{
-    // const imageId = 'example://1';
-    console.log(dcmLoader.GlobalDcmLoadManager)
+    const self = this;
     if (this.props.orientation === "Axial")
     {
-      this.setState({
-        dicomImage: document.getElementById('dicomImageAxial')},
-        ()=>{
-          var element = this.state.dicomImage
-          cornerstone.enable(element);
-          cornerstone.loadImage('Axial://0').then(function(image) {
-            cornerstone.displayImage(element, image);
-            cornerstone.resize(element)
-          })
-        })
+      const axialElement = document.getElementById('dicomImageAxial');
+
+      if (axialElement!==null){
+        console.log(axialElement)
+        console.log(this.singleViewer.element)
+        if (this.singleViewer.element === null){
+          this.singleViewer.element = document.getElementById('dicomImageAxial');
+          console.log(this.singleViewer.element)
+          this.viewerLoadImage()
+        }
+      }
+      else {
+        console.log('element not rendered')
+      }
+      // this.setState({
+      //   dicomImage: document.getElementById('dicomImageAxial')},
+      //   ()=>{
+      //     var element = this.state.dicomImage
+      //     cornerstone.enable(element);
+      //     cornerstone.loadImage('Axial://0').then(function(image) {
+      //       cornerstone.displayImage(element, image);
+      //       cornerstone.resize(element)
+      //     })
+      //   })
     }
     else if (this.props.orientation === "Sagittal")
     {
-      this.setState({
-        dicomImage: document.getElementById('dicomImageSagittal')},
-        ()=>{
-          var element = this.state.dicomImage
-          cornerstone.enable(element);
-          cornerstone.loadImage('Sagittal://0').then(function(image) {
-            cornerstone.displayImage(element, image);
-          })
-        })
+      // this.setState({
+      //   dicomImage: document.getElementById('dicomImageSagittal')},
+      //   ()=>{
+      //     var element = this.state.dicomImage
+      //     cornerstone.enable(element);
+      //     cornerstone.loadImage('Sagittal://0').then(function(image) {
+      //       cornerstone.displayImage(element, image);
+      //     })
+      //   })
     }
     else if (this.props.orientation === "Coronal")
     {
-      this.setState({
-        dicomImage: document.getElementById('dicomImageCoronal')},
-        ()=>{
-          var element = this.state.dicomImage
-          cornerstone.enable(element);
-          cornerstone.loadImage('Coronal://0').then(function(image) {
-            cornerstone.displayImage(element, image);
-          })
-        })
+      // this.setState({
+      //   dicomImage: document.getElementById('dicomImageCoronal')},
+      //   ()=>{
+      //     var element = this.state.dicomImage
+      //     cornerstone.enable(element);
+      //     cornerstone.loadImage('Coronal://0').then(function(image) {
+      //       cornerstone.displayImage(element, image);
+      //     })
+      //   })
     }
 
     window.addEventListener('resize', (event)=>{this.handleResize(event, this.state.dicomImage)})
-    })
+
   }
 
   componentWillReceiveProps(nextProps) {
