@@ -41,6 +41,7 @@ export class pngLoader{
 					reject("Get image failed");
 				}
 				else {
+					// console.log(response);
 					var png = new pngjs.PNG().parse(response,function(error,data){
 						if (error){
 							reject(null);
@@ -65,6 +66,35 @@ export class pngLoader{
 					})
 				}
 			})
+		})
+		return this.imageSeries[this.imageSeries.length-1]
+	}
+	loadImageFromBuffer(inputArrayBuffer){
+		this.imageSeries.push(null);
+		this.imageSeries[this.imageSeries.length-1] = new Promise(function(resolve,reject){
+			var png = new pngjs.PNG().parse(inputArrayBuffer,function(error,data){
+				if (error){
+					reject(null);
+				}
+				else {
+					var array = data.data;
+					const range = getArrayMinMax(array);
+					resolve({
+						minPixelValue:range[0],
+						maxPixelValue:range[1],
+						getPixelData:()=>array,
+						rows: data.height,
+						columns:data.width,
+						height:data.height,
+						width:data.width,
+						color:true,
+						columnPixelSpacing:1,
+						rowPixelSpacing:1,
+						sizeInBytes:data.width*data.height*2,
+					});
+				}//else (err) end
+			})
+
 		})
 		return this.imageSeries[this.imageSeries.length-1]
 	}
@@ -116,7 +146,13 @@ export class pngManager{
 				console.log("Load series first");
 			}
 			else {
-				return GlobalPngLoadManager.loadedBuffer[currentIndex].pngLoader.loadImage(inputImagePath);
+				if (inputImagePath.length < 1000){
+					console.log(inputImagePath)
+					return GlobalPngLoadManager.loadedBuffer[currentIndex].pngLoader.loadImage(inputImagePath);
+				}
+				else {
+					return GlobalPngLoadManager.loadedBuffer[currentIndex].pngLoader.loadImageFromBuffer(inputImagePath);
+				}
 				// return GlobalPngLoadManager.loadedBuffer[currentIndex].pngLoader.loadImage('http://127.0.0.1:8081/0002.png');
 			}
 		}

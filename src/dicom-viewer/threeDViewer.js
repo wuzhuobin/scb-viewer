@@ -3,10 +3,11 @@ import Hammer from "hammerjs";
 import classNames from 'classnames';
 import {withStyles} from '@material-ui/core/styles'
 import {Paper}  from '@material-ui/core'
-import exampleImageIdLoader from "./exampleImageIdLoader";
+// import exampleImageIdLoader from "./exampleImageIdLoader";
 import * as cornerstone from "cornerstone-core";
 import * as cornerstoneTools from "cornerstone-tools";
 import * as cornerstoneMath from "cornerstone-math";
+import pngViewer from "./pngViewer";
 
 const styles = theme=> ({
     root:{    
@@ -32,22 +33,33 @@ class ThreeDViewer extends React.Component {
     this.state = {
       dicomImage: null,
    	};
+    this.singleViewer = new pngViewer(null);
   }
 
+  viewerLoadImage(){
+    if (this.singleViewer.element!==null){
+      this.singleViewer.displayImage('http://127.0.0.1:8081/0003.png');
+    }
+  }
 
   componentDidMount(){
-    const imageId = 'example://1';
-
     this.setState({
       dicomImage: document.getElementById('dicomImageThreeD')},
       ()=>{
-        var element = this.state.dicomImage
-        cornerstone.enable(element);
-        cornerstone.loadImage(imageId).then(function(image) {
-          cornerstone.displayImage(element, image);
-        })
+        // var element = this.state.dicomImage
+        // cornerstone.enable(element);
+        // cornerstone.loadImage(imageId).then(function(image) {
+        //   cornerstone.displayImage(element, image);
+        // })
       })
-
+    const threeDElement = document.getElementById('dicomImageThreeD');
+    if (threeDElement){
+      if (this.singleViewer.element === null){
+        this.singleViewer.element = threeDElement;
+        this.singleViewer.name = 'threeD';
+        this.viewerLoadImage();
+      }
+    }
     window.addEventListener('resize', (event)=>{this.handleResize(event, this.state.dicomImage)})
   }
 
