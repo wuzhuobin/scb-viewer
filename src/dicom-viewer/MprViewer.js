@@ -6,8 +6,9 @@ import {Paper}  from '@material-ui/core'
 import * as cornerstone from "cornerstone-core";
 import * as cornerstoneTools from "cornerstone-tools";
 import * as cornerstoneMath from "cornerstone-math";
-import dcmViewer from "./dcmViewer"
+import * as dcmViewer from "./dcmViewer"
 // import * as dcmLoader from "./dcmLoader";
+
 
 const styles = theme=> ({
     root:{    
@@ -38,14 +39,15 @@ class MprViewer extends React.Component {
       dicomImage: null,
    	};
     //Delibrately not using it as React state variable
-    this.singleViewer = new dcmViewer(null)
+    this.singleViewer = new dcmViewer.pngViewer(null)
   }
 
   viewerLoadImage(){
     const self = this;
 
     if (this.singleViewer.element!==null){
-      this.singleViewer.initialiseSeries("139de8e7-ad0fb5df-be841b43-590380a5+935e427f")
+      this.singleViewer.displayImage(null)
+      // this.singleViewer.initialiseSeries("139de8e7-ad0fb5df-be841b43-590380a5-935e427f")
       // .then(res=>{
       //   console.log(self)
       //   console.log(this);
@@ -98,11 +100,12 @@ class MprViewer extends React.Component {
       const axialElement = document.getElementById('dicomImageAxial');
 
       if (axialElement!==null){
-        console.log(axialElement)
-        console.log(this.singleViewer.element)
+        // console.log(axialElement)
+        // console.log(this.singleViewer.element)
         if (this.singleViewer.element === null){
           this.singleViewer.element = document.getElementById('dicomImageAxial');
-          console.log(this.singleViewer.element)
+          this.singleViewer.name = 'Axial';
+          // console.log(this.singleViewer.element)
           this.viewerLoadImage()
         }
       }
@@ -150,10 +153,10 @@ class MprViewer extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-      if (this.state.dicomImage){
-        if (this.props.drawerOpen != nextProps.drawerOpen){          
+    if (this.state.dicomImage){
+      if (this.props.drawerOpen != nextProps.drawerOpen){          
         if (nextProps.drawerOpen){
-            this.state.dicomImage.style.width = 'calc(50vw - 120px - 85px - 3px)'
+          this.state.dicomImage.style.width = 'calc(50vw - 120px - 85px - 3px)'
         }
         else{
           this.state.dicomImage.style.width = 'calc(50vw - 85px - 3px)'
@@ -161,23 +164,23 @@ class MprViewer extends React.Component {
         cornerstone.resize(this.state.dicomImage)
       } 
     }
-    }
+  }
 
 
   handleResize(event,dicomImage){
     if (dicomImage)
     {
-        console.log('updateSize')
+      console.log('updateSize')
 
-        dicomImage.style.height = 'calc(50vh - 32px - 32px - 3px)'
-        dicomImage.style.width = 'calc(50vw - 85px - 3px)'
-        try{
-            cornerstone.resize(dicomImage)          
-        }
-        catch(error)
-        {
-          console.log(error)
-        }
+      dicomImage.style.height = 'calc(50vh - 32px - 32px - 3px)'
+      dicomImage.style.width = 'calc(50vw - 85px - 3px)'
+      try{
+          cornerstone.resize(dicomImage)          
+      }
+      catch(error)
+      {
+        console.log(error)
+      }
     }
   }
 

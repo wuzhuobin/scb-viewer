@@ -2,19 +2,23 @@ import * as cornerstone from "cornerstone-core";
 import * as cornerstoneTools from "cornerstone-tools";
 import * as cornerstoneMath from "cornerstone-math";
 import * as dcmLoader from "./dcmLoader";
+import * as pngLoader from "./pngLoader.js"
 
+Number.prototype.pad = function(size) {
+    var s = String(this);
+    while (s.length < (size || 4)) {s = "0" + s;}
+    return s;
+}
 
-
-export default class dcmViewer{
+export class dcmViewer{
 	constructor(inputElement){
-        console.log("abc");
 		this.imagePathArray=[];
 		this.imageLoaderHintArray=[];
 		this.currentInteractionMode=1;
 		this.rowCosine=[1,0,0];
 		this.columnCosine=[0,1,0];
 		this.currentLoaderHint="noImage";
-        this.element = inputElement
+        this.element = inputElement;
 	}
 	displayImage(inputLoaderHint){
         console.log(inputLoaderHint)
@@ -97,14 +101,27 @@ export default class dcmViewer{
             const middleIndex = parseInt((cacheimageLoaderHintsArray.length / 2)|0);
             self.displayImage(cacheimageLoaderHintsArray[middleIndex]);
         })  
-
     }
+}
 
+export class pngViewer{
+    constructor(inputElement){
+        this.currentLoaderHint="noImage";
+        this.name = null;
+        this.currentId = 0;
+        this.element = inputElement;
+    }
+    displayImage(inputPath){
 
-
-
-
-
-
-
+        const path = this.name+"://"+ this.currentId.pad();
+        pngLoader.GlobalPngLoadManager.loadSeries([inputPath], this.name);
+        console.log(this.name)
+        console.log(path)
+        cornerstone.loadImage(path, 'http://127.0.0.1:8081/0003.png')
+        .then(image => {
+            cornerstone.enable(this.element)
+            cornerstone.displayImage(this.element,image);
+        })
+        this.currentId++;
+    }
 }
