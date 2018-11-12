@@ -46,7 +46,7 @@ class MprViewer extends React.Component {
     const self = this;
 
     if (this.singleViewer.element!==null){
-      this.singleViewer.displayImage(null)
+      this.singleViewer.displayImage('http://127.0.0.1:8081/0003.png')
       // this.singleViewer.initialiseSeries("139de8e7-ad0fb5df-be841b43-590380a5-935e427f")
       // .then(res=>{
       //   console.log(self)
@@ -94,6 +94,7 @@ class MprViewer extends React.Component {
   // }
 
   componentDidMount(){
+    console.log('didmount');
     const self = this;
     if (this.props.orientation === "Axial")
     {
@@ -153,6 +154,11 @@ class MprViewer extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
+    console.log('ReceiveProps');
+    if (nextProps.orientation === 'Axial'){
+      this.singleViewer.displayImage('http://127.0.0.1:8081/0002.png')
+      console.log('abc');
+    }
     if (this.state.dicomImage){
       if (this.props.drawerOpen != nextProps.drawerOpen){          
         if (nextProps.drawerOpen){
@@ -168,6 +174,7 @@ class MprViewer extends React.Component {
 
 
   handleResize(event,dicomImage){
+    console.log('handleResize');
     if (dicomImage)
     {
       console.log('updateSize')

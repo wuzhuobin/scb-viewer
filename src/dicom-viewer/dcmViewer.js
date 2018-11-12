@@ -117,7 +117,7 @@ export class pngViewer{
         pngLoader.GlobalPngLoadManager.loadSeries([inputPath], this.name);
         console.log(this.name)
         console.log(path)
-        cornerstone.loadImage(path, 'http://127.0.0.1:8081/0003.png')
+        cornerstone.loadImage(path, inputPath)
         .then(image => {
             cornerstone.enable(this.element)
             cornerstone.displayImage(this.element,image);
