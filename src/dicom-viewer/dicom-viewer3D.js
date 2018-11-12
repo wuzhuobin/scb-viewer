@@ -2,11 +2,15 @@ import React from "react";
 import Hammer from "hammerjs";
 import classNames from 'classnames';
 import {withStyles} from '@material-ui/core/styles'
-import {AppBar,Toolbar, Button, Grid}  from '@material-ui/core';
+import {AppBar,Toolbar, Button, Grid, Snackbar}  from '@material-ui/core';
 import SeriesPreviewVertical from '../components/SeriesPreviewVertical'
 import {NavigationOutlined} from '@material-ui/icons';
 import MprViewer from './MprViewer'
 import ThreeDViewer from './threeDViewer'
+import SearchIcon from '@material-ui/icons/Search';
+import Brightness6Icon from '@material-ui/icons/Brightness6Outlined';
+import axios from 'axios';
+import ProgressDialog from "./progressDialog";
 
 const styles = theme=> ({
     root:{    
@@ -46,6 +50,9 @@ const styles = theme=> ({
     drawerOpenGrid:{
       width: 'calc(100vw - 240px - 170px)',
     },
+    loadingProgressSnackbar:{
+
+    },
 })
 
 class DicomViewer3D extends React.Component {
@@ -54,40 +61,162 @@ class DicomViewer3D extends React.Component {
     super(props);
     this.state = {
       selectedSeries: null,
+      loadingProgress: 100,
+      loadingMessage: "Loading...",
+      loadingPromise: null,
+      serverStatus: "",
+      serverStatusOpen: false,
+      displaySEries: null,
    	};
+  }
+
+  componentWillReceiveProps(nextProps){
+    if (nextProps.socket){
+      nextProps.socket.on('disconnect', ()=>{
+      this.setState({
+        serverStatus: "MPR Server Disconnected", 
+        serverStatusOpen:true})
+    })
+    }
+  }
+
+  onSelectSeries = (event, series)=>{
+    // console.log("select series: " + series)
+
+    // check server status
+    if (this.props.socket === null || this.props.socket.disconnected){
+      this.setState({
+        serverStatus: "MPR Server Disconnected", 
+        serverStatusOpen:true})
+      // console.log("server disconnected")
+      return;
+    }
+
+    // console.log("socket client id: " + this.props.socket.id)
+
+    // check if mutiple clicking same series
+    // if (series !== this.state.selectedSeries){
+    //   console.log("selecting same series")
+    // } else{
+      this.setState({selectedSeries: series})
+      this.setState({loadingProgress: 0})
+      this.setState({loadingMessage: "Loading"})
+      var loadingPromise = axios({
+          method: 'post',
+          url: 'http://192.168.1.112:8080/api/loadDicom',
+          // timeout: 1 * 1000,
+          data: {
+            series: series,
+            id: this.props.socket.id
+          },
+          headers:  {'Access-Control-Allow-Origin': '*'},
+      })
+
+      loadingPromise.then((res)=>{
+          if (series === this.state.selectedSeries){
+            this.setState({loadingProgress: 100})
+            // this.setState({serverStatus: "MPR Server Load Success: " + this.state.selectedSeries , serverStatusOpen:true})
+            this.setState({serverStatus: "MPR Loading Success", serverStatusOpen:true})
+            this.setState({displaySeries: series})
+          }
+          
+          // console.log(series)
+          // console.log("server side load complete: " + this.state.selectedSeries)
+      }).catch((err)=>{
+        // server side error
+        if (err.response.status === 500){
+          // console.log("error 500")
+          // console.log(err.response)
+          // console.log(err.response.data)
+
+          if (err.response.data === "No Key Found"){
+            this.setState({loadingProgress: 0})
+            // this.setState({loadingProgress: 100})
+            // this.setState({serverStatus: "No Key Found", serverStatusOpen:true})
+          }
+          else{
+            this.setState({loadingProgress: 100})
+            this.setState({serverStatus: "MPR Server Error", serverStatusOpen:true})
+          }
+        }
+        if (err.code === "ECONNABORTED"){
+          this.setState({loadingMessage: "Server connection timeout!"})
+          this.setState({loadingProgress: 100})
+        }
+      })
+  }
+
+  handleServerStatusClose = () =>{
+    this.setState({serverStatusOpen: false})
   }
 
     render() {
       const {drawerOpen, series, classes} = this.props
-      console.log('drawerOpen:' + drawerOpen)
+
     	return(
         <div className={classNames(classes.root, {[classes.drawerOpen]: this.props.drawerOpen,})}>
             <AppBar className={classes.appBar}>
               <Toolbar>
-                  <Button classes={{label: classes.label}} color="inherit" >
-                    <NavigationOutlined />
-                    Navigate
-                  </Button>
+                <Button classes={{label: classes.label}} color="inherit" >
+                  <NavigationOutlined />
+                  Navigate
+                </Button>
+                <Button classes={{label: classes.label}} value="2" color="inherit" size="small" onClick={() => {}}>
+                  <Brightness6Icon />
+                  Levels
+                </Button>
+                <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {}}>
+                  <SearchIcon />
+                  Zoom
+                </Button>
               </Toolbar>
           </AppBar>
 
-          <SeriesPreviewVertical series={series} selectedSeries={this.state.selectedSeries} />
+          <SeriesPreviewVertical series={series} selectedSeries={this.state.selectedSeries} onSelectSeries={this.onSelectSeries}/>
             <Grid container className={classNames(classes.gridRoot, {[classes.drawerOpenGrid]: this.props.drawerOpen,})}>
               <Grid container spacing={0}>
                 <Grid item xs={6}>
-                  <MprViewer orientation={"Axial"} drawerOpen={drawerOpen}/>
+                  <MprViewer orientation={"Axial"} series={this.state.displaySeries} socket={this.props.socket} drawerOpen={drawerOpen}/>
                 </Grid>
                 <Grid item xs={6}>
-                  <MprViewer orientation={"Sagittal"} drawerOpen={drawerOpen}/>
+                  <MprViewer orientation={"Sagittal"} series={this.state.displaySeries} socket={this.props.socket} drawerOpen={drawerOpen}/>
                 </Grid>
                 <Grid item xs={6}>
                   <ThreeDViewer drawerOpen={drawerOpen}/>
                 </Grid>
                 <Grid item xs={6}>
-                  <MprViewer orientation={"Coronal"} drawerOpen={drawerOpen}/>
+                  <MprViewer orientation={"Coronal"} series={this.state.displaySeries} socket={this.props.socket} drawerOpen={drawerOpen}/>
                 </Grid>
               </Grid>
             </Grid>
+
+            <Snackbar
+              anchorOrigin={{vertical:'bottom',horizontal:'right'}}
+              open={this.state.loadingProgress < 100}
+              // open={true}
+              ContentProps={{
+                'aria-describedby': 'message-id',
+                className: classes.loadingProgressSnackbar
+              }}
+              message={<span id="message-id">
+                MPR Loading... 
+                </span>}
+            />
+
+            <Snackbar
+              anchorOrigin={{vertical:'bottom',horizontal:'right'}}
+              open={this.state.serverStatusOpen}
+              // open={true}
+              autoHideDuration={6000}
+              onClose={this.handleServerStatusClose}
+              ContentProps={{
+                'aria-describedby': 'message-id',
+                className: classes.loadingProgressSnackbar
+              }}
+              message={<span id="message-id">
+                {this.state.serverStatus}
+                </span>}
+            />
         </div>
         );
     };
