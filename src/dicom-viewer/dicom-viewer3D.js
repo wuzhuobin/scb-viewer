@@ -7,6 +7,8 @@ import SeriesPreviewVertical from '../components/SeriesPreviewVertical'
 import {NavigationOutlined} from '@material-ui/icons';
 import MprViewer from './MprViewer'
 import ThreeDViewer from './threeDViewer'
+import SearchIcon from '@material-ui/icons/Search';
+import Brightness6Icon from '@material-ui/icons/Brightness6Outlined';
 
 const styles = theme=> ({
     root:{    
@@ -64,10 +66,18 @@ class DicomViewer3D extends React.Component {
         <div className={classNames(classes.root, {[classes.drawerOpen]: this.props.drawerOpen,})}>
             <AppBar className={classes.appBar}>
               <Toolbar>
-                  <Button classes={{label: classes.label}} color="inherit" >
-                    <NavigationOutlined />
-                    Navigate
-                  </Button>
+                <Button classes={{label: classes.label}} color="inherit" >
+                  <NavigationOutlined />
+                  Navigate
+                </Button>
+                <Button classes={{label: classes.label}} value="2" color="inherit" size="small" onClick={() => {}}>
+                  <Brightness6Icon />
+                  Levels
+                </Button>
+                <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {}}>
+                  <SearchIcon />
+                  Zoom
+                </Button>
               </Toolbar>
           </AppBar>
 
