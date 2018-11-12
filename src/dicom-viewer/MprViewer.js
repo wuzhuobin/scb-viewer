@@ -6,7 +6,7 @@ import {Paper}  from '@material-ui/core'
 import * as cornerstone from "cornerstone-core";
 import * as cornerstoneTools from "cornerstone-tools";
 import * as cornerstoneMath from "cornerstone-math";
-import * as dcmViewer from "./dcmViewer"
+import * as Viewer from "./pngViewer"
 // import * as dcmLoader from "./dcmLoader";
 
 
@@ -39,7 +39,7 @@ class MprViewer extends React.Component {
       dicomImage: null,
    	};
     //Delibrately not using it as React state variable
-    this.singleViewer = new dcmViewer.pngViewer(null)
+    this.singleViewer = new Viewer.pngViewer(null)
   }
 
   viewerLoadImage(){
