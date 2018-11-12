@@ -47,7 +47,7 @@ class Content extends React.Component {
         this.state = {
             page: 3,
             series: null,
-            sessionId: null,
+            socket: null,
         };
     }
 
@@ -70,14 +70,14 @@ class Content extends React.Component {
       var endPoint = "http://192.168.1.112:8080"
       const socket = socketIOClient(endPoint)
       socket.on('connect', ()=>{
-        this.setState({sessionId: socket.id});
+        this.setState({socket: socket});
       }
       ) 
     }
  
     render(){
         const {series, open, onDrawerClose, classes} = this.props
-        const {page} = this.state
+        const {page, socket} = this.state
 
         return(
         <div className={classes.root}>
@@ -90,7 +90,7 @@ class Content extends React.Component {
               {page === 0 && <Images onSelectSeries={this.onSelectSeries}/>}
               {page === 1 && <Projects />}         
               {page === 2 && <DicomViewer series={this.state.series} drawerOpen={this.props.open}/>}
-              {page === 3 && <DicomViewer3D series={this.state.series} drawerOpen={this.props.open}/>} 
+              {page === 3 && <DicomViewer3D series={this.state.series} drawerOpen={this.props.open} socket={socket}/>} 
           </main>
         </div>
     );

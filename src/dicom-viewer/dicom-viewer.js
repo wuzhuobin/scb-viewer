@@ -44,7 +44,6 @@ import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
 import ToggleButton from '@material-ui/lab/ToggleButton';
 import Popover from "@material-ui/core/Popover";
 import Typography from '@material-ui/core/Typography';
-import ProgressDialog from "./progressDialog";
 import classNames from 'classnames';
 
 import SeriesPreviewVertical from '../components/SeriesPreviewVertical'
@@ -1035,4 +1034,3 @@ export default withStyles(styles)(DicomViewer);
 
 //<div class="orientationMarkers" style={{borderStyle:"solid", borderColor:"red",position: "absolute", top: "0%", left: "0%", width: viewerWidth, height: viewerHeight}}>
 
-//<ProgressDialog open={this.state.loading <100}/>

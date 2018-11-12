@@ -8,6 +8,7 @@ import * as cornerstoneTools from "cornerstone-tools";
 import * as cornerstoneMath from "cornerstone-math";
 import dcmViewer from "./dcmViewer"
 import * as dcmLoader from "./dcmLoader";
+import axios from 'axios';
 
 const styles = theme=> ({
     root:{    
@@ -45,6 +46,7 @@ class MprViewer extends React.Component {
       cursorViewportY: 0.5,
       isMouseDown: false,
       leaveCanvasOnDown: false,
+      slice: 255,
    	};
   }
   
@@ -52,16 +54,19 @@ class MprViewer extends React.Component {
     if (Path1 == 'Axial'){
       return new Promise(function(resolve,reject){
         resolve(['http://192.168.1.112:8080/api/getReslice/2/255']);
+        // resolve(['http://192.168.1.112:8080/api/getReslice/2/' + this.state.slice]);
       })   
     }
     if (Path1 == 'Sagittal'){
       return new Promise(function(resolve,reject){
         resolve(['http://192.168.1.112:8080/api/getReslice/1/255']);
+        // resolve(['http://192.168.1.112:8080/api/getReslice/1/' + this.state.slice]);
       })   
     }
     if (Path1 == 'Coronal'){
       return new Promise(function(resolve,reject){
         resolve(['http://192.168.1.112:8080/api/getReslice/0/255']);
+        // resolve(['http://192.168.1.112:8080/api/getReslice/0/' + this.state.slice]);
       })   
     }
     
@@ -196,14 +201,14 @@ class MprViewer extends React.Component {
 
     // horizontal
     ctx.beginPath();
-    ctx.strokeStyle = "green";
+    ctx.strokeStyle = '#6fcbff';
     ctx.moveTo(0, canvas.height*this.state.cursorViewportY);
     ctx.lineTo(canvas.width, canvas.height*this.state.cursorViewportY);
     ctx.stroke();
 
     // vertical
     ctx.beginPath();
-    ctx.strokeStyle = "blue";
+    ctx.strokeStyle = '#6fcbff';
     ctx.moveTo(canvas.width*this.state.cursorViewportX, 0);
     ctx.lineTo(canvas.width*this.state.cursorViewportX, canvas.height);
     ctx.stroke();    
@@ -223,6 +228,69 @@ class MprViewer extends React.Component {
           // need to setCursor again
           this.setCursor()
         } 
+      }
+
+      if (this.props.series != nextProps.series){
+        console.log("get slice in mpr viewer: " + nextProps.series)
+
+        axios({
+          method: 'post',
+          url: 'http://192.168.1.112:8080/api/getReslice',
+          data: {
+            series: nextProps.series,
+            id: this.props.socket.id,
+            direction: 0,
+            slice: 1
+          },
+          headers:  {'Access-Control-Allow-Origin': '*'},
+        }).then(res=>{
+          console.log("reslice...")
+          console.log(res)
+        }).catch(err=>{
+          console.log(err)
+        })
+      //   var loadingPromise = axios({
+      //     method: 'post',
+      //     url: 'http://192.168.1.112:8080/api/loadDicom',
+      //     // timeout: 1 * 1000,
+      //     data: {
+      //       series: series,
+      //       id: this.props.socket.id
+      //     },
+      //     headers:  {'Access-Control-Allow-Origin': '*'},
+      // })
+
+      // loadingPromise.then((res)=>{
+      //     if (series === this.state.selectedSeries){
+      //       this.setState({loadingProgress: 100})
+      //       this.setState({serverStatus: "MPR Server Load Success: " + this.state.selectedSeries , serverStatusOpen:true})
+      //       this.setState({displaySeries: series})
+      //     }
+          
+      //     console.log(series)
+      //     console.log("server side load complete: " + this.state.selectedSeries)
+      // }).catch((err)=>{
+      //   // server side error
+      //   if (err.response.status === 500){
+      //     // console.log("error 500")
+      //     // console.log(err.response)
+      //     // console.log(err.response.data)
+
+      //     if (err.response.data === "No Key Found"){
+      //       this.setState({loadingProgress: 0})
+      //       // this.setState({loadingProgress: 100})
+      //       // this.setState({serverStatus: "No Key Found", serverStatusOpen:true})
+      //     }
+      //     else{
+      //       this.setState({loadingProgress: 100})
+      //       this.setState({serverStatus: "MPR Server Error", serverStatusOpen:true})
+      //     }
+      //   }
+      //   if (err.code === "ECONNABORTED"){
+      //     this.setState({loadingMessage: "Server connection timeout!"})
+      //     this.setState({loadingProgress: 100})
+      //   }
+      // })
       }
     }
 
@@ -280,7 +348,7 @@ class MprViewer extends React.Component {
   }
 
     render() {
-      const {drawerOpen, orientation, classes} = this.props
+      const {series, drawerOpen, orientation, classes} = this.props
       const {canvasWidth, canvasHeight} = this.state
 
     	return(

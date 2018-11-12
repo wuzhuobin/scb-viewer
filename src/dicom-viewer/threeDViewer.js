@@ -43,9 +43,9 @@ class ThreeDViewer extends React.Component {
       ()=>{
         var element = this.state.dicomImage
         cornerstone.enable(element);
-        cornerstone.loadImage(imageId).then(function(image) {
-          cornerstone.displayImage(element, image);
-        })
+        // cornerstone.loadImage(imageId).then(function(image) {
+        //   cornerstone.displayImage(element, image);
+        // })
       })
 
     window.addEventListener('resize', (event)=>{this.handleResize(event, this.state.dicomImage)})
