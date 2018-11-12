@@ -1,16 +1,18 @@
 import * as cornerstone from "cornerstone-core";
+import * as cornerstoneTools from "cornerstone-tools";
 import * as dcmLoader from "./dcmLoader";
 
 
 export default class dcmViewer{
 	constructor(inputElement){
-		this.imagePathArray=[];
-		this.imageLoaderHintArray=[];
+		// this.imagePathArray=[];
+		// this.imageLoaderHintArray=[];
 		this.currentInteractionMode=1;
 		this.rowCosine=[1,0,0];
 		this.columnCosine=[0,1,0];
 		this.currentLoaderHint="noImage";
         this.element = inputElement;
+        this.stack = [];
 	}
 	displayImage(inputLoaderHint){
         console.log(inputLoaderHint)
@@ -29,7 +31,7 @@ export default class dcmViewer{
           return loaderHint+"://" + String(number);
         });
         dcmLoader.GlobalDcmLoadManager.loadSeries(inputOrderedImageList, loaderHint);
-        this.imagePathArray = inputOrderedImageList
+        // this.imagePathArray = inputOrderedImageList
         this.currentLoaderHint = inputLoaderHint
 	}
     seriesImages(id){
@@ -73,7 +75,7 @@ export default class dcmViewer{
         const self = this;
         const cacheInputSeries = inputSeries;
 
-          self.getImagePathList(1,1,cacheInputSeries)
+          this.getImagePathList(1,1,cacheInputSeries)
         .then((queryList)=>{
             var cacheImagePathArray = [];
             var loaderHint = cacheInputSeries;
@@ -87,12 +89,35 @@ export default class dcmViewer{
             for (let i=0;i<queryList.length;i++){
                 cacheImagePathArray.push(queryList[i]);
             }
-            self.imagePathArray = cacheImagePathArray;
-            self.imageLoaderHintArray = cacheimageLoaderHintsArray;
+            // this.imagePathArray = cacheImagePathArray;
+            // this.imageLoaderHintArray = cacheimageLoaderHintsArray;
             dcmLoader.GlobalDcmLoadManager.loadSeries(cacheImagePathArray,loaderHint);
             const middleIndex = parseInt((cacheimageLoaderHintsArray.length / 2)|0);
-            self.displayImage(cacheimageLoaderHintsArray[middleIndex]);
+            this.displayImage(cacheimageLoaderHintsArray[middleIndex]);
+            this.stack = {
+                currentImageIdIndex : middleIndex,
+                imageIds: cacheimageLoaderHintsArray
+            }
+            this.internalInitializeViewer();
+            this.toNavigateMode();
         })  
     }
+    internalInitializeViewer(){
+        // Now we start enable cornerstoneTools
+        const currentElement = this.element;
+        console.log(this.element);
+        cornerstoneTools.mouseInput.enable(currentElement);
+        cornerstoneTools.mouseWheelInput.enable(currentElement);
+        const stack = this.stack;
+        cornerstoneTools.addStackStateManager(currentElement, ['stack']);
+        cornerstoneTools.addToolState(currentElement, 'stack', this.stack);
+    }
+    disableAllMode(){
+
+    }
+    toNavigateMode(){
+        cornerstoneTools.stackScroll.activate(this.element,1);
+    }
+
 }
 

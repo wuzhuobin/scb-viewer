@@ -6,8 +6,8 @@ import {Paper}  from '@material-ui/core'
 import * as cornerstone from "cornerstone-core";
 import * as cornerstoneTools from "cornerstone-tools";
 import * as cornerstoneMath from "cornerstone-math";
-import * as Viewer from "./pngViewer"
-// import * as dcmLoader from "./dcmLoader";
+import pngViewer from "./pngViewer"
+import dcmViewer from "./dcmViewer";
 
 
 const styles = theme=> ({
@@ -39,14 +39,15 @@ class MprViewer extends React.Component {
       dicomImage: null,
    	};
     //Delibrately not using it as React state variable
-    this.singleViewer = new Viewer.pngViewer(null)
+    this.singleViewer = new pngViewer(null)
+    // this.anotherViewer = new dcmViewer(null)
   }
 
   viewerLoadImage(){
     const self = this;
 
     if (this.singleViewer.element!==null){
-      this.singleViewer.displayImage('http://127.0.0.1:8081/0003.png')
+      this.singleViewer.displayImage('http://127.0.0.1:8081/0003.png');
       // this.singleViewer.initialiseSeries("139de8e7-ad0fb5df-be841b43-590380a5-935e427f")
       // .then(res=>{
       //   console.log(self)
@@ -56,9 +57,15 @@ class MprViewer extends React.Component {
       //   this.singleViewer.displayImage();
       // })
     }
-
   }
 
+  // anotherViewerLoadImage(){
+  //   const self = this;
+
+  //   if (this.anotherViewer.element!==null){
+  //     this.anotherViewer.initialiseSeries("139de8e7-ad0fb5df-be841b43-590380a5-935e427f");
+  //   }
+  // }
 
   // readImage(props, state, hardCodeHint){
   //     //Get image path Array first
@@ -126,6 +133,16 @@ class MprViewer extends React.Component {
     }
     else if (this.props.orientation === "Sagittal")
     {
+      // const sagittalElement = document.getElementById('dicomImageSagittal');
+      // if (sagittalElement!==null){
+      //   if (this.anotherViewer.element === null){
+      //     this.anotherViewer.element = document.getElementById('dicomImageSagittal');
+      //     this.anotherViewerLoadImage()
+      //   }
+      // }
+      // else {
+      //   console.log('element not rendered')
+      // }
       // this.setState({
       //   dicomImage: document.getElementById('dicomImageSagittal')},
       //   ()=>{

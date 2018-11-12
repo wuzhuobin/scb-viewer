@@ -7,7 +7,7 @@ Number.prototype.pad = function(size) {
     return s;
 }
 
-export class pngViewer{
+export default class pngViewer{
     constructor(inputElement){
         this.currentLoaderHint="noImage";
         this.name = null;
