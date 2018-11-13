@@ -63,13 +63,13 @@ class MprViewer extends React.Component {
     }
     if (Path1 == 'Sagittal'){
       return new Promise(function(resolve,reject){
-        resolve(['http://192.168.1.112:8080/api/getReslice/1/255']);
+        resolve(['http://192.168.1.112:8080/api/getReslice/0/255']);
         // resolve(['http://192.168.1.112:8080/api/getReslice/1/' + this.state.slice]);
       })   
     }
     if (Path1 == 'Coronal'){
       return new Promise(function(resolve,reject){
-        resolve(['http://192.168.1.112:8080/api/getReslice/0/255']);
+        resolve(['http://192.168.1.112:8080/api/getReslice/1/255']);
         // resolve(['http://192.168.1.112:8080/api/getReslice/0/' + this.state.slice]);
       })   
     }
@@ -178,11 +178,11 @@ class MprViewer extends React.Component {
       this.setState({
         dicomImage: document.getElementById('dicomImageSagittal')},
         ()=>{
-          // var element = this.state.dicomImage
-          // cornerstone.enable(element);
-          // cornerstone.loadImage('Sagittal://0').then(function(image) {
-          //   cornerstone.displayImage(element, image);
-          // })
+          var element = this.state.dicomImage
+          cornerstone.enable(element);
+          cornerstone.loadImage('Sagittal://0').then(function(image) {
+            cornerstone.displayImage(element, image);
+          })
         })
       this.setCursor()
     }
@@ -202,11 +202,11 @@ class MprViewer extends React.Component {
       this.setState({
         dicomImage: document.getElementById('dicomImageCoronal')},
         ()=>{
-          // var element = this.state.dicomImage
-          // cornerstone.enable(element);
-          // cornerstone.loadImage('Coronal://0').then(function(image) {
-          //   cornerstone.displayImage(element, image);
-          // })
+          var element = this.state.dicomImage
+          cornerstone.enable(element);
+          cornerstone.loadImage('Coronal://0').then(function(image) {
+            cornerstone.displayImage(element, image);
+          })
         })
       this.setCursor()
     }
@@ -256,6 +256,58 @@ class MprViewer extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
+    // cursor 3d
+    if (this.props.worldPos !=  nextProps.worldPos){
+      // cursor3D update
+      console.log("cursor3D update")
+
+      if (this.props.orientation === "Axial"){
+        if (this.props.worldPos[0] === nextProps.worldPos[0] && this.props.worldPos[1] === nextProps.worldPos[1]){
+          return;
+        }
+
+          var canvas = document.getElementById("canvasAxial")
+          this.props.cursor3D.viewportAxialSizeX = canvas.width;
+          this.props.cursor3D.viewportAxialSizeY = canvas.height;
+
+          // console.log("sagittal:", this.props.cursor3D.getSagittalViewportPosition())
+          this.setState({
+            "cursorViewportX": this.props.cursor3D.getAxialViewportPosition()[0],
+            "cursorViewportY": this.props.cursor3D.getAxialViewportPosition()[1]
+        }, this.setCursor())
+      }
+      if (this.props.orientation === "Sagittal"){
+        if (this.props.worldPos[1] === nextProps.worldPos[1] && this.props.worldPos[2] === nextProps.worldPos[2]){
+          return;
+        }
+
+        var canvas = document.getElementById("canvasSagittal")
+        this.props.cursor3D.viewportSagittalSizeX = canvas.width;
+        this.props.cursor3D.viewportSagittalSizeY = canvas.height;
+
+        console.log("sagittal:", this.props.cursor3D.getSagittalViewportPosition())
+        this.setState({
+          "cursorViewportX": this.props.cursor3D.getSagittalViewportPosition()[0],
+          "cursorViewportY": this.props.cursor3D.getSagittalViewportPosition()[1]
+      }, this.setCursor())
+      }
+      if (this.props.orientation === "Coronal"){
+        if (this.props.worldPos[0] === nextProps.worldPos[0] && this.props.worldPos[2] === nextProps.worldPos[2]){
+          return;
+        }
+
+        var canvas = document.getElementById("canvasCoronal")
+        this.props.cursor3D.viewportCoronalSizeX = canvas.width;
+        this.props.cursor3D.viewportCorohnalSizeY = canvas.height;
+
+        // console.log("sagittal:", this.props.cursor3D.getSagittalViewportPosition())
+        this.setState({
+          "cursorViewportX": this.props.cursor3D.getCoronalViewportPosition()[0],
+          "cursorViewportY": this.props.cursor3D.getCoronalViewportPosition()[1]
+      }, this.setCursor())
+      }
+    }
+
       if (this.state.dicomImage){
         if (this.props.drawerOpen != nextProps.drawerOpen){          
           if (nextProps.drawerOpen){
@@ -377,6 +429,38 @@ class MprViewer extends React.Component {
     this.setState({cursorViewportX: (event.clientX - rect.left)/canvas.width, cursorViewportY: (event.clientY - rect.top)/canvas.height},()=>{
       this.setCursor()
     })
+
+    // console.log(this.props.cursor3D)
+    // console.log("cursor vp pos: "  + this.state.cursorViewportX + ","+ this.state.cursorViewportX)
+
+    if (orientation === "Axial"){
+      var canvas = document.getElementById("canvasAxial")
+      this.props.cursor3D.viewportAxialSizeX = canvas.width;
+      this.props.cursor3D.viewportAxialSizeY = canvas.height;
+
+      this.props.cursor3D.update()
+      var worldPos = this.props.cursor3D.getWorldPositionFromAxial(this.state.cursorViewportX, this.state.cursorViewportY)
+      this.props.onCursorChange()
+    }
+    if (orientation === "Sagittal"){
+      var canvas = document.getElementById("canvasSagittal")
+      this.props.cursor3D.viewportSagittalSizeX = canvas.width;
+      this.props.cursor3D.viewportSagittalSizeY = canvas.height;
+
+      this.props.cursor3D.update()
+      var worldPos = this.props.cursor3D.getWorldPositionFromSagittal(this.state.cursorViewportX, this.state.cursorViewportY)
+      this.props.onCursorChange()
+    }
+    if (orientation === "Coronal"){
+      var canvas = document.getElementById("canvasCoronal")
+      this.props.cursor3D.viewportCoronalSizeX = canvas.width;
+      this.props.cursor3D.viewportCoronalSizeY = canvas.height;
+
+      this.props.cursor3D.update()
+      var worldPos = this.props.cursor3D.getWorldPositionFromCoronal(this.state.cursorViewportX, this.state.cursorViewportY)
+      this.props.onCursorChange()
+    }
+
   }
 
   handleWheelChange(event, orientation){

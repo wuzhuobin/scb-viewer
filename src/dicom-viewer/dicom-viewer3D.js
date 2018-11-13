@@ -11,6 +11,7 @@ import SearchIcon from '@material-ui/icons/Search';
 import Brightness6Icon from '@material-ui/icons/Brightness6Outlined';
 import axios from 'axios';
 import ProgressDialog from "./progressDialog";
+import Cursor3D from "./cursor3D";
 
 const styles = theme=> ({
     root:{    
@@ -67,6 +68,8 @@ class DicomViewer3D extends React.Component {
       serverStatus: "",
       serverStatusOpen: false,
       displaySEries: null,
+      cursor3D: new Cursor3D(),
+      worldPos: [0,0,0],
    	};
   }
 
@@ -150,8 +153,15 @@ class DicomViewer3D extends React.Component {
     this.setState({serverStatusOpen: false})
   }
 
+  onCursorChange = () =>{
+    // console.log("cursor change")
+    // console.log(this.state.cursor3D.getWorldPosition())
+    this.setState({worldPos: this.state.cursor3D.getWorldPosition()})
+  }
+
     render() {
       const {drawerOpen, series, classes} = this.props
+      const {cursor3D, worldPos} = this.state
 
     	return(
         <div className={classNames(classes.root, {[classes.drawerOpen]: this.props.drawerOpen,})}>
@@ -176,16 +186,37 @@ class DicomViewer3D extends React.Component {
             <Grid container className={classNames(classes.gridRoot, {[classes.drawerOpenGrid]: this.props.drawerOpen,})}>
               <Grid container spacing={0}>
                 <Grid item xs={6}>
-                  <MprViewer orientation={"Axial"} series={this.state.displaySeries} socket={this.props.socket} drawerOpen={drawerOpen}/>
+                  <MprViewer 
+                    orientation={"Axial"} 
+                    series={this.state.displaySeries} 
+                    socket={this.props.socket} 
+                    drawerOpen={drawerOpen}
+                    cursor3D={cursor3D}
+                    onCursorChange={this.onCursorChange}
+                    worldPos={worldPos}/>
                 </Grid>
                 <Grid item xs={6}>
-                  <MprViewer orientation={"Sagittal"} series={this.state.displaySeries} socket={this.props.socket} drawerOpen={drawerOpen}/>
+                  <MprViewer 
+                    orientation={"Sagittal"} 
+                    series={this.state.displaySeries} 
+                    socket={this.props.socket} 
+                    drawerOpen={drawerOpen}
+                    cursor3D={cursor3D}
+                    onCursorChange={this.onCursorChange}
+                    worldPos={worldPos}/>
                 </Grid>
                 <Grid item xs={6}>
                   <ThreeDViewer drawerOpen={drawerOpen}/>
                 </Grid>
                 <Grid item xs={6}>
-                  <MprViewer orientation={"Coronal"} series={this.state.displaySeries} socket={this.props.socket} drawerOpen={drawerOpen}/>
+                  <MprViewer 
+                    orientation={"Coronal"} 
+                    series={this.state.displaySeries} 
+                    socket={this.props.socket} 
+                    drawerOpen={drawerOpen}
+                    cursor3D={cursor3D}
+                    onCursorChange={this.onCursorChange}
+                    worldPos={worldPos}/>
                 </Grid>
               </Grid>
             </Grid>
