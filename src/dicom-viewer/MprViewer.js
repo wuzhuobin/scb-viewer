@@ -7,6 +7,7 @@ import * as cornerstone from "cornerstone-core";
 import * as cornerstoneTools from "cornerstone-tools";
 import * as cornerstoneMath from "cornerstone-math";
 import dcmViewer from "./dcmViewer"
+import pngViewer from "./pngViewer"
 import * as dcmLoader from "./dcmLoader";
 import axios from 'axios';
 
@@ -143,7 +144,7 @@ class MprViewer extends React.Component {
         if (this.singleViewer.element === null){
           this.singleViewer.element = document.getElementById('dicomImageAxial');
           this.singleViewer.name = 'Axial';
-          this.viewerLoadImage();
+          // this.viewerLoadImage();
         }
       }
       else {
@@ -168,7 +169,7 @@ class MprViewer extends React.Component {
         if (this.singleViewer.element === null){
           this.singleViewer.element = document.getElementById('dicomImageSagittal');
           this.singleViewer.name = 'Sagittal';
-          this.viewerLoadImage();
+          // this.viewerLoadImage();
         }
       }
       else {
@@ -192,7 +193,7 @@ class MprViewer extends React.Component {
         if (this.singleViewer.element === null){
           this.singleViewer.element = document.getElementById('dicomImageCoronal');
           this.singleViewer.name = 'Coronal';
-          this.viewerLoadImage();
+          // this.viewerLoadImage();
         }
       }
       else {
@@ -211,7 +212,7 @@ class MprViewer extends React.Component {
     }
 
     window.addEventListener('resize', (event)=>{this.handleResize(event, this.state.dicomImage)})
-  }
+  })}
 
   componentWillUnmount(){
     console.log('unmount');
@@ -281,6 +282,7 @@ class MprViewer extends React.Component {
             id: this.props.socket.id,
             direction: 0,
             slice: 1
+
           },
           headers:  {'Access-Control-Allow-Origin': '*'},
         }).then(res=>{
