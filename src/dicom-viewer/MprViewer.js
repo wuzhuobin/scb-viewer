@@ -178,11 +178,11 @@ class MprViewer extends React.Component {
       this.setState({
         dicomImage: document.getElementById('dicomImageSagittal')},
         ()=>{
-          // var element = this.state.dicomImage
-          // cornerstone.enable(element);
-          // cornerstone.loadImage('Sagittal://0').then(function(image) {
-          //   cornerstone.displayImage(element, image);
-          // })
+          var element = this.state.dicomImage
+          cornerstone.enable(element);
+          cornerstone.loadImage('Sagittal://0').then(function(image) {
+            cornerstone.displayImage(element, image);
+          })
         })
       this.setCursor()
     }
@@ -202,11 +202,11 @@ class MprViewer extends React.Component {
       this.setState({
         dicomImage: document.getElementById('dicomImageCoronal')},
         ()=>{
-          // var element = this.state.dicomImage
-          // cornerstone.enable(element);
-          // cornerstone.loadImage('Coronal://0').then(function(image) {
-          //   cornerstone.displayImage(element, image);
-          // })
+          var element = this.state.dicomImage
+          cornerstone.enable(element);
+          cornerstone.loadImage('Coronal://0').then(function(image) {
+            cornerstone.displayImage(element, image);
+          })
         })
       this.setCursor()
     }
