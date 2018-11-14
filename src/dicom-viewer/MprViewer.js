@@ -36,7 +36,8 @@ class MprViewer extends React.Component {
    	};
     //Delibrately not using it as React state variable
     console.log('aaa');
-    this.singleViewer = new pngViewer(null);
+    this.cornerstoneInstance = cornerstone;
+    this.singleViewer = new pngViewer(null, this.cornerstoneInstance);
   }
 
   viewerLoadImage(){
@@ -124,7 +125,11 @@ class MprViewer extends React.Component {
 
   componentWillUnmount(){
     console.log('unmount');
+    this.singleViewer.callForDelete();
     this.singleViewer = null;
+    // console.log(cornerstone.getCacheInfo());
+    // this.cornerstoneInstance.purgeCache();
+    this.cornerstoneInstance = null;
   }
 
   componentWillReceiveProps(nextProps) {

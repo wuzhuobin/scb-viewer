@@ -33,7 +33,8 @@ class ThreeDViewer extends React.Component {
     this.state = {
       dicomImage: null,
    	};
-    this.singleViewer = new pngViewer(null);
+    this.cornerstoneInstance = cornerstone;
+    this.singleViewer = new pngViewer(null, this.cornerstoneInstance);
   }
 
   viewerLoadImage(){
@@ -41,6 +42,16 @@ class ThreeDViewer extends React.Component {
       this.singleViewer.displayImage('http://127.0.0.1:8081/0003.png');
     }
   }
+
+  componentWillUnmount(){
+    console.log('unmount');
+    this.singleViewer.callForDelete();
+    this.singleViewer = null;
+    // console.log(this.cornerstoneInstance.getCacheInfo());
+    // this.cornerstoneInstance.purgeCache();
+    this.cornerstoneInstance = null;
+  }
+
 
   componentDidMount(){
     this.setState({

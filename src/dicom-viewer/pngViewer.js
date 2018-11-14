@@ -8,20 +8,25 @@ Number.prototype.pad = function(size) {
 }
 
 export default class pngViewer{
-    constructor(inputElement){
+    constructor(inputElement, inputCornerstoneInstance){
         this.currentLoaderHint="noImage";
         this.name = null;
         this.currentId = 0;
         this.element = inputElement;
+        this.cornerstoneInstance = inputCornerstoneInstance;
     }
     displayImage(inputPath){
         const path = this.name+"://"+ this.currentId.pad();
         pngLoader.GlobalPngLoadManager.loadSeries([inputPath], this.name);
         cornerstone.loadImage(path, inputPath)
         .then(image => {
-            cornerstone.enable(this.element)
-            cornerstone.displayImage(this.element,image);
+            this.cornerstoneInstance.enable(this.element);
+            this.cornerstoneInstance.displayImage(this.element,image);
         })
         this.currentId++;
+    }
+    callForDelete(){
+        this.cornerstoneInstance.disable(this.element);
+        pngLoader.GlobalPngLoadManager.callForDelete(this.name);
     }
 }

@@ -18,12 +18,12 @@ function getArrayMinMax(a){
 
 function httpFetch(url, requestMethod){
 	// const fetch = require('node-fetch');
-	var output;
+	// var output;
 
-	output = fetch(url)
+	return fetch(url)
 	.then(response=> response.arrayBuffer())
 	.catch(error=>null);
-	return output;
+	// return output;
 }
 
 
@@ -130,6 +130,22 @@ export class pngManager{
 		}
 		return hitIndex;
 	}
+    callForDelete(inputLoaderHint){
+		console.log('remove')
+		const hitIndex = this.findSeries(inputLoaderHint)
+		if (hitIndex === null){
+			console.log("no need to delete");
+		}
+		else {
+			console.log(hitIndex)
+			console.log(this.loadedBuffer)
+			console.log(this.loadedBuffer[hitIndex])
+			// this.loadedBuffer[hitIndex].dcmLoader.callForDestructor();
+			this.loadedBuffer.splice(hitIndex,1);
+			console.log(this.loadedBuffer)
+			console.log(this)
+		}
+    }
 
 	getImage(imageId, inputImagePath){
 		function getPixelData(){
