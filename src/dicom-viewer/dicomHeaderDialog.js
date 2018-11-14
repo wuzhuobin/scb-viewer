@@ -21,13 +21,12 @@ const styles = theme => ({
     overflowX: 'auto',
   },
   table: {
-    minWidth: 700,
+    minWidth: 1000,
   },
 })
 
 class DicomHeaderDialog extends React.Component {
   state = {
-    open: false,
     scroll: 'paper',
     rowCount: 0,
   };
@@ -49,7 +48,7 @@ class DicomHeaderDialog extends React.Component {
 
 
   render() {
-      const {classes, theme} = this.props
+      const {classes, theme,open, onClose} = this.props
       const rows = [
       this.createData('Frozen yoghurt', 159, 6.0, 24, 4.0),
       this.createData('Ice cream sandwich', 237, 9.0, 37, 4.3),
@@ -60,17 +59,42 @@ class DicomHeaderDialog extends React.Component {
     return (
       <div>
         <Dialog
-          open={this.state.open}
-          onClose={this.handleClose}
+          open={open}
+          onClose={onClose}
           scroll={this.state.scroll}
           aria-labelledby="HeaderInfo"
         >
           <DialogTitle id="HeaderInfo">Header Information</DialogTitle>
           <DialogContent>
-
+           <Table className={classes.table}>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Dessert (100g serving)</TableCell>
+                  <TableCell numeric>Calories</TableCell>
+                  <TableCell numeric>Fat (g)</TableCell>
+                  <TableCell numeric>Carbs (g)</TableCell>
+                  <TableCell numeric>Protein (g)</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {rows.map(row => {
+                  return (
+                    <TableRow key={row.id}>
+                      <TableCell component="th" scope="row">
+                        {row.name}
+                      </TableCell>
+                      <TableCell numeric>{row.calories}</TableCell>
+                      <TableCell numeric>{row.fat}</TableCell>
+                      <TableCell numeric>{row.carbs}</TableCell>
+                      <TableCell numeric>{row.protein}</TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
           </DialogContent>
           <DialogActions>
-            <Button onClick={this.handleClose} color="primary">
+            <Button onClick={onClose} color="primary">
               Close
             </Button>
           </DialogActions>
@@ -81,30 +105,3 @@ class DicomHeaderDialog extends React.Component {
 }
 
 export default withStyles(styles)(DicomHeaderDialog);
-
-           // <Table className={classes.table}>
-           //    <TableHead>
-           //      <TableRow>
-           //        <TableCell>Dessert (100g serving)</TableCell>
-           //        <TableCell numeric>Calories</TableCell>
-           //        <TableCell numeric>Fat (g)</TableCell>
-           //        <TableCell numeric>Carbs (g)</TableCell>
-           //        <TableCell numeric>Protein (g)</TableCell>
-           //      </TableRow>
-           //    </TableHead>
-           //    <TableBody>
-           //      {rows.map(row => {
-           //        return (
-           //          <TableRow key={row.id}>
-           //            <TableCell component="th" scope="row">
-           //              {row.name}
-           //            </TableCell>
-           //            <TableCell numeric>{row.calories}</TableCell>
-           //            <TableCell numeric>{row.fat}</TableCell>
-           //            <TableCell numeric>{row.carbs}</TableCell>
-           //            <TableCell numeric>{row.protein}</TableCell>
-           //          </TableRow>
-           //        );
-           //      })}
-           //    </TableBody>
-           //  </Table>

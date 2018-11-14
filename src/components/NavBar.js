@@ -96,7 +96,7 @@ class NavBar extends React.Component {
                         )
                     }
                     <Typography variant="title" color="inherit" className={classes.grow}>
-                        Sucabot WebViewer
+                        Sucabot WebViewer (Alpha)
                     </Typography>
 
                     { auth && (

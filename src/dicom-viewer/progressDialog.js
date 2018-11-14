@@ -23,7 +23,7 @@ class ProgressDialog extends React.Component {
   };
 
   render() {
-    const {open, fullScreen } = this.props;
+    const {open, fullScreen, message} = this.props;
 
     return (
       <div>
@@ -33,7 +33,7 @@ class ProgressDialog extends React.Component {
           onClose={this.handleClose}
           aria-labelledby="Loading"
         >
-          <DialogTitle id="Loading">{"Loading"}</DialogTitle>
+          <DialogTitle id="Loading">{message}</DialogTitle>
           <DialogContent>
             <LinearProgress/>
           </DialogContent>

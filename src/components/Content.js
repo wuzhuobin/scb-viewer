@@ -15,6 +15,7 @@ const drawerWidth = 240;
 const styles = theme=> ({
   root: {
     display: 'flex',
+    backgroundColor: "black"
   },
   drawerPaper: {
     position: 'relative',
@@ -44,9 +45,9 @@ class Content extends React.Component {
     constructor(props){
         super(props);
         this.state = {
-            page: 0,
+            page: 3,
             series: null,
-            sessionId: null,
+            socket: null,
         };
     }
 
@@ -69,18 +70,17 @@ class Content extends React.Component {
       var endPoint = "http://192.168.1.112:8080"
       const socket = socketIOClient(endPoint)
       socket.on('connect', ()=>{
-        this.setState({sessionId: socket.id});
+        this.setState({socket: socket});
       }
       ) 
     }
-
+ 
     render(){
         const {series, open, onDrawerClose, classes} = this.props
-        const {page} = this.state
+        const {page, socket} = this.state
 
         return(
         <div className={classes.root}>
-
           <DrawerMenu open={open} onDrawerClose={onDrawerClose} onChangePage={this.handleChangePage}/>
           <main 
               className={classNames(classes.content,{
@@ -90,7 +90,7 @@ class Content extends React.Component {
               {page === 0 && <Images onSelectSeries={this.onSelectSeries}/>}
               {page === 1 && <Projects />}         
               {page === 2 && <DicomViewer series={this.state.series} drawerOpen={this.props.open}/>}
-              {page === 3 && <DicomViewer3D series={this.state.series} drawerOpen={this.props.open}/>} 
+              {page === 3 && <DicomViewer3D series={this.state.series} drawerOpen={this.props.open} socket={socket}/>} 
           </main>
         </div>
     );
