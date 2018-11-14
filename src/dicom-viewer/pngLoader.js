@@ -21,7 +21,7 @@ function httpFetch(url, requestMethod){
 	// var output;
 
 	return fetch(url)
-	.then(response=> response.arrayBuffer())
+	.then(response=> {console.log(response);response.arrayBuffer()})
 	.catch(error=>null);
 	// return output;
 }

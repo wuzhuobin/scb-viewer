@@ -296,10 +296,10 @@ class MprViewer extends React.Component {
               slice: this.props.cursor3D.sizeZ/2 | 0
             },
             headers:  {'Access-Control-Allow-Origin': '*'},
+            responseType: 'arraybuffer'
           }).then(res=>{
             this.setState({slice: this.props.cursor3D.sizeZ/2 | 0})
-            // console.log("reslice...")
-            console.log(res)
+            this.viewerLoadImage(res.data)
           }).catch(err=>{
             console.log(err)
           })
@@ -314,11 +314,10 @@ class MprViewer extends React.Component {
               slice: this.props.cursor3D.sizeX/2 | 0
             },
             headers:  {'Access-Control-Allow-Origin': '*'},
+            responseType: 'arraybuffer'
           }).then(res=>{
             this.setState({slice: this.props.cursor3D.sizeX/2 | 0})
-            // console.log("reslice...")
-
-            console.log(res)
+            this.viewerLoadImage(res.data)
           }).catch(err=>{
             console.log(err)
           })
@@ -333,11 +332,9 @@ class MprViewer extends React.Component {
               slice: this.props.cursor3D.sizeY/2 | 0
             },
             headers:  {'Access-Control-Allow-Origin': '*'},
+            responseType: 'arraybuffer'
           }).then(res=>{
             this.setState({slice: this.props.cursor3D.sizeY/2 | 0})
-            // console.log("reslice...")
-            console.log(res)
-
             this.viewerLoadImage(res.data)
 
           }).catch(err=>{
