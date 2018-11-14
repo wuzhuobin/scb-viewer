@@ -156,7 +156,7 @@ class DicomViewer3D extends React.Component {
   onCursorChange = () =>{
     // console.log("cursor change")
     // console.log(this.state.cursor3D.getWorldPosition())
-    this.setState({worldPos: this.state.cursor3D.getWorldPosition()})
+    this.setState({worldPos: this.state.cursor3D.getIjkPosition()})
   }
 
     render() {

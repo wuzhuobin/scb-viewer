@@ -57,7 +57,7 @@ class MprViewer extends React.Component {
   getImagePathList(IP,Port,Path1){//sync request for now
     if (Path1 == 'Axial'){
       return new Promise(function(resolve,reject){
-        resolve(['http://192.168.1.112:8080/api/getReslice/2/255']);
+        resolve(['http://192.168.1.112:8080/api/getReslice/2/271']);
         // resolve(['http://192.168.1.112:8080/api/getReslice/2/' + this.state.slice]);
       })   
     }
@@ -261,51 +261,51 @@ class MprViewer extends React.Component {
       // cursor3D update
       console.log("cursor3D update")
 
-      if (this.props.orientation === "Axial"){
-        if (this.props.worldPos[0] === nextProps.worldPos[0] && this.props.worldPos[1] === nextProps.worldPos[1]){
-          return;
-        }
+    //   if (this.props.orientation === "Axial"){
+    //     if (this.props.worldPos[0] === nextProps.worldPos[0] && this.props.worldPos[1] === nextProps.worldPos[1]){
+    //       return;
+    //     }
 
-          var canvas = document.getElementById("canvasAxial")
-          this.props.cursor3D.viewportAxialSizeX = canvas.width;
-          this.props.cursor3D.viewportAxialSizeY = canvas.height;
+    //       var canvas = document.getElementById("canvasAxial")
+    //       this.props.cursor3D.viewportAxialSizeX = canvas.width;
+    //       this.props.cursor3D.viewportAxialSizeY = canvas.height;
 
-          // console.log("sagittal:", this.props.cursor3D.getSagittalViewportPosition())
-          this.setState({
-            "cursorViewportX": this.props.cursor3D.getAxialViewportPosition()[0],
-            "cursorViewportY": this.props.cursor3D.getAxialViewportPosition()[1]
-        }, this.setCursor())
-      }
-      if (this.props.orientation === "Sagittal"){
-        if (this.props.worldPos[1] === nextProps.worldPos[1] && this.props.worldPos[2] === nextProps.worldPos[2]){
-          return;
-        }
+    //       // console.log("sagittal:", this.props.cursor3D.getSagittalViewportPosition())
+    //       this.setState({
+    //         "cursorViewportX": this.props.cursor3D.getAxialViewportPosition()[0],
+    //         "cursorViewportY": this.props.cursor3D.getAxialViewportPosition()[1]
+    //     }, this.setCursor())
+    //   }
+    //   if (this.props.orientation === "Sagittal"){
+    //     if (this.props.worldPos[1] === nextProps.worldPos[1] && this.props.worldPos[2] === nextProps.worldPos[2]){
+    //       return;
+    //     }
 
-        var canvas = document.getElementById("canvasSagittal")
-        this.props.cursor3D.viewportSagittalSizeX = canvas.width;
-        this.props.cursor3D.viewportSagittalSizeY = canvas.height;
+    //     var canvas = document.getElementById("canvasSagittal")
+    //     this.props.cursor3D.viewportSagittalSizeX = canvas.width;
+    //     this.props.cursor3D.viewportSagittalSizeY = canvas.height;
 
-        console.log("sagittal:", this.props.cursor3D.getSagittalViewportPosition())
-        this.setState({
-          "cursorViewportX": this.props.cursor3D.getSagittalViewportPosition()[0],
-          "cursorViewportY": this.props.cursor3D.getSagittalViewportPosition()[1]
-      }, this.setCursor())
-      }
-      if (this.props.orientation === "Coronal"){
-        if (this.props.worldPos[0] === nextProps.worldPos[0] && this.props.worldPos[2] === nextProps.worldPos[2]){
-          return;
-        }
+    //     console.log("sagittal:", this.props.cursor3D.getSagittalViewportPosition())
+    //     this.setState({
+    //       "cursorViewportX": this.props.cursor3D.getSagittalViewportPosition()[0],
+    //       "cursorViewportY": this.props.cursor3D.getSagittalViewportPosition()[1]
+    //   }, this.setCursor())
+    //   }
+    //   if (this.props.orientation === "Coronal"){
+    //     if (this.props.worldPos[0] === nextProps.worldPos[0] && this.props.worldPos[2] === nextProps.worldPos[2]){
+    //       return;
+    //     }
 
-        var canvas = document.getElementById("canvasCoronal")
-        this.props.cursor3D.viewportCoronalSizeX = canvas.width;
-        this.props.cursor3D.viewportCorohnalSizeY = canvas.height;
+    //     var canvas = document.getElementById("canvasCoronal")
+    //     this.props.cursor3D.viewportCoronalSizeX = canvas.width;
+    //     this.props.cursor3D.viewportCorohnalSizeY = canvas.height;
 
-        // console.log("sagittal:", this.props.cursor3D.getSagittalViewportPosition())
-        this.setState({
-          "cursorViewportX": this.props.cursor3D.getCoronalViewportPosition()[0],
-          "cursorViewportY": this.props.cursor3D.getCoronalViewportPosition()[1]
-      }, this.setCursor())
-      }
+    //     // console.log("sagittal:", this.props.cursor3D.getSagittalViewportPosition())
+    //     this.setState({
+    //       "cursorViewportX": this.props.cursor3D.getCoronalViewportPosition()[0],
+    //       "cursorViewportY": this.props.cursor3D.getCoronalViewportPosition()[1]
+    //   }, this.setCursor())
+    //   }
     }
 
       if (this.state.dicomImage){
@@ -439,7 +439,8 @@ class MprViewer extends React.Component {
       this.props.cursor3D.viewportAxialSizeY = canvas.height;
 
       this.props.cursor3D.update()
-      var worldPos = this.props.cursor3D.getWorldPositionFromAxial(this.state.cursorViewportX, this.state.cursorViewportY)
+      var ijkPos = this.props.cursor3D.getIjkPositionFromAxial(this.state.cursorViewportX, this.state.cursorViewportY)
+      console.log("ijk position:",ijkPos)
       this.props.onCursorChange()
     }
     if (orientation === "Sagittal"){
@@ -448,7 +449,8 @@ class MprViewer extends React.Component {
       this.props.cursor3D.viewportSagittalSizeY = canvas.height;
 
       this.props.cursor3D.update()
-      var worldPos = this.props.cursor3D.getWorldPositionFromSagittal(this.state.cursorViewportX, this.state.cursorViewportY)
+      var ijkPos = this.props.cursor3D.getIjkPositionFromSagittal(this.state.cursorViewportX, this.state.cursorViewportY)
+      console.log("ijk position:",ijkPos)
       this.props.onCursorChange()
     }
     if (orientation === "Coronal"){
@@ -457,7 +459,8 @@ class MprViewer extends React.Component {
       this.props.cursor3D.viewportCoronalSizeY = canvas.height;
 
       this.props.cursor3D.update()
-      var worldPos = this.props.cursor3D.getWorldPositionFromCoronal(this.state.cursorViewportX, this.state.cursorViewportY)
+      var worldPos = this.props.cursor3D.getIjkPositionFromCoronal(this.state.cursorViewportX, this.state.cursorViewportY)
+      console.log("ijk position:",ijkPos)
       this.props.onCursorChange()
     }
 
