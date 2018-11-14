@@ -14,6 +14,7 @@ export default class pngViewer{
         this.currentId = 0;
         this.element = inputElement;
         this.cornerstoneInstance = inputCornerstoneInstance;
+        this.cornerstoneInstance.enable(this.element);
     }
     displayImage(inputPath){
         const path = this.name+"://"+ this.currentId.pad();
@@ -28,5 +29,8 @@ export default class pngViewer{
     callForDelete(){
         this.cornerstoneInstance.disable(this.element);
         pngLoader.GlobalPngLoadManager.callForDelete(this.name);
+    }
+    resizeImage(){
+        this.cornerstoneInstance.resize(this.element);
     }
 }

@@ -51,11 +51,12 @@ class MprViewer extends React.Component {
    	};
     //Delibrately not using it as React state variable
     this.cornerstoneInstance = cornerstone;
-    this.singleViewer = new pngViewer(null, this.cornerstoneInstance);
+    // this.singleViewer = new pngViewer(null, this.cornerstoneInstance);
+    this.singleViewer = null;
   }
 
   viewerLoadImage(inputPath){
-    if (this.singleViewer.element!==null){
+    if (this.singleViewer){
       this.singleViewer.displayImage(inputPath);
       // this.singleViewer.initialiseSeries("139de8e7-ad0fb5df-be841b43-590380a5-935e427f")
     }
@@ -107,8 +108,8 @@ class MprViewer extends React.Component {
         })
 
       if (element!==null){
-        if (this.singleViewer.element === null){
-          this.singleViewer.element = document.getElementById('dicomImageAxial');
+        if (this.singleViewer === null){
+          this.singleViewer = new pngViewer(element, this.cornerstoneInstance);
           this.singleViewer.name = 'Axial';
           // this.viewerLoadImage('http://192.168.1.108:8081/0002.png');
         }
@@ -134,8 +135,9 @@ class MprViewer extends React.Component {
         })
 
       if (element!==null){
-        if (this.singleViewer.element === null){
-          this.singleViewer.element = document.getElementById('dicomImageSagittal');
+        if (this.singleViewer === null){
+          this.singleViewer = new pngViewer(element, this.cornerstoneInstance);
+          // this.singleViewer.element = document.getElementById('dicomImageSagittal');
           this.singleViewer.name = 'Sagittal';
           // this.viewerLoadImage('http://192.168.1.108:8081/0002.png');
         }
@@ -159,8 +161,9 @@ class MprViewer extends React.Component {
         })
 
       if (element!==null){
-        if (this.singleViewer.element === null){
-          this.singleViewer.element = document.getElementById('dicomImageCoronal');
+        if (this.singleViewer === null){
+          this.singleViewer = new pngViewer(element, this.cornerstoneInstance);
+          // this.singleViewer.element = document.getElementById('dicomImageCoronal');
           this.singleViewer.name = 'Coronal';
           // this.viewerLoadImage('http://192.168.1.108:8081/0002.png');
         }
@@ -273,7 +276,9 @@ class MprViewer extends React.Component {
           else{
             this.state.dicomImage.style.width = 'calc(50vw - 85px - 3px)'
           }
-          cornerstone.resize(this.state.dicomImage)
+          if (this.singleViewer){
+            this.singleViewer.resizeImage();
+          }
 
           // need to setCursor again
           this.setCursor()
@@ -354,14 +359,10 @@ class MprViewer extends React.Component {
 
         dicomImage.style.height = 'calc(50vh - 32px - 32px - 3px)'
         dicomImage.style.width = 'calc(50vw - 85px - 3px)'
-        try{
-            cornerstone.resize(dicomImage)          
-        }
-        catch(error)
-        {
-          console.log(error)
-        }
 
+        if (this.singleViewer){
+          this.singleViewer.resizeImage();
+        }
         this.setCursor()
     }
   }

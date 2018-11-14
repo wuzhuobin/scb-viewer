@@ -34,11 +34,11 @@ class ThreeDViewer extends React.Component {
       dicomImage: null,
    	};
     this.cornerstoneInstance = cornerstone;
-    this.singleViewer = new pngViewer(null, this.cornerstoneInstance);
+    this.singleViewer = null;
   }
 
   viewerLoadImage(inputPath){
-    if (this.singleViewer.element!==null){
+    if (this.singleViewer){
       this.singleViewer.displayImage(inputPath);
     }
   }
@@ -65,8 +65,9 @@ class ThreeDViewer extends React.Component {
       })
     const threeDElement = document.getElementById('dicomImageThreeD');
     if (threeDElement){
-      if (this.singleViewer.element === null){
-        this.singleViewer.element = threeDElement;
+      if (this.singleViewer === null){
+        this.singleViewer = new pngViewer(threeDElement,this.cornerstoneInstance);
+        // this.singleViewer.element = threeDElement;
         this.singleViewer.name = 'threeD';
         // this.viewerLoadImage();
       }
