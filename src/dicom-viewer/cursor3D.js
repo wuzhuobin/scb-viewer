@@ -156,18 +156,20 @@ class Cursor3D{
 	}
 
 	getAxialViewportPosition(){
-		var vpPos = math.multiply(this.worldToAxialViewportMatrix,math.matrix([this.ijkPositionX, this.ijkPositionY, 1]))
+		var matrixInv = math.inv(this.viewportAxialToIjkMatrix)
+		var vpPos = math.multiply(matrixInv,math.matrix([this.ijkPositionX, this.ijkPositionY, 1]))
 		return [math.subset(vpPos, math.index(0)),math.subset(vpPos, math.index(1))]
 	}
 
 	getSagittalViewportPosition(){
-		console.log(this.ijkPositionX, this.ijkPositionY, this.ijkPositionZ)		
-		var vpPos = math.multiply(this.worldToSagittalViewportMatrix,math.matrix([this.ijkPositionY, this.ijkPositionZ, 1]))
+		var matrixInv = math.inv(this.viewportSagittalToIjkMatrix)
+		var vpPos = math.multiply(matrixInv,math.matrix([this.ijkPositionY, this.ijkPositionZ, 1]))
 		return [math.subset(vpPos, math.index(0)),math.subset(vpPos, math.index(1))]
 	}
 
 	getCoronalViewportPosition(){
-		var vpPos = math.multiply(this.worldToCoronalViewportMatrix,math.matrix([this.ijkPositionX, this.ijkPositionZ, 1]))
+		var matrixInv = math.inv(this.viewportCoronalToIjkMatrix)
+		var vpPos = math.multiply(matrixInv,math.matrix([this.ijkPositionX, this.ijkPositionZ, 1]))
 		return [math.subset(vpPos, math.index(0)),math.subset(vpPos, math.index(1))]
 	}
 
@@ -186,9 +188,6 @@ class Cursor3D{
 		this.ijkPositionY = math.subset(pos, math.index(0))
 		this.ijkPositionZ = math.subset(pos, math.index(1))
 
-		console.log(x,y, this.ijkPositionY, this.ijkPositionZ)
-		console.log(this.viewportSagittalToIjkMatrix)
-
 		return [this.ijkPositionX, this.ijkPositionY, this.ijkPositionZ]
 	}
 
@@ -197,9 +196,6 @@ class Cursor3D{
 
 		this.ijkPositionX = math.subset(pos, math.index(0))
 		this.ijkPositionZ = math.subset(pos, math.index(1))
-
-		console.log(x,y, this.ijkPositionX, this.ijkPositionZ)
-		console.log(this.viewportCoronalToIjkMatrix)
 
 		return [this.ijkPositionX, this.ijkPositionY, this.ijkPositionZ]
 	}

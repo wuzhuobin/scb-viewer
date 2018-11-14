@@ -69,7 +69,7 @@ class DicomViewer3D extends React.Component {
       serverStatusOpen: false,
       displaySEries: null,
       cursor3D: new Cursor3D(),
-      worldPos: [0,0,0],
+      ijkPos: [0,0,0],
    	};
   }
 
@@ -155,13 +155,13 @@ class DicomViewer3D extends React.Component {
 
   onCursorChange = () =>{
     // console.log("cursor change")
-    // console.log(this.state.cursor3D.getWorldPosition())
-    this.setState({worldPos: this.state.cursor3D.getIjkPosition()})
+    // console.log(this.state.cursor3D.getIjkPosition())
+    this.setState({ijkPos: this.state.cursor3D.getIjkPosition()})
   }
 
     render() {
       const {drawerOpen, series, classes} = this.props
-      const {cursor3D, worldPos} = this.state
+      const {cursor3D, ijkPos} = this.state
 
     	return(
         <div className={classNames(classes.root, {[classes.drawerOpen]: this.props.drawerOpen,})}>
@@ -193,7 +193,7 @@ class DicomViewer3D extends React.Component {
                     drawerOpen={drawerOpen}
                     cursor3D={cursor3D}
                     onCursorChange={this.onCursorChange}
-                    worldPos={worldPos}/>
+                    ijkPos={ijkPos}/>
                 </Grid>
                 <Grid item xs={6}>
                   <MprViewer 
@@ -203,7 +203,7 @@ class DicomViewer3D extends React.Component {
                     drawerOpen={drawerOpen}
                     cursor3D={cursor3D}
                     onCursorChange={this.onCursorChange}
-                    worldPos={worldPos}/>
+                    ijkPos={ijkPos}/>
                 </Grid>
                 <Grid item xs={6}>
                   <ThreeDViewer drawerOpen={drawerOpen}/>
@@ -216,7 +216,7 @@ class DicomViewer3D extends React.Component {
                     drawerOpen={drawerOpen}
                     cursor3D={cursor3D}
                     onCursorChange={this.onCursorChange}
-                    worldPos={worldPos}/>
+                    ijkPos={ijkPos}/>
                 </Grid>
               </Grid>
             </Grid>
