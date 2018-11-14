@@ -21,7 +21,7 @@ class Cursor3D{
 		// this.scaleZ = 1;
 		this.ijkPositionX = 256;
 		this.ijkPositionY = 256;
-		this.ijkPositionZ = 271;
+		this.ijkPositionZ = 256;
 		this.viewportAxialSizeX = 256.;
 		this.viewportAxialSizeY = 256.;
 		this.viewportSagittalSizeX = 256.;

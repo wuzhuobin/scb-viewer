@@ -117,10 +117,29 @@ class DicomViewer3D extends React.Component {
 
       loadingPromise.then((res)=>{
           if (series === this.state.selectedSeries){
-            this.setState({loadingProgress: 100})
-            // this.setState({serverStatus: "MPR Server Load Success: " + this.state.selectedSeries , serverStatusOpen:true})
-            this.setState({serverStatus: "MPR Loading Success", serverStatusOpen:true})
-            this.setState({displaySeries: series})
+            // get image header
+            axios({
+              method: 'get',
+              url: 'http://192.168.1.112:8080/api/getImageHeader',
+              params:{
+                id: this.props.socket.id,
+                series: series,
+              },
+              headers:  {'Access-Control-Allow-Origin': '*'},
+            }).then(res=>{
+              console.log(res.data)
+              this.state.cursor3D.sizeX = res.data.Size[0]
+              this.state.cursor3D.sizeY = res.data.Size[1]
+              this.state.cursor3D.sizeZ = res.data.Size[2]
+
+              this.state.cursor3D.ijkPositionX = res.data.Size[0]/2;
+              this.state.cursor3D.ijkPositionY = res.data.Size[1]/2;
+              this.state.cursor3D.ijkPositionZ = res.data.Size[2]/2;
+
+              this.setState({loadingProgress: 100})
+              this.setState({serverStatus: "MPR Loading Success", serverStatusOpen:true})
+              this.setState({displaySeries: series})
+            })
           }
           
           // console.log(series)
@@ -238,7 +257,7 @@ class DicomViewer3D extends React.Component {
               anchorOrigin={{vertical:'bottom',horizontal:'right'}}
               open={this.state.serverStatusOpen}
               // open={true}
-              autoHideDuration={6000}
+              autoHideDuration={2000}
               onClose={this.handleServerStatusClose}
               ContentProps={{
                 'aria-describedby': 'message-id',

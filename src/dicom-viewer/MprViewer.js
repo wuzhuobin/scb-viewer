@@ -87,9 +87,7 @@ class MprViewer extends React.Component {
 
   }
 
-
   componentDidMount(){
-
     // const imageId = 'example://1';
     // console.log(dcmLoader.GlobalDcmLoadManager)
     if (this.props.orientation === "Axial")
@@ -116,8 +114,6 @@ class MprViewer extends React.Component {
       else {
         console.log('element not rendered')
       }
-      console.log(document.getElementById('dicomImageAxial'))
-
     }
     else if (this.props.orientation === "Sagittal")
     {
@@ -273,7 +269,12 @@ class MprViewer extends React.Component {
           else{
             this.state.dicomImage.style.width = 'calc(50vw - 85px - 3px)'
           }
-          cornerstone.resize(this.state.dicomImage)
+
+          try{
+            cornerstone.resize(this.state.dicomImage)
+          }catch(err){
+            console.log(err)
+          }
 
           // need to setCursor again
           this.setCursor()
@@ -281,25 +282,65 @@ class MprViewer extends React.Component {
       }
 
       if (this.props.series != nextProps.series){
-        console.log("get slice in mpr viewer: " + nextProps.series)
+        // console.log("get slice in mpr viewer: " + nextProps.series)
 
-        axios({
-          method: 'post',
-          url: 'http://192.168.1.112:8080/api/getReslice',
-          data: {
-            series: nextProps.series,
-            id: this.props.socket.id,
-            direction: 0,
-            slice: 1
+        if (this.props.orientation === "Axial"){
+          axios({
+            method: 'post',
+            url: 'http://192.168.1.112:8080/api/getReslice',
+            data: {
+              series: nextProps.series,
+              id: this.props.socket.id,
+              direction: 2,
+              slice: this.props.cursor3D.sizeZ | 0
+            },
+            headers:  {'Access-Control-Allow-Origin': '*'},
+          }).then(res=>{
+            this.setState({slice: this.props.cursor3D.sizeZ/2 | 0})
+            // console.log("reslice...")
+            console.log(res)
+          }).catch(err=>{
+            console.log(err)
+          })
+        }else if (this.props.orientation === "Sagittal"){
+          axios({
+            method: 'post',
+            url: 'http://192.168.1.112:8080/api/getReslice',
+            data: {
+              series: nextProps.series,
+              id: this.props.socket.id,
+              direction: 0,
+              slice: this.props.cursor3D.sizeX/2 | 0
+            },
+            headers:  {'Access-Control-Allow-Origin': '*'},
+          }).then(res=>{
+            this.setState({slice: this.props.cursor3D.sizeX/2 | 0})
+            // console.log("reslice...")
 
-          },
-          headers:  {'Access-Control-Allow-Origin': '*'},
-        }).then(res=>{
-          console.log("reslice...")
-          console.log(res)
-        }).catch(err=>{
-          console.log(err)
-        })
+            console.log(res)
+          }).catch(err=>{
+            console.log(err)
+          })
+        }else if (this.props.orientation === "Coronal"){
+          axios({
+            method: 'post',
+            url: 'http://192.168.1.112:8080/api/getReslice',
+            data: {
+              series: nextProps.series,
+              id: this.props.socket.id,
+              direction: 1,
+              slice: this.props.cursor3D.sizeY/2 | 0
+            },
+            headers:  {'Access-Control-Allow-Origin': '*'},
+          }).then(res=>{
+            this.setState({slice: this.props.cursor3D.sizeY/2 | 0})
+            // console.log("reslice...")
+            console.log(res)
+          }).catch(err=>{
+            console.log(err)
+          })
+        }
+        
       //   var loadingPromise = axios({
       //     method: 'post',
       //     url: 'http://192.168.1.112:8080/api/loadDicom',
