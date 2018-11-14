@@ -37,9 +37,9 @@ class ThreeDViewer extends React.Component {
     this.singleViewer = new pngViewer(null, this.cornerstoneInstance);
   }
 
-  viewerLoadImage(){
+  viewerLoadImage(inputPath){
     if (this.singleViewer.element!==null){
-      this.singleViewer.displayImage('http://127.0.0.1:8081/0003.png');
+      this.singleViewer.displayImage(inputPath);
     }
   }
 
@@ -68,7 +68,7 @@ class ThreeDViewer extends React.Component {
       if (this.singleViewer.element === null){
         this.singleViewer.element = threeDElement;
         this.singleViewer.name = 'threeD';
-        this.viewerLoadImage();
+        // this.viewerLoadImage();
       }
     }
     window.addEventListener('resize', (event)=>{this.handleResize(event, this.state.dicomImage)})
