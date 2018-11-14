@@ -217,6 +217,68 @@ class MprViewer extends React.Component {
     ctx.stroke();    
   }
 
+  loadSlice(){
+    if (this.props.orientation === "Axial"){
+      axios({
+        method: 'post',
+        url: 'http://192.168.1.112:8080/api/getReslice',
+        data: {
+          series: this.props.series,
+          id: this.props.socket.id,
+          direction: 2,
+          slice: this.state.slice
+        },
+        headers:  {
+          'Access-Control-Allow-Origin': '*',
+          'Cache-Control': 'no-store'
+        },
+        responseType: 'arraybuffer',
+      }).then(res=>{
+        this.viewerLoadImage(res.data)
+      }).catch(err=>{
+        console.log(err)
+      })
+    }else if (this.props.orientation === "Sagittal"){
+      axios({
+        method: 'post',
+        url: 'http://192.168.1.112:8080/api/getReslice',
+        data: {
+          series: this.props.series,
+          id: this.props.socket.id,
+          direction: 0,
+          slice: this.state.slice
+        },
+        headers:  {
+          'Access-Control-Allow-Origin': '*',
+        },
+        responseType: 'arraybuffer'
+      }).then(res=>{
+        this.viewerLoadImage(res.data)
+      }).catch(err=>{
+        console.log(err)
+      })
+    }else if (this.props.orientation === "Coronal"){
+      axios({
+        method: 'post',
+        url: 'http://192.168.1.112:8080/api/getReslice',
+        data: {
+          series: this.props.series,
+          id: this.props.socket.id,
+          direction: 1,
+          slice: this.state.slice
+        },
+        headers:  {
+          'Access-Control-Allow-Origin': '*',
+        },
+        responseType: 'arraybuffer'
+      }).then(res=>{
+        this.viewerLoadImage(res.data)
+      }).catch(err=>{
+        console.log(err)
+      })
+    }
+
+  }
   componentWillReceiveProps(nextProps) {
     // cursor 3d
     if (this.props.ijkPos !=  nextProps.ijkPos){
@@ -225,7 +287,6 @@ class MprViewer extends React.Component {
         if (this.props.ijkPos[0] === nextProps.ijkPos[0] && this.props.ijkPos[1] === nextProps.ijkPos[1]){
           return;
         }
-
           var canvas = document.getElementById("canvasAxial")
           this.props.cursor3D.viewportAxialSizeX = canvas.width;
           this.props.cursor3D.viewportAxialSizeY = canvas.height;
@@ -233,7 +294,16 @@ class MprViewer extends React.Component {
           this.setState({
             "cursorViewportX": this.props.cursor3D.getAxialViewportPosition()[0],
             "cursorViewportY": this.props.cursor3D.getAxialViewportPosition()[1]
-        }, this.setCursor())
+        }, ()=>{
+          this.props.cursor3D.update()
+          this.setCursor()
+          // change slice
+          var ijkPos = this.props.cursor3D.getIjkPositionFromAxial(this.state.cursorViewportX, this.state.cursorViewportY)
+            this.setState({slice: ijkPos[2]}, ()=>{
+            this.loadSlice()
+          })
+        }
+        )
       }
       if (this.props.orientation === "Sagittal"){
         if (this.props.ijkPos[1] === nextProps.ijkPos[1] && this.props.ijkPos[2] === nextProps.ijkPos[2]){
@@ -246,7 +316,15 @@ class MprViewer extends React.Component {
         this.setState({
           "cursorViewportX": this.props.cursor3D.getSagittalViewportPosition()[0],
           "cursorViewportY": this.props.cursor3D.getSagittalViewportPosition()[1]
-      }, this.setCursor())
+      }, ()=>{
+          this.props.cursor3D.update()
+          this.setCursor()
+          // change slice
+          var ijkPos = this.props.cursor3D.getIjkPositionFromSagittal(this.state.cursorViewportX, this.state.cursorViewportY)
+            this.setState({slice: ijkPos[0]}, ()=>{
+            this.loadSlice()
+          })
+        })
       }
       if (this.props.orientation === "Coronal"){
         if (this.props.ijkPos[0] === nextProps.ijkPos[0] && this.props.ijkPos[2] === nextProps.ijkPos[2]){
@@ -260,7 +338,15 @@ class MprViewer extends React.Component {
         this.setState({
           "cursorViewportX": this.props.cursor3D.getCoronalViewportPosition()[0],
           "cursorViewportY": this.props.cursor3D.getCoronalViewportPosition()[1]
-      }, this.setCursor())
+      }, ()=>{
+          this.props.cursor3D.update()
+          this.setCursor()
+          // change slice
+          var ijkPos = this.props.cursor3D.getIjkPositionFromCoronal(this.state.cursorViewportX, this.state.cursorViewportY)
+            this.setState({slice: ijkPos[1]}, ()=>{
+            this.loadSlice()
+          })
+        })
       }
     }
 
@@ -283,63 +369,24 @@ class MprViewer extends React.Component {
       }
 
       if (this.props.series != nextProps.series){
-        // console.log("get slice in mpr viewer: " + nextProps.series)
-
         if (this.props.orientation === "Axial"){
-          axios({
-            method: 'post',
-            url: 'http://192.168.1.112:8080/api/getReslice',
-            data: {
-              series: nextProps.series,
-              id: this.props.socket.id,
-              direction: 2,
-              slice: this.props.cursor3D.sizeZ/2 | 0
-            },
-            headers:  {'Access-Control-Allow-Origin': '*'},
-            responseType: 'arraybuffer'
-          }).then(res=>{
-            this.setState({slice: this.props.cursor3D.sizeZ/2 | 0})
-            this.viewerLoadImage(res.data)
-          }).catch(err=>{
-            console.log(err)
-          })
+          this.setState({slice: this.props.cursor3D.sizeZ/2 | 0},
+            ()=>{
+              this.loadSlice()
+            })
         }else if (this.props.orientation === "Sagittal"){
-          axios({
-            method: 'post',
-            url: 'http://192.168.1.112:8080/api/getReslice',
-            data: {
-              series: nextProps.series,
-              id: this.props.socket.id,
-              direction: 0,
-              slice: this.props.cursor3D.sizeX/2 | 0
-            },
-            headers:  {'Access-Control-Allow-Origin': '*'},
-            responseType: 'arraybuffer'
-          }).then(res=>{
-            this.setState({slice: this.props.cursor3D.sizeX/2 | 0})
-            this.viewerLoadImage(res.data)
-          }).catch(err=>{
-            console.log(err)
-          })
+          this.setState({slice: this.props.cursor3D.sizeX/2 | 0},
+            ()=>{
+              this.loadSlice()
+            })
         }else if (this.props.orientation === "Coronal"){
-          axios({
-            method: 'post',
-            url: 'http://192.168.1.112:8080/api/getReslice',
-            data: {
-              series: nextProps.series,
-              id: this.props.socket.id,
-              direction: 1,
-              slice: this.props.cursor3D.sizeY/2 | 0
-            },
-            headers:  {'Access-Control-Allow-Origin': '*'},
-            responseType: 'arraybuffer'
-          }).then(res=>{
-            this.setState({slice: this.props.cursor3D.sizeY/2 | 0})
-            this.viewerLoadImage(res.data)
-
-          }).catch(err=>{
-            console.log(err)
-          })
+          this.setState({slice: this.props.cursor3D.sizeY/2 | 0},
+            ()=>{
+              this.loadSlice()
+            })
+        }
+        
+        
         }
         
       //   var loadingPromise = axios({
@@ -384,7 +431,6 @@ class MprViewer extends React.Component {
       //     this.setState({loadingProgress: 100})
       //   }
       // })
-      }
     }
 
 
@@ -459,10 +505,37 @@ class MprViewer extends React.Component {
     if (event.deltaY < 0 ){
       // mouse wheel up
       console.log("wheel up")
+      // update cursor position
+      if (this.props.orientation === "Axial"){
+        this.props.cursor3D.ijkPositionZ = this.props.cursor3D.ijkPositionZ + 1;
+      }else if(this.props.orientation === "Sagittal"){
+        this.props.cursor3D.ijkPositionX = this.props.cursor3D.ijkPositionX + 1;
+      }else if(this.props.orientation === "Coronal"){
+        this.props.cursor3D.ijkPositionY = this.props.cursor3D.ijkPositionY + 1;
+      }
+
+      this.props.cursor3D.update(); 
+      this.props.onCursorChange();
+      this.setCursor();
+      this.setState({slice: this.state.slice + 1}, ()=>{this.loadSlice()})
     }
     if (event.deltaY > 0){
       // mouse wheel down
       console.log("wheel down")
+
+      if (this.props.orientation === "Axial"){
+        this.props.cursor3D.ijkPositionZ = this.props.cursor3D.ijkPositionZ - 1;
+      }else if(this.props.orientation === "Sagittal"){
+        this.props.cursor3D.ijkPositionX = this.props.cursor3D.ijkPositionX - 1;
+      }else if(this.props.orientation === "Coronal"){
+        this.props.cursor3D.ijkPositionY = this.props.cursor3D.ijkPositionY - 1;
+      }
+
+      this.props.cursor3D.update(); 
+      this.props.onCursorChange();
+      this.setCursor();
+
+      this.setState({slice: this.state.slice - 1}, ()=>{this.loadSlice()})
     }
   }
 
