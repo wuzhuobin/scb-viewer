@@ -1,5 +1,6 @@
-import pngjs from "pngjs";
+import * as pngjs from "pngjs";
 import * as cornerstone from "cornerstone-core";
+import * as jpgjs from "jpeg-js"
 
 function getArrayMinMax(a){
 	const dataArray = a;
@@ -17,13 +18,9 @@ function getArrayMinMax(a){
 };
 
 function httpFetch(url, requestMethod){
-	// const fetch = require('node-fetch');
-	// var output;
-
 	return fetch(url)
-	.then(response=> {console.log(response);response.arrayBuffer()})
+	.then(response=> {return response.arrayBuffer();})
 	.catch(error=>null);
-	// return output;
 }
 
 
@@ -41,10 +38,25 @@ export class pngLoader{
 					reject("Get image failed");
 				}
 				else {
-					// console.log(response);
-					var png = new pngjs.PNG().parse(response,function(error,data){
+					const httpResponse = response;
+					const pngParser = new pngjs.PNG().parse(response,function(error,data){
 						if (error){
-							reject(null);
+							const parser = jpgjs.decode(httpResponse);
+							var array = parser.data;
+							const range = getArrayMinMax(array);
+							resolve({
+								minPixelValue:range[0],
+								maxPixelValue:range[1],
+								getPixelData:()=>array,
+								rows: parser.height,
+								columns:parser.width,
+								height:parser.height,
+								width:parser.width,
+								color:true,
+								columnPixelSpacing:1,
+								rowPixelSpacing:1,
+								sizeInBytes:parser.width*parser.height*2,
+							})
 						}
 						else {
 							var array = data.data;
@@ -61,9 +73,10 @@ export class pngLoader{
 								columnPixelSpacing:1,
 								rowPixelSpacing:1,
 								sizeInBytes:data.width*data.height*2,
-							});
+							})
 						}//else (err) end
-					})
+					});
+
 				}
 			})
 		})
@@ -74,7 +87,23 @@ export class pngLoader{
 		this.imageSeries[this.imageSeries.length-1] = new Promise(function(resolve,reject){
 			var png = new pngjs.PNG().parse(inputArrayBuffer,function(error,data){
 				if (error){
-					reject(null);
+					const parser = jpgjs.decode(inputArrayBuffer);
+					console.log(parser);
+					var array = parser.data;
+					const range = getArrayMinMax(array);
+					resolve({
+						minPixelValue:range[0],
+						maxPixelValue:range[1],
+						getPixelData:()=>array,
+						rows: parser.height,
+						columns:parser.width,
+						height:parser.height,
+						width:parser.width,
+						color:true,
+						columnPixelSpacing:1,
+						rowPixelSpacing:1,
+						sizeInBytes:parser.width*parser.height*2,
+					})
 				}
 				else {
 					var array = data.data;
@@ -94,7 +123,6 @@ export class pngLoader{
 					});
 				}//else (err) end
 			})
-
 		})
 		return this.imageSeries[this.imageSeries.length-1]
 	}
@@ -173,6 +201,27 @@ export class pngManager{
 			}
 		}
 
+		
+		// const signatureLocation1 = String(imageId).indexOf("://");
+		// const currentLoaderHint = String(imageId).substring(0,signatureLocation1)
+		// const currentIndex = GlobalPngLoadManager.findSeries(currentLoaderHint);
+		// if (inputImagePath.length < 1000){
+		// 	console.log(inputImagePath)
+		// 	return {
+		// 		Promise: new Promise(resolve=>{
+		// 			const a = GlobalPngLoadManager.loadedBuffer[currentIndex].pngLoader.loadImage(inputImagePath);
+		// 			console.log(a);
+		// 			return resolve(a);
+		// 		}),
+		// 		cancelFn: null,
+		// 	};
+		// }
+		// else {
+		// 	return {
+		// 		Promise:GlobalPngLoadManager.loadedBuffer[currentIndex].pngLoader.loadImageFromBuffer(inputImagePath),
+		// 		cancelFn: null,
+		// 	};
+		// }
 
 		return {
 			promise: new Promise(resolve => getPixelData()
