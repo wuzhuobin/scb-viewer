@@ -1,5 +1,4 @@
 import React from "react";
-import Hammer from "hammerjs";
 import classNames from 'classnames';
 import {withStyles} from '@material-ui/core/styles'
 import {AppBar,Toolbar, Button, Grid, Snackbar}  from '@material-ui/core';
@@ -10,7 +9,6 @@ import ThreeDViewer from './threeDViewer'
 import SearchIcon from '@material-ui/icons/Search';
 import Brightness6Icon from '@material-ui/icons/Brightness6Outlined';
 import axios from 'axios';
-import ProgressDialog from "./progressDialog";
 import Cursor3D from "./cursor3D";
 
 const styles = theme=> ({
@@ -127,15 +125,11 @@ class DicomViewer3D extends React.Component {
               },
               headers:  {'Access-Control-Allow-Origin': '*'},
             }).then(res=>{
-              console.log(res.data)
-              this.state.cursor3D.sizeX = res.data.Size[0]
-              this.state.cursor3D.sizeY = res.data.Size[1]
-              this.state.cursor3D.sizeZ = res.data.Size[2]
+              this.state.cursor3D.setSize(res.data.Size[0],res.data.Size[1],res.data.Size[2])
+              this.state.cursor3D.setIjkPosition(res.data.Size[0]/2,res.data.Size[1]/2, res.data.Size[2]/2)
 
-              this.state.cursor3D.ijkPositionX = res.data.Size[0]/2;
-              this.state.cursor3D.ijkPositionY = res.data.Size[1]/2;
-              this.state.cursor3D.ijkPositionZ = res.data.Size[2]/2;
-
+              console.log(this.state.cursor3D.getIjkPosition())
+              this.setState({ijkPos: this.state.cursor3D.getIjkPosition()})
               this.setState({loadingProgress: 100})
               this.setState({serverStatus: "MPR Loading Success", serverStatusOpen:true})
               this.setState({displaySeries: series})

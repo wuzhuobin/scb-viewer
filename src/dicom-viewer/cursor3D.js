@@ -6,9 +6,9 @@ class Cursor3D{
 		this.sizeY = 512;
 		this.sizeZ = 512;
 
-		this.spacingX = 0.546;
-		this.spacingY = 0.546;
-		this.spacingZ = 0.546;
+		// this.spacingX = 0.546;
+		// this.spacingY = 0.546;
+		// this.spacingZ = 0.546;
 
 		this.offsetAxialX = 0.;
 		this.offsetAxialY = 0.;
@@ -62,6 +62,27 @@ class Cursor3D{
 		// 	])
 	}
 
+	setSize(x,y,z){
+		this.sizeX = x;
+		this.sizeY = y;
+		this.sizeZ = z;
+	}
+
+	setViewportAxialSize(x,y){
+		this.viewportAxialSizeX = x;
+      	this.viewportAxialSizeY = y;
+	}
+
+	setViewportSagittalSize(x,y){
+		this.viewportSagittalSizeX = x;
+      	this.viewportSagittalSizeY = y;
+	}
+
+	setViewportCoronalSize(x,y){
+		this.viewportCoronalSizeX = x;
+      	this.viewportCoronalSizeY = y;
+	}
+
 	update(){
 		// determine viewport ratio
 		var viewportRatioAxial = this.viewportAxialSizeX/this.viewportAxialSizeY
@@ -70,6 +91,8 @@ class Cursor3D{
 		var sizeRatioSagittal = this.sizeY/this.sizeZ;
 		var viewportRatioCoronal = this.viewportCoronalSizeX/this.viewportCoronalSizeY
 		var sizeRatioCoronal = this.sizeX/this.sizeZ;
+
+		console.log("size ratio",sizeRatioSagittal,sizeRatioCoronal)
 
 		// determine offset in viewport coordinate
 		if (sizeRatioAxial >= viewportRatioAxial){
@@ -146,6 +169,8 @@ class Cursor3D{
 	}
 
 	setIjkPosition(x,y,z){
+		console.log(x,y,z)
+
 		this.ijkPositionX = x;
 		this.ijkPositionY = y;
 		this.ijkPositionZ = z;
