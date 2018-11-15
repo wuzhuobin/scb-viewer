@@ -280,9 +280,6 @@ class MprViewer extends React.Component {
 
   }
   componentWillReceiveProps(nextProps) {
-    console.log("will receive props")
-    console.log(this.props,nextProps)
-
     // cursor 3d
     if (this.props.ijkPos !=  nextProps.ijkPos){
       // cursor3D update
@@ -291,20 +288,19 @@ class MprViewer extends React.Component {
           return;
         }
           var canvas = document.getElementById("canvasAxial")
-          this.props.cursor3D.viewportAxialSizeX = canvas.width;
-          this.props.cursor3D.viewportAxialSizeY = canvas.height;
+          this.props.cursor3D.setViewportAxialSize(canvas.width,canvas.height);
 
+          this.props.cursor3D.update()
           this.setState({
             "cursorViewportX": this.props.cursor3D.getAxialViewportPosition()[0],
             "cursorViewportY": this.props.cursor3D.getAxialViewportPosition()[1]
         }, ()=>{
-          this.props.cursor3D.update()
+          
           this.setCursor()
           // change slice
           var ijkPos = this.props.cursor3D.getIjkPositionFromAxial(this.state.cursorViewportX, this.state.cursorViewportY)
             this.setState({slice: ijkPos[2]}, ()=>{
             if (nextProps.series){
-                console.log("load slice")
                 this.loadSlice()
               }
           })
@@ -316,20 +312,19 @@ class MprViewer extends React.Component {
           return;
         }
         var canvas = document.getElementById("canvasSagittal")
-        this.props.cursor3D.viewportSagittalSizeX = canvas.width;
-        this.props.cursor3D.viewportSagittalSizeY = canvas.height;
+        this.props.cursor3D.setViewportSagittalSize(canvas.width,canvas.height);
 
+        this.props.cursor3D.update()
         this.setState({
           "cursorViewportX": this.props.cursor3D.getSagittalViewportPosition()[0],
           "cursorViewportY": this.props.cursor3D.getSagittalViewportPosition()[1]
       }, ()=>{
-          this.props.cursor3D.update()
+          
           this.setCursor()
           // change slice
           var ijkPos = this.props.cursor3D.getIjkPositionFromSagittal(this.state.cursorViewportX, this.state.cursorViewportY)
             this.setState({slice: ijkPos[0]}, ()=>{
             if (nextProps.series){
-                console.log("load slice")
                 this.loadSlice()
               }
           })
@@ -341,20 +336,19 @@ class MprViewer extends React.Component {
         }
 
         var canvas = document.getElementById("canvasCoronal")
-        this.props.cursor3D.viewportCoronalSizeX = canvas.width;
-        this.props.cursor3D.viewportCorohnalSizeY = canvas.height;
+        this.props.cursor3D.setViewportCoronalSize(canvas.width,canvas.height);
 
+        this.props.cursor3D.update()
         this.setState({
           "cursorViewportX": this.props.cursor3D.getCoronalViewportPosition()[0],
           "cursorViewportY": this.props.cursor3D.getCoronalViewportPosition()[1]
       }, ()=>{
-          this.props.cursor3D.update()
+          
           this.setCursor()
           // change slice
           var ijkPos = this.props.cursor3D.getIjkPositionFromCoronal(this.state.cursorViewportX, this.state.cursorViewportY)
             this.setState({slice: ijkPos[1]}, ()=>{
             if (nextProps.series){
-                console.log("load slice")
                 this.loadSlice()
               }
           })
@@ -374,7 +368,6 @@ class MprViewer extends React.Component {
           if (this.singleViewer){
             this.singleViewer.resizeImage();
           }
-
           // need to setCursor again
           this.setCursor()
         } 
@@ -489,8 +482,7 @@ class MprViewer extends React.Component {
 
     if (orientation === "Axial"){
       var canvas = document.getElementById("canvasAxial")
-      this.props.cursor3D.viewportAxialSizeX = canvas.width;
-      this.props.cursor3D.viewportAxialSizeY = canvas.height;
+      this.props.cursor3D.setViewportAxialSize(canvas.width, canvas.height) 
 
       this.props.cursor3D.update()
       var ijkPos = this.props.cursor3D.getIjkPositionFromAxial(this.state.cursorViewportX, this.state.cursorViewportY)
@@ -498,8 +490,7 @@ class MprViewer extends React.Component {
     }
     if (orientation === "Sagittal"){
       var canvas = document.getElementById("canvasSagittal")
-      this.props.cursor3D.viewportSagittalSizeX = canvas.width;
-      this.props.cursor3D.viewportSagittalSizeY = canvas.height;
+      this.props.cursor3D.setViewportSagittalSize(canvas.width, canvas.height) 
 
       this.props.cursor3D.update()
       var ijkPos = this.props.cursor3D.getIjkPositionFromSagittal(this.state.cursorViewportX, this.state.cursorViewportY)
@@ -507,8 +498,7 @@ class MprViewer extends React.Component {
     }
     if (orientation === "Coronal"){
       var canvas = document.getElementById("canvasCoronal")
-      this.props.cursor3D.viewportCoronalSizeX = canvas.width;
-      this.props.cursor3D.viewportCoronalSizeY = canvas.height;
+      this.props.cursor3D.setViewportCoronalSize(canvas.width, canvas.height) 
 
       this.props.cursor3D.update()
       var worldPos = this.props.cursor3D.getIjkPositionFromCoronal(this.state.cursorViewportX, this.state.cursorViewportY)

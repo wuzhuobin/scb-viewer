@@ -128,6 +128,8 @@ class DicomViewer3D extends React.Component {
               this.state.cursor3D.setSize(res.data.Size[0],res.data.Size[1],res.data.Size[2])
               this.state.cursor3D.setIjkPosition(res.data.Size[0]/2,res.data.Size[1]/2, res.data.Size[2]/2)
 
+              console.log(this.state.cursor3D.getIjkPosition())
+              this.setState({ijkPos: this.state.cursor3D.getIjkPosition()})
               this.setState({loadingProgress: 100})
               this.setState({serverStatus: "MPR Loading Success", serverStatusOpen:true})
               this.setState({displaySeries: series})

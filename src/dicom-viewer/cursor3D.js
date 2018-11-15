@@ -6,9 +6,9 @@ class Cursor3D{
 		this.sizeY = 512;
 		this.sizeZ = 512;
 
-		this.spacingX = 0.546;
-		this.spacingY = 0.546;
-		this.spacingZ = 0.546;
+		// this.spacingX = 0.546;
+		// this.spacingY = 0.546;
+		// this.spacingZ = 0.546;
 
 		this.offsetAxialX = 0.;
 		this.offsetAxialY = 0.;
@@ -68,6 +68,21 @@ class Cursor3D{
 		this.sizeZ = z;
 	}
 
+	setViewportAxialSize(x,y){
+		this.viewportAxialSizeX = x;
+      	this.viewportAxialSizeY = y;
+	}
+
+	setViewportSagittalSize(x,y){
+		this.viewportSagittalSizeX = x;
+      	this.viewportSagittalSizeY = y;
+	}
+
+	setViewportCoronalSize(x,y){
+		this.viewportCoronalSizeX = x;
+      	this.viewportCoronalSizeY = y;
+	}
+
 	update(){
 		// determine viewport ratio
 		var viewportRatioAxial = this.viewportAxialSizeX/this.viewportAxialSizeY
@@ -76,6 +91,8 @@ class Cursor3D{
 		var sizeRatioSagittal = this.sizeY/this.sizeZ;
 		var viewportRatioCoronal = this.viewportCoronalSizeX/this.viewportCoronalSizeY
 		var sizeRatioCoronal = this.sizeX/this.sizeZ;
+
+		console.log("size ratio",sizeRatioSagittal,sizeRatioCoronal)
 
 		// determine offset in viewport coordinate
 		if (sizeRatioAxial >= viewportRatioAxial){
@@ -90,6 +107,8 @@ class Cursor3D{
 		if (sizeRatioSagittal >= viewportRatioSagittal){
 			this.offsetSagittalX = 0;
 			this.offsetSagittalY = (this.viewportSagittalSizeY-this.viewportSagittalSizeX*this.sizeZ/this.sizeY)/2
+			console.log("SAGG:",this.viewportSagittalSizeY, this.viewportSagittalSizeX, this.sizeZ,this.sizeY)
+			console.log(this.offsetSagittalY)
 		}
 		else{
 			this.offsetSagittalX = (this.viewportSagittalSizeX-this.viewportSagittalSizeY*this.sizeY/this.sizeZ)/2
@@ -99,6 +118,8 @@ class Cursor3D{
 		if (sizeRatioCoronal >= viewportRatioCoronal){
 			this.offsetCoronalX = 0;
 			this.offsetCoronalY = (this.viewportCoronalSizeY-this.viewportCoronalSizeX*this.sizeZ/this.sizeX)/2
+			console.log("CORO:",this.viewportCoronalSizeY, this.viewportCoronalSizeX, this.sizeZ,this.sizeX)
+			console.log(this.offsetCoronalY)
 		}
 		else{
 			this.offsetCoronalX = (this.viewportCoronalSizeX-this.viewportCoronalSizeY*this.sizeX/this.sizeZ)/2
@@ -152,6 +173,8 @@ class Cursor3D{
 	}
 
 	setIjkPosition(x,y,z){
+		console.log(x,y,z)
+
 		this.ijkPositionX = x;
 		this.ijkPositionY = y;
 		this.ijkPositionZ = z;
