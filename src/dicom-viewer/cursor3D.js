@@ -107,8 +107,6 @@ class Cursor3D{
 		if (sizeRatioSagittal >= viewportRatioSagittal){
 			this.offsetSagittalX = 0;
 			this.offsetSagittalY = (this.viewportSagittalSizeY-this.viewportSagittalSizeX*this.sizeZ/this.sizeY)/2
-			console.log("SAGG:",this.viewportSagittalSizeY, this.viewportSagittalSizeX, this.sizeZ,this.sizeY)
-			console.log(this.offsetSagittalY)
 		}
 		else{
 			this.offsetSagittalX = (this.viewportSagittalSizeX-this.viewportSagittalSizeY*this.sizeY/this.sizeZ)/2
@@ -118,8 +116,6 @@ class Cursor3D{
 		if (sizeRatioCoronal >= viewportRatioCoronal){
 			this.offsetCoronalX = 0;
 			this.offsetCoronalY = (this.viewportCoronalSizeY-this.viewportCoronalSizeX*this.sizeZ/this.sizeX)/2
-			console.log("CORO:",this.viewportCoronalSizeY, this.viewportCoronalSizeX, this.sizeZ,this.sizeX)
-			console.log(this.offsetCoronalY)
 		}
 		else{
 			this.offsetCoronalX = (this.viewportCoronalSizeX-this.viewportCoronalSizeY*this.sizeX/this.sizeZ)/2
