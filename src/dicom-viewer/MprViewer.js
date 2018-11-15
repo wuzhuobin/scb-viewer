@@ -280,6 +280,9 @@ class MprViewer extends React.Component {
 
   }
   componentWillReceiveProps(nextProps) {
+    console.log("will receive props")
+    console.log(this.props,nextProps)
+
     // cursor 3d
     if (this.props.ijkPos !=  nextProps.ijkPos){
       // cursor3D update
@@ -300,7 +303,10 @@ class MprViewer extends React.Component {
           // change slice
           var ijkPos = this.props.cursor3D.getIjkPositionFromAxial(this.state.cursorViewportX, this.state.cursorViewportY)
             this.setState({slice: ijkPos[2]}, ()=>{
-            this.loadSlice()
+            if (nextProps.series){
+                console.log("load slice")
+                this.loadSlice()
+              }
           })
         }
         )
@@ -322,7 +328,10 @@ class MprViewer extends React.Component {
           // change slice
           var ijkPos = this.props.cursor3D.getIjkPositionFromSagittal(this.state.cursorViewportX, this.state.cursorViewportY)
             this.setState({slice: ijkPos[0]}, ()=>{
-            this.loadSlice()
+            if (nextProps.series){
+                console.log("load slice")
+                this.loadSlice()
+              }
           })
         })
       }
@@ -344,7 +353,10 @@ class MprViewer extends React.Component {
           // change slice
           var ijkPos = this.props.cursor3D.getIjkPositionFromCoronal(this.state.cursorViewportX, this.state.cursorViewportY)
             this.setState({slice: ijkPos[1]}, ()=>{
-            this.loadSlice()
+            if (nextProps.series){
+                console.log("load slice")
+                this.loadSlice()
+              }
           })
         })
       }
@@ -369,6 +381,10 @@ class MprViewer extends React.Component {
       }
 
       if (this.props.series != nextProps.series){
+        if (!nextProps.series){
+          return;
+        }
+
         if (this.props.orientation === "Axial"){
           this.setState({slice: this.props.cursor3D.sizeZ/2 | 0},
             ()=>{

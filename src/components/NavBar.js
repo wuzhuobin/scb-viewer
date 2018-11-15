@@ -1,9 +1,8 @@
 import React from 'react'
-import {AppBar, Toolbar, Typography, IconButton, Divider, Drawer} from '@material-ui/core'
-import {AccountCircle, Menu, ChevronRight, ChevronLeft} from '@material-ui/icons';
+import {AppBar, Toolbar, Typography, IconButton} from '@material-ui/core'
+import {AccountCircle, Menu} from '@material-ui/icons';
 import {withStyles} from '@material-ui/core/styles'
 import classNames from 'classnames';
-import DrawerMenu from './DrawerMenu';
 
 import MenuItem from '@material-ui/core/MenuItem';
 import Menu2 from '@material-ui/core/Menu';

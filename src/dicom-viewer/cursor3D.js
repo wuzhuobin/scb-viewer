@@ -62,6 +62,12 @@ class Cursor3D{
 		// 	])
 	}
 
+	setSize(x,y,z){
+		this.sizeX = x;
+		this.sizeY = y;
+		this.sizeZ = z;
+	}
+
 	update(){
 		// determine viewport ratio
 		var viewportRatioAxial = this.viewportAxialSizeX/this.viewportAxialSizeY
