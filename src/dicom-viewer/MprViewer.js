@@ -83,7 +83,7 @@ class MprViewer extends React.Component {
         if (this.singleViewer === null){
           this.singleViewer = new pngViewer(element, this.cornerstoneInstance);
           this.singleViewer.name = 'Axial';
-          this.viewerLoadImage('http://192.168.1.108:8081/0002.png');
+          //this.viewerLoadImage('http://192.168.1.108:8081/0002.png');
         }
       }
       else {
@@ -109,7 +109,7 @@ class MprViewer extends React.Component {
           this.singleViewer = new pngViewer(element, this.cornerstoneInstance);
           // this.singleViewer.element = document.getElementById('dicomImageSagittal');
           this.singleViewer.name = 'Sagittal';
-          // this.viewerLoadImage('http://192.168.1.108:8081/0001.jpg');
+          //this.viewerLoadImage('http://192.168.1.108:8081/0001.jpg');
         }
       }
       else {
@@ -419,7 +419,7 @@ class MprViewer extends React.Component {
 
   handleResize(event,dicomImage){
     console.log('handleResize');
-    this.viewerLoadImage('http://192.168.1.108:8081/0001.png');
+    // this.viewerLoadImage('http://192.168.1.108:8081/0001.png');
     console.log(cornerstone.getImage(dicomImage))
     if (dicomImage)
     {
