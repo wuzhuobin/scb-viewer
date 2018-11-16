@@ -57,40 +57,14 @@ class MprViewer extends React.Component {
 
   viewerLoadImage(inputPath){
     if (this.singleViewer){
+      // this.singleViewer.cornerstoneInstance = this.cornerstoneInstance;
       this.singleViewer.displayImage(inputPath);
       // this.singleViewer.initialiseSeries("139de8e7-ad0fb5df-be841b43-590380a5-935e427f")
     }
   }
   
-  getImagePathList(IP,Port,Path1){//sync request for now
-    if (Path1 == 'Axial'){
-      return new Promise(function(resolve,reject){
-        resolve(['http://192.168.1.112:8080/api/getReslice/2/271']);
-        // resolve(['http://192.168.1.112:8080/api/getReslice/2/' + this.state.slice]);
-      })   
-    }
-    if (Path1 == 'Sagittal'){
-      return new Promise(function(resolve,reject){
-        resolve(['http://192.168.1.112:8080/api/getReslice/0/255']);
-        // resolve(['http://192.168.1.112:8080/api/getReslice/1/' + this.state.slice]);
-      })   
-    }
-    if (Path1 == 'Coronal'){
-      return new Promise(function(resolve,reject){
-        resolve(['http://192.168.1.112:8080/api/getReslice/1/255']);
-        // resolve(['http://192.168.1.112:8080/api/getReslice/0/' + this.state.slice]);
-      })   
-    }
-    
-    return new Promise(function(resolve,reject){
-      resolve(['http://192.168.1.108:8080/0002.png']);
-    })
-
-  }
-
   componentDidMount(){
-    // const imageId = 'example://1';
-    // console.log(dcmLoader.GlobalDcmLoadManager)
+    console.log('did mount');
     if (this.props.orientation === "Axial")
     {
       const element = document.getElementById('dicomImageAxial');
@@ -135,7 +109,7 @@ class MprViewer extends React.Component {
           this.singleViewer = new pngViewer(element, this.cornerstoneInstance);
           // this.singleViewer.element = document.getElementById('dicomImageSagittal');
           this.singleViewer.name = 'Sagittal';
-          this.viewerLoadImage('http://192.168.1.108:8081/0001.jpg');
+          // this.viewerLoadImage('http://192.168.1.108:8081/0001.jpg');
         }
       }
       else {
@@ -176,8 +150,8 @@ class MprViewer extends React.Component {
     console.log('unmount');
     this.singleViewer.callForDelete();
     this.singleViewer = null;
-    // console.log(cornerstone.getCacheInfo());
-    // this.cornerstoneInstance.purgeCache();
+    console.log(cornerstone.imageCache.getCacheInfo());
+    this.cornerstoneInstance.imageCache.purgeCache();
     this.cornerstoneInstance = null;
   }
 
@@ -445,6 +419,8 @@ class MprViewer extends React.Component {
 
   handleResize(event,dicomImage){
     console.log('handleResize');
+    this.viewerLoadImage('http://192.168.1.108:8081/0001.png');
+    console.log(cornerstone.getImage(dicomImage))
     if (dicomImage)
     {
       console.log('updateSize')
@@ -453,6 +429,7 @@ class MprViewer extends React.Component {
         dicomImage.style.width = 'calc(50vw - 85px - 3px)'
 
         if (this.singleViewer){
+          this.singleViewer.element = dicomImage;
           this.singleViewer.resizeImage();
         }
         this.setCursor()

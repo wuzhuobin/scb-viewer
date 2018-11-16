@@ -1,4 +1,4 @@
-import * as cornerstone from "cornerstone-core";
+// import * as cornerstone from "cornerstone-core";
 import * as pngLoader from "./pngLoader.js";
 
 Number.prototype.pad = function(size) {
@@ -15,13 +15,20 @@ export default class pngViewer{
         this.element = inputElement;
         this.cornerstoneInstance = inputCornerstoneInstance;
         this.cornerstoneInstance.enable(this.element);
+        if (pngLoader.GlobalPngLoadManager.cs === null){
+            pngLoader.GlobalPngLoadManager.cs = inputCornerstoneInstance;
+        }
     }
     displayImage(inputPath){
         const path = this.name+"://"+ this.currentId.pad();
         pngLoader.GlobalPngLoadManager.loadSeries([inputPath], this.name);
-        cornerstone.loadImage(path, inputPath)
+        console.log(inputPath)
+        this.cornerstoneInstance.loadImage(path, inputPath)
         .then(image => {
-            this.cornerstoneInstance.enable(this.element);
+            // this.cornerstoneInstance.enable(this.element);
+            console.log(this.name)
+            console.log(image)
+            console.log(this.name)
             this.cornerstoneInstance.displayImage(this.element,image);
         })
         this.currentId++;
@@ -31,6 +38,12 @@ export default class pngViewer{
         pngLoader.GlobalPngLoadManager.callForDelete(this.name);
     }
     resizeImage(){
-        this.cornerstoneInstance.resize(this.element);
+        this.cornerstoneInstance.resize(this.element, true);
+        try{
+            this.cornerstoneInstance.updateImage(this.element, true);
+        }
+        catch(error){
+            
+        }
     }
 }
