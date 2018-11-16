@@ -26,9 +26,7 @@ export default class pngViewer{
         this.cornerstoneInstance.loadImage(path, inputPath)
         .then(image => {
             // this.cornerstoneInstance.enable(this.element);
-            console.log(this.name)
-            console.log(image)
-            console.log(this.name)
+            console.log(this.element);
             this.cornerstoneInstance.displayImage(this.element,image);
         })
         this.currentId++;
@@ -40,6 +38,7 @@ export default class pngViewer{
     resizeImage(){
         this.cornerstoneInstance.resize(this.element, true);
         try{
+            console.log('update');
             this.cornerstoneInstance.updateImage(this.element, true);
         }
         catch(error){
