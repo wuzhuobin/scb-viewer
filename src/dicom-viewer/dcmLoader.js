@@ -1,4 +1,5 @@
-import daikon from "daikon";
+// import daikon from "daikon";
+import * as daikon from "daikon";
 import pngjs from "pngjs";
 import * as cornerstone from "cornerstone-core";
 import * as cornerstoneTools from "cornerstone-tools";
@@ -125,6 +126,8 @@ class dcmLoader{
 							if (image.getPatientName()){
 								name = image.getPatientName();
 							}
+							// console.log(image.getSliceThickness())
+							// console.log(image.getTag(0x0018, 0x0050)['value'])
 							self.numLoaded++;
 							resolve({
 								minPixelValue: imageMin,
