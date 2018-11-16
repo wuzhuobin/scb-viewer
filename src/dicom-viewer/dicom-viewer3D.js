@@ -184,14 +184,6 @@ class DicomViewer3D extends React.Component {
                   <NavigationOutlined />
                   Navigate
                 </Button>
-                <Button classes={{label: classes.label}} value="2" color="inherit" size="small" onClick={() => {}}>
-                  <Brightness6Icon />
-                  Levels
-                </Button>
-                <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {}}>
-                  <SearchIcon />
-                  Zoom
-                </Button>
               </Toolbar>
           </AppBar>
 
@@ -267,3 +259,13 @@ class DicomViewer3D extends React.Component {
 }
 
 export default withStyles(styles)(DicomViewer3D);
+
+
+                // <Button classes={{label: classes.label}} value="2" color="inherit" size="small" onClick={() => {}}>
+                //   <Brightness6Icon />
+                //   Levels
+                // </Button>
+                // <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {}}>
+                //   <SearchIcon />
+                //   Zoom
+                // </Button>

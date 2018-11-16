@@ -772,12 +772,6 @@ class DicomViewer extends React.Component {
                       Play
                     </Button>
 
-                    <DicomHeaderDialog id='dicomHeaderDialog' open={this.state.infoDialog} onClose={this.handleInfoDialogClose}/>
-                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={this.handleInfoDialogOpen}>
-                      <InfoIcon />
-                      Info
-                    </Button>
-
                     <Button classes={{label: classes.label}} color="inherit" size="small" aria-owns={open ? "simple-popper" : null} aria-haspopup="true"
                       onClick={this.handleClick}>
                       <MoreIcon />
@@ -1034,3 +1028,8 @@ export default withStyles(styles)(DicomViewer);
 
 //<div class="orientationMarkers" style={{borderStyle:"solid", borderColor:"red",position: "absolute", top: "0%", left: "0%", width: viewerWidth, height: viewerHeight}}>
 
+                    // <DicomHeaderDialog id='dicomHeaderDialog' open={this.state.infoDialog} onClose={this.handleInfoDialogClose}/>
+                    // <Button classes={{label: classes.label}} color="inherit" size="small" onClick={this.handleInfoDialogOpen}>
+                    //   <InfoIcon />
+                    //   Info
+                    // </Button>
