@@ -83,7 +83,7 @@ class MprViewer extends React.Component {
         if (this.singleViewer === null){
           this.singleViewer = new pngViewer(element, this.cornerstoneInstance);
           this.singleViewer.name = 'Axial';
-          //this.viewerLoadImage('http://192.168.1.108:8081/0002.png');
+          this.viewerLoadImage('http://192.168.1.108:8081/0002.png');
         }
       }
       else {
@@ -109,7 +109,7 @@ class MprViewer extends React.Component {
           this.singleViewer = new pngViewer(element, this.cornerstoneInstance);
           // this.singleViewer.element = document.getElementById('dicomImageSagittal');
           this.singleViewer.name = 'Sagittal';
-          //this.viewerLoadImage('http://192.168.1.108:8081/0001.jpg');
+          this.viewerLoadImage('http://192.168.1.108:8081/0001.jpg');
         }
       }
       else {
@@ -135,24 +135,32 @@ class MprViewer extends React.Component {
           this.singleViewer = new pngViewer(element, this.cornerstoneInstance);
           // this.singleViewer.element = document.getElementById('dicomImageCoronal');
           this.singleViewer.name = 'Coronal';
-          // this.viewerLoadImage('http://192.168.1.108:8081/0002.png');
+          this.viewerLoadImage('http://192.168.1.108:8081/0002.png');
         }
       }
       else {
         console.log('element not rendered')
       }
     }
-
     window.addEventListener('resize', (event)=>{this.handleResize(event, this.state.dicomImage)})
   }
 
+
+
   componentWillUnmount(){
+    //Remove window resize event listener
     console.log('unmount');
-    this.singleViewer.callForDelete();
-    this.singleViewer = null;
-    console.log(cornerstone.imageCache.getCacheInfo());
-    this.cornerstoneInstance.imageCache.purgeCache();
-    this.cornerstoneInstance = null;
+    window.removeEventListener("mousemove",  (event)=>{this.handleResize(event, this.state.dicomImage)});
+    if (this.singleViewer){
+      this.singleViewer.callForDelete();
+      this.singleViewer = null;
+      console.log(cornerstone.imageCache.getCacheInfo());
+      // this.cornerstoneInstance.removeElementData(this.state.dicomImage);
+      this.cornerstoneInstance.disable(this.state.dicomImage);
+      this.cornerstoneInstance.imageCache.purgeCache();
+      this.cornerstoneInstance = null;
+    }
+
   }
 
   setCursor = () =>{
@@ -167,28 +175,31 @@ class MprViewer extends React.Component {
     else if (this.props.orientation === "Coronal"){
       canvas = document.getElementById("canvasCoronal")
     }
-    var ctx = canvas.getContext('2d');
+    if (canvas){
+      var ctx = canvas.getContext('2d');
 
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    canvas.width = element.clientWidth
-    canvas.height = element.clientHeight
+      canvas.width = element.clientWidth
+      canvas.height = element.clientHeight
 
-    ctx.lineWidth = 2;
+      ctx.lineWidth = 2;
 
-    // horizontal
-    ctx.beginPath();
-    ctx.strokeStyle = '#6fcbff';
-    ctx.moveTo(0, canvas.height*this.state.cursorViewportY);
-    ctx.lineTo(canvas.width, canvas.height*this.state.cursorViewportY);
-    ctx.stroke();
+      // horizontal
+      ctx.beginPath();
+      ctx.strokeStyle = '#6fcbff';
+      ctx.moveTo(0, canvas.height*this.state.cursorViewportY);
+      ctx.lineTo(canvas.width, canvas.height*this.state.cursorViewportY);
+      ctx.stroke();
 
-    // vertical
-    ctx.beginPath();
-    ctx.strokeStyle = '#6fcbff';
-    ctx.moveTo(canvas.width*this.state.cursorViewportX, 0);
-    ctx.lineTo(canvas.width*this.state.cursorViewportX, canvas.height);
-    ctx.stroke();    
+      // vertical
+      ctx.beginPath();
+      ctx.strokeStyle = '#6fcbff';
+      ctx.moveTo(canvas.width*this.state.cursorViewportX, 0);
+      ctx.lineTo(canvas.width*this.state.cursorViewportX, canvas.height);
+      ctx.stroke(); 
+    }
+   
   }
 
   loadSlice(){
@@ -417,10 +428,10 @@ class MprViewer extends React.Component {
     }
 
 
-  handleResize(event,dicomImage){
+  handleResize(event, dicomImage){
     console.log('handleResize');
-    // this.viewerLoadImage('http://192.168.1.108:8081/0001.png');
-    console.log(cornerstone.getImage(dicomImage))
+    this.viewerLoadImage('http://192.168.1.108:8081/0001.png');
+    // console.log(cornerstone.getImage(dicomImage))
     if (dicomImage)
     {
       console.log('updateSize')
