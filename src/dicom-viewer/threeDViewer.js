@@ -7,6 +7,7 @@ import * as cornerstone from "cornerstone-core";
 import * as cornerstoneTools from "cornerstone-tools";
 import * as cornerstoneMath from "cornerstone-math";
 import pngViewer from "./pngViewer";
+import axios from 'axios';
 
 const styles = theme=> ({
     root:{    
@@ -75,6 +76,8 @@ class ThreeDViewer extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
+    console.log("receivedProps");
+      // if (true){
       if (this.state.dicomImage){
         if (this.props.drawerOpen != nextProps.drawerOpen){
         if (nextProps.drawerOpen){
@@ -83,10 +86,40 @@ class ThreeDViewer extends React.Component {
         else{
           this.state.dicomImage.style.width = 'calc(50vw - 85px - 3px)'
         }
-        cornerstone.resize(this.state.dicomImage)
+
       }
     }
-    }
+    this.setState(()=>{
+      if (nextProps.series){
+        this.loadSlice();
+      }
+    })
+  }
+
+
+
+  loadSlice(){
+      axios({
+        method: 'post',
+        url: 'http://192.168.1.112:8080/api/getVolumeRendering',
+        data: {
+          series: this.props.series,
+          id: this.props.socket.id,
+          // direction: 1,
+          // slice: this.state.slice
+        },
+        headers:  {
+          'Access-Control-Allow-Origin': '*',
+        },
+        responseType: 'arraybuffer'
+      }).then(res=>{
+        this.viewerLoadImage(res.data)
+      }).catch(err=>{
+        console.log(err)
+      })
+    
+
+  }
 
 
   handleResize(event,dicomImage){

@@ -29,6 +29,7 @@ export default class pngViewer{
             // this.cornerstoneInstance.enable(this.element);
             // console.log(this.element);
             this.cornerstoneInstance.displayImage(this.element,image);
+            this.updateImageDisplaySize();
         })
         this.currentId++;
     }

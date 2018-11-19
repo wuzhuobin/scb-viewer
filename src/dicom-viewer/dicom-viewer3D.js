@@ -211,7 +211,10 @@ class DicomViewer3D extends React.Component {
                     ijkPos={ijkPos}/>
                 </Grid>
                 <Grid item xs={6}>
-                  <ThreeDViewer drawerOpen={drawerOpen}/>
+                  <ThreeDViewer
+                  series={this.state.displaySeries} 
+                  socket={this.props.socket} 
+                  drawerOpen={drawerOpen}/>
                 </Grid>
                 <Grid item xs={6}>
                   <MprViewer 
