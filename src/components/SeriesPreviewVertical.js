@@ -65,31 +65,33 @@ class SeriesPreviewVertical extends React.Component {
 	}
 
 	componentDidMount(){
-		if (this.props.series){
-			for (let i = 0;i< this.props.series.length; i++)
-			{
-				PACS.serieInfo(this.props.series[i], (json)=>{
-					let serie = createData(
-			            json.MainDicomTags.BodyPartExamined,
-			            json.MainDicomTags.Modality,
-			            json.MainDicomTags.ProtocolName,
-			            json.MainDicomTags.SeriesNumber,
-			            json.MainDicomTags.StationName
-			          );
-			    serie.id = this.props.series[i];
-			    serie.slicesCount = json.Instances.length;
-
-					const seriesInfo = this.state.seriesInfo.slice();
-					seriesInfo.push(serie);
-					this.setState({seriesInfo: seriesInfo})  
-					PACS.seriesPreview(this.props.series[i], (str)=>{
-					let imgs = this.state.imgs.slice(); 
-					imgs.push(str);
-					this.setState({imgs: imgs});
-			    } );    		
-			});
+		if (this.props.series)
+		{
+			let promises = [];
+			for (let i = 0; i < this.props.series.length; i++) {
+				promises.push(PACS.serieInfo(this.props.series[i]));
+				promises.push(PACS.seriesPreview(this.props.series[i]));
 			}
-      }
+			Promise.all(promises).then((jsons)=>{
+				let seriesInfo = [];
+				let imgs = [];
+				for(let i = 0; i < jsons.length; i+=2)
+				{
+					let serie = createData(
+						jsons[i].MainDicomTags.BodyPartExamined,
+						jsons[i].MainDicomTags.Modality,
+						jsons[i].MainDicomTags.ProtocolName,
+						jsons[i].MainDicomTags.SeriesNumber,
+						jsons[i].MainDicomTags.StationName
+					);
+					serie.id = this.props.series[i/2];
+					serie.slicesCount = jsons[i].Instances.length;	
+					seriesInfo.push(serie);
+					imgs.push(jsons[i+1]);
+				}
+				this.setState({seriesInfo: seriesInfo, imgs: imgs});
+			})
+    }
 	}
 
 	componentWillReceiveProps(nextProps) {
