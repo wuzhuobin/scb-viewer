@@ -89,21 +89,20 @@ class ThreeDViewer extends React.Component {
 
       }
     }
-    this.setState(()=>{
-      if (nextProps.series){
-        this.loadSlice();
-      }
-    })
+
+    if (this.props.series != nextProps.series){
+        this.loadSlice(nextProps.series);
+    }
   }
 
 
 
-  loadSlice(){
+  loadSlice(series){
       axios({
         method: 'post',
         url: 'http://192.168.1.112:8080/api/getVolumeRendering',
         data: {
-          series: this.props.series,
+          series: series,
           id: this.props.socket.id,
           // direction: 1,
           // slice: this.state.slice
