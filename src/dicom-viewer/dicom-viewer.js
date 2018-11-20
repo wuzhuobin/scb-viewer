@@ -451,9 +451,23 @@ class DicomViewer extends React.Component {
           columnCosine:image.patientOri.slice(3,6),
         });
         }
+
         if (document.getElementById("mrtopleft")){
-          document.getElementById("mrtopleft").textContent = `Patient Name: ${image.patientName}`
+          document.getElementById("mrtopleft").textContent = `${image.patientName}`
         }
+
+        if (document.getElementById("mrtopright")){
+          document.getElementById("mrtopright").textContent = `${image.institutionName}`
+          document.getElementById("mrtopright").textContent += "\r\n";  
+          document.getElementById("mrtopright").textContent += `${image.studyDescription}`;  
+          document.getElementById("mrtopright").textContent += "\r\n";  
+          document.getElementById("mrtopright").textContent += `${image.seriesDescription}`;  
+          document.getElementById("mrtopright").textContent += "\r\n";  
+          document.getElementById("mrtopright").textContent += `${image.studyDate}`;  
+
+        }
+
+
       }
 
       element.style.height = 'calc(100vh - 128px - 2px)'
@@ -527,8 +541,7 @@ class DicomViewer extends React.Component {
 
     function onImageRendered(e) {
       const viewport = cornerstone.getViewport(e.target);
-
-
+      
       // var bottomLeftTag = document.getElementById("mrbottomleft"), bottomRightTag = document.getElementById("mrbottomright");
       // if (bottomLeftTag){
       //   bottomLeftTag.textContent = `WW/WC: ${Math.round(viewport.voi.windowWidth)}/${Math.round(viewport.voi.windowCenter)} , Slices: ${stack.currentImageIdIndex+1}/${stack.imageIds.length}`;
@@ -541,11 +554,14 @@ class DicomViewer extends React.Component {
       //document.getElementById("mrbottomleft").setAttribute('style', 'white-space: pre;');
       if (document.getElementById("mrbottomleft")){
         document.getElementById("mrbottomleft").textContent = `Slices: ${stack.currentImageIdIndex+1}/${stack.imageIds.length}`;
-        document.getElementById("mrbottomleft").textContent += "\r\n";
-        document.getElementById("mrbottomleft").textContent += `WW/WC: ${Math.round(viewport.voi.windowWidth)}/${Math.round(viewport.voi.windowCenter)}`;
+        
       }
+
       if (document.getElementById("mrbottomright")){
-        document.getElementById("mrbottomright").textContent = `Zoom: ${viewport.scale.toFixed(2)}`;
+        document.getElementById("mrbottomright").textContent = `Zoom: ${viewport.scale.toFixed(2)*100}%`;
+        document.getElementById("mrbottomright").textContent += "\r\n";
+        document.getElementById("mrbottomright").textContent += `W:${Math.round(viewport.voi.windowWidth)} L:${Math.round(viewport.voi.windowCenter)}`;
+        
       }
 
     }
@@ -873,20 +889,20 @@ class DicomViewer extends React.Component {
                 }}
               />
 
-              <div id="mrtopleft" style={{ position: "absolute", top: "0.5%", left: "0.5%" }}>
-                Patient Name: Chan Tai Man
+              <div id="mrtopleft" style={{ position: "absolute", top: "0.5%", left: "0.5%", whiteSpace: 'pre' }}>
+                
               </div>
               
-              <div id="mrtopright" style={{ position: "absolute", top: "0.5%", right: "0.5%" }}>
-                Hospital: PWH
+              <div id="mrtopright" style={{ position: "absolute", top: "0.5%", right: "0.5%", whiteSpace: 'pre', textAlign:"right" }}>
+                
               </div>
               
-              <div id="mrbottomright" style={{ position: "absolute", bottom: "0.5%", right: "0.5%" }}>
-                Zoom:
+              <div id="mrbottomright" style={{ position: "absolute", bottom: "0.5%", right: "0.5%", whiteSpace: 'pre', textAlign:"right"  }}>
+               
               </div>
 
               <div id="mrbottomleft" style={{ position: "absolute", bottom: "0.5%", left: "0.5%", whiteSpace: 'pre'}}>
-                WW/WC:
+               
               </div>
 
               <div class="mrbottommiddle orientationMarkerDiv" style={{ position: "absolute", bottom: "0.5%", left: "50%" }}>
