@@ -33,7 +33,7 @@ class ThreeDViewer extends React.Component {
     this.state = {
       dicomImage: null,
       leaveCanvasOnDown: false,
-      isMouseDown: false,
+      mouseEvent: -1,
       curMousePosX: -1,  //indicate first click
       curMousePosY: -1,  //indicate first click
       lastMousePosX: -1,  //indicate first click
@@ -101,13 +101,13 @@ class ThreeDViewer extends React.Component {
     }
 
     if (this.props.series != nextProps.series){
-        this.loadSlice(nextProps.series);
+        this.rotateView(nextProps.series);
     }
   }
 
 
 
-  loadSlice(series,action){
+  rotateView(series){
     var curMousePosX = this.state.curMousePosX
     var curMousePosY = this.state.curMousePosY
     var lastMousePosX = this.state.lastMousePosX
@@ -129,39 +129,115 @@ class ThreeDViewer extends React.Component {
                   rotate:{ 
                   current: [ -lastMousePosX, lastMousePosY ],
                   last: [ -curMousePosX, curMousePosY ],
-                  motionFactor: 3}},
+                  motionFactor: 5}},
           // sizeX:document.getElementById("dicomImageThreeD").style.width, 
           // sizeY:document.getElementById("dicomImageThreeD").style.height
           // sizeX:this.state.dicomImage.clientWidth, 
           // sizeY:this.state.dicomImage.clientHeight
-        },
-
-        headers:  {
+              },
+        headers: {
           'Access-Control-Allow-Origin': '*',
-        },
+          },
         responseType: 'arraybuffer'
-      }).then(res=>{
-        this.setState({isImageUpdated2:true})
-        console.log(this.state.isImageUpdated2);
-        this.viewerLoadImage(res.data)
-      }).catch(err=>{
-        console.log(err)
-      })}
-    );
+        }).then(res=>{
+          this.setState({isImageUpdated2:true})
+          this.viewerLoadImage(res.data)
+          }).catch(err=>{console.log(err)}
+        )}
+      );
+    }     
   }
-    
-      
+
+  dollyView(series){
+    var curMousePosX = this.state.curMousePosX
+    var curMousePosY = this.state.curMousePosY
+    var lastMousePosX = this.state.lastMousePosX
+    var lastMousePosY = this.state.lastMousePosY
+
+    if (this.state.isImageUpdated2 === true)
+    {
+      this.setState({isImageUpdated2:false},()=>{
+        axios({
+        method: 'post',
+        url: 'http://192.168.1.112:8080/api/getVolumeRendering',
+        data: {
+          series: series,
+          id: this.props.socket.id,
+          input:{ preset: 1, 
+                  shift: 0, 
+                  opacity: 1,
+                  size:[this.state.dicomImage.clientWidth, this.state.dicomImage.clientHeight],
+                  dolly:{ 
+                  current: [ -lastMousePosX, lastMousePosY ],
+                  last: [ -curMousePosX, curMousePosY ],
+                  motionFactor: 5}},
+          // sizeX:document.getElementById("dicomImageThreeD").style.width, 
+          // sizeY:document.getElementById("dicomImageThreeD").style.height
+          // sizeX:this.state.dicomImage.clientWidth, 
+          // sizeY:this.state.dicomImage.clientHeight
+              },
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          },
+        responseType: 'arraybuffer'
+        }).then(res=>{
+          this.setState({isImageUpdated2:true})
+          this.viewerLoadImage(res.data)
+          }).catch(err=>{console.log(err)}
+        )}
+      );
+    }     
   }
+
+  panView(series){
+    var curMousePosX = this.state.curMousePosX
+    var curMousePosY = this.state.curMousePosY
+    var lastMousePosX = this.state.lastMousePosX
+    var lastMousePosY = this.state.lastMousePosY
+
+    if (this.state.isImageUpdated2 === true)
+    {
+      this.setState({isImageUpdated2:false},()=>{
+        axios({
+        method: 'post',
+        url: 'http://192.168.1.112:8080/api/getVolumeRendering',
+        data: {
+          series: series,
+          id: this.props.socket.id,
+          input:{ preset: 1, 
+                  shift: 0, 
+                  opacity: 1,
+                  size:[this.state.dicomImage.clientWidth, this.state.dicomImage.clientHeight],
+                  pan:{ 
+                  current: [ -lastMousePosX, lastMousePosY ],
+                  last: [ -curMousePosX, curMousePosY ],
+                  motionFactor: 1}},
+          // sizeX:document.getElementById("dicomImageThreeD").style.width, 
+          // sizeY:document.getElementById("dicomImageThreeD").style.height
+          // sizeX:this.state.dicomImage.clientWidth, 
+          // sizeY:this.state.dicomImage.clientHeight
+              },
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          },
+        responseType: 'arraybuffer'
+        }).then(res=>{
+          this.setState({isImageUpdated2:true})
+          this.viewerLoadImage(res.data)
+          }).catch(err=>{console.log(err)}
+        )}
+      );
+    }     
+  }
+
 
   handleDrag(event){
-    if (! this.state.isMouseDown){
+    if (this.state.mouseEvent<0){
       return;
     }
     if(this.state.isImageUpdated2 ===false){
       return;
     }
-
-
 
     //Calcalate cursor position
     var rect = document.getElementById("dicomImageThreeD").getBoundingClientRect();
@@ -189,7 +265,12 @@ class ThreeDViewer extends React.Component {
     }
     else
     {
-      this.loadSlice(this.props.series);
+      if (this.state.mouseEvent === 0)
+        this.rotateView(this.props.series);
+      else if (this.state.mouseEvent === 1)
+        this.panView(this.props.series);
+      else if (this.state.mouseEvent === 2)
+        this.dollyView(this.props.series);
     }
 
     //Update last cursor position
@@ -223,23 +304,22 @@ class ThreeDViewer extends React.Component {
             <div id="dicomImageThreeD" 
               className={classNames(classes.threeDViewer, {[classes.drawerOpenThreeDViewer]: this.props.drawerOpen})}
               onMouseDown={(event)=>{
-                    if (event.button === 0 ||event.button === 4 ){
-                      this.setState({isMouseDown:true})
-                  
-                      var rect = document.getElementById("dicomImageThreeD").getBoundingClientRect();
-                      this.state.lastMousePosX= event.clientX - rect.left;
-                      this.state.lastMousePosY = event.clientY - rect.top;
-                      }
+                    var rect = document.getElementById("dicomImageThreeD").getBoundingClientRect();
+                    this.state.lastMousePosX= event.clientX - rect.left;
+                    this.state.lastMousePosY = event.clientY - rect.top;
+                    
+                    this.setState({mouseEvent:event.button});
                     }}
               onMouseUp={(event)=>{
-                      this.setState({isMouseDown:false});
+                      
+                      this.setState({mouseEvent:-1});
                       this.handleDrag(event);
                       }}
               onMouseMove={(event)=>{this.handleDrag(event)}}
               onWheel={(event)=>{}}
               onContextMenu={event=>{event.preventDefault()}}
               onMouseLeave={(event)=>{
-                      if (this.state.isMouseDown){
+                      if (this.state.mouseEvent){
                         this.setState({leaveCanvasOnDown:true})
                       }
                       else {
@@ -248,13 +328,13 @@ class ThreeDViewer extends React.Component {
               onMouseEnter={(event)=>{
                       if (event.buttons === 1){
                         if (this.state.leaveCanvasOnDown){
-                          this.setState({isMouseDown: true})
+                          this.setState({mouseEvent: -1})
                         }
                         else{
-                          this.setState({isMouseDown: false})
+                          this.setState({mouseEvent: -1})
                         }
                       } else {
-                        this.setState({isMouseDown: false})
+                        this.setState({mouseEvent: -1})
                       }}}
             />
         </div>            
