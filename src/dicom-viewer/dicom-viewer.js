@@ -299,12 +299,6 @@ class DicomViewer extends React.Component {
     });
   } 
 
-  enableTool(toolName, mouseButtonNumber){
-  };
-
-  disableAllTools(){
-
-  };
 
   dicomImageRef= el => {
     if (el !== this.state.dicomImage){
@@ -555,21 +549,22 @@ class DicomViewer extends React.Component {
                 }}
                 />
 
-                <div id="mrtopleft" style={{ position: "absolute", top: "0.5%", left: "0.5%" }}>
-                Patient Name: Chan Tai Man
-                </div>
 
-                <div id="mrtopright" style={{ position: "absolute", top: "0.5%", right: "0.5%" }}>
-                Hospital: PWH
-                </div>
+              <div id="mrtopleft" style={{ position: "absolute", top: "0.5%", left: "0.5%", whiteSpace: 'pre' }}>
+                
+              </div>
+              
+              <div id="mrtopright" style={{ position: "absolute", top: "0.5%", right: "0.5%", whiteSpace: 'pre', textAlign:"right" }}>
+                
+              </div>
+              
+              <div id="mrbottomright" style={{ position: "absolute", bottom: "0.5%", right: "0.5%", whiteSpace: 'pre', textAlign:"right"  }}>
+               
+              </div>
 
-                <div id="mrbottomright" style={{ position: "absolute", bottom: "0.5%", right: "0.5%" }}>
-                Zoom:
-                </div>
-
-                <div id="mrbottomleft" style={{ position: "absolute", bottom: "0.5%", left: "0.5%", whiteSpace: 'pre'}}>
-                WW/WC:
-                </div>
+              <div id="mrbottomleft" style={{ position: "absolute", bottom: "0.5%", left: "0.5%", whiteSpace: 'pre'}}>
+               
+              </div>
 
                 <div class="mrbottommiddle orientationMarkerDiv" style={{ position: "absolute", bottom: "0.5%", left: "50%" }}>
                 <span class="orientationMarker">Q</span>

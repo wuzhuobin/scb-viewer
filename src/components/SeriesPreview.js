@@ -71,46 +71,33 @@ class SeriesPreview extends React.Component {
 
 
   updateSeries = (study)=>{
-           PACS.studyInfo(study,
-          function (json) {
-            let seriesPromises = [];
-            for (let i = 0; i < json.Series.length; ++i) {
-              seriesPromises.push(PACS.serieInfo(json.Series[i]));
-            }
-            // console.log(json);
-            Promise.all(seriesPromises).then(
-              function (seriesJsons) {
-                let series = [];
-                for (let i = 0; i < seriesJsons.length; ++i) {
-                  let serie = createData(
-                    seriesJsons[i].MainDicomTags.BodyPartExamined,
-                    seriesJsons[i].MainDicomTags.Modality,
-                    seriesJsons[i].MainDicomTags.ProtocolName,
-                    seriesJsons[i].MainDicomTags.SeriesNumber,
-                    seriesJsons[i].MainDicomTags.StationName
-                  );
-                  serie.id = json.Series[i];
-                  serie.slicesCount = seriesJsons[i].Instances.length;
-                  series.push(serie);
-                }
-                // console.log(series)
-                this.setState({ series: series });
-              }.bind(this)
+    PACS.studyInfo(study,
+      (json)=> {
+        let promises = [];
+        for (let i = 0; i < json.Series.length; i++) {
+          promises.push(PACS.serieInfo(json.Series[i]));
+          promises.push(PACS.seriesPreview(json.Series[i]));
+        }
+        Promise.all(promises).then((jsons) => {
+          let seriesInfo = [];
+          let imgs = [];
+          for (let i = 0; i < jsons.length; i += 2) {
+            let serie = createData(
+              jsons[i].MainDicomTags.BodyPartExamined,
+              jsons[i].MainDicomTags.Modality,
+              jsons[i].MainDicomTags.ProtocolName,
+              jsons[i].MainDicomTags.SeriesNumber,
+              jsons[i].MainDicomTags.StationName
             );
-          }.bind(this)
-        )
-        // update images 
-        // this.setState({imgs: []});
-        this.state.imgs = [];
-        PACS.studyInfo(study, (json)=>{
-          for (let i = 0; i < json.Series.length; ++i) {
-            PACS.seriesPreview(json.Series[i], (str)=>{
-              let imgs = this.state.imgs.slice(); 
-              imgs.push(str);
-              this.setState({imgs: imgs});
-            } );
-          } 
+            serie.id = json.Series[i/2];
+            serie.slicesCount = jsons[i].Instances.length;
+            seriesInfo.push(serie);
+            imgs.push(jsons[i + 1]);
+          }
+          this.setState({ series: seriesInfo, imgs: imgs });
         });
+      }
+    )
   }
    
     render() {

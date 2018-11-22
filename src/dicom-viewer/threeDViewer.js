@@ -32,6 +32,13 @@ class ThreeDViewer extends React.Component {
     super(props);
     this.state = {
       dicomImage: null,
+      leaveCanvasOnDown: false,
+      mouseEvent: -1,
+      curMousePosX: -1,  //indicate first click
+      curMousePosY: -1,  //indicate first click
+      lastMousePosX: -1,  //indicate first click
+      lastMousePosY: -1,  //indicate first click
+      isImageUpdated2: true,
    	};
     this.cornerstoneInstance = cornerstone;
     this.singleViewer = null;
@@ -54,6 +61,7 @@ class ThreeDViewer extends React.Component {
 
 
   componentDidMount(){
+
     this.setState({
       dicomImage: document.getElementById('dicomImageThreeD')},
       ()=>{
@@ -72,6 +80,8 @@ class ThreeDViewer extends React.Component {
         // this.viewerLoadImage();
       }
     }
+
+
     window.addEventListener('resize', (event)=>{this.handleResize(event, this.state.dicomImage)})
   }
 
@@ -91,33 +101,181 @@ class ThreeDViewer extends React.Component {
     }
 
     if (this.props.series != nextProps.series){
-        this.loadSlice(nextProps.series);
+        this.rotateView(nextProps.series);
     }
   }
 
 
 
-  loadSlice(series){
-      axios({
+  rotateView(series){
+    var curMousePosX = this.state.curMousePosX
+    var curMousePosY = this.state.curMousePosY
+    var lastMousePosX = this.state.lastMousePosX
+    var lastMousePosY = this.state.lastMousePosY
+
+    if (this.state.isImageUpdated2 === true)
+    {
+      this.setState({isImageUpdated2:false},()=>{
+        axios({
         method: 'post',
         url: 'http://192.168.1.112:8080/api/getVolumeRendering',
         data: {
           series: series,
           id: this.props.socket.id,
-          // direction: 1,
-          // slice: this.state.slice
-        },
-        headers:  {
+          input:{ preset: 1, 
+                  shift: 0, 
+                  opacity: 1,
+                  size:[this.state.dicomImage.clientWidth, this.state.dicomImage.clientHeight],
+                  rotate:{ 
+                  current: [ -lastMousePosX, lastMousePosY ],
+                  last: [ -curMousePosX, curMousePosY ],
+                  motionFactor: 5}},
+          // sizeX:document.getElementById("dicomImageThreeD").style.width, 
+          // sizeY:document.getElementById("dicomImageThreeD").style.height
+          // sizeX:this.state.dicomImage.clientWidth, 
+          // sizeY:this.state.dicomImage.clientHeight
+              },
+        headers: {
           'Access-Control-Allow-Origin': '*',
-        },
+          },
         responseType: 'arraybuffer'
-      }).then(res=>{
-        this.viewerLoadImage(res.data)
-      }).catch(err=>{
-        console.log(err)
-      })
-    
+        }).then(res=>{
+          this.setState({isImageUpdated2:true})
+          this.viewerLoadImage(res.data)
+          }).catch(err=>{console.log(err)}
+        )}
+      );
+    }     
+  }
 
+  dollyView(series){
+    var curMousePosX = this.state.curMousePosX
+    var curMousePosY = this.state.curMousePosY
+    var lastMousePosX = this.state.lastMousePosX
+    var lastMousePosY = this.state.lastMousePosY
+
+    if (this.state.isImageUpdated2 === true)
+    {
+      this.setState({isImageUpdated2:false},()=>{
+        axios({
+        method: 'post',
+        url: 'http://192.168.1.112:8080/api/getVolumeRendering',
+        data: {
+          series: series,
+          id: this.props.socket.id,
+          input:{ preset: 1, 
+                  shift: 0, 
+                  opacity: 1,
+                  size:[this.state.dicomImage.clientWidth, this.state.dicomImage.clientHeight],
+                  dolly:{ 
+                  current: [ -lastMousePosX, lastMousePosY ],
+                  last: [ -curMousePosX, curMousePosY ],
+                  motionFactor: 5}},
+          // sizeX:document.getElementById("dicomImageThreeD").style.width, 
+          // sizeY:document.getElementById("dicomImageThreeD").style.height
+          // sizeX:this.state.dicomImage.clientWidth, 
+          // sizeY:this.state.dicomImage.clientHeight
+              },
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          },
+        responseType: 'arraybuffer'
+        }).then(res=>{
+          this.setState({isImageUpdated2:true})
+          this.viewerLoadImage(res.data)
+          }).catch(err=>{console.log(err)}
+        )}
+      );
+    }     
+  }
+
+  panView(series){
+    var curMousePosX = this.state.curMousePosX
+    var curMousePosY = this.state.curMousePosY
+    var lastMousePosX = this.state.lastMousePosX
+    var lastMousePosY = this.state.lastMousePosY
+
+    if (this.state.isImageUpdated2 === true)
+    {
+      this.setState({isImageUpdated2:false},()=>{
+        axios({
+        method: 'post',
+        url: 'http://192.168.1.112:8080/api/getVolumeRendering',
+        data: {
+          series: series,
+          id: this.props.socket.id,
+          input:{ preset: 1, 
+                  shift: 0, 
+                  opacity: 1,
+                  size:[this.state.dicomImage.clientWidth, this.state.dicomImage.clientHeight],
+                  pan:{ 
+                  current: [ -lastMousePosX, lastMousePosY ],
+                  last: [ -curMousePosX, curMousePosY ],
+                  motionFactor: 1}},
+          // sizeX:document.getElementById("dicomImageThreeD").style.width, 
+          // sizeY:document.getElementById("dicomImageThreeD").style.height
+          // sizeX:this.state.dicomImage.clientWidth, 
+          // sizeY:this.state.dicomImage.clientHeight
+              },
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          },
+        responseType: 'arraybuffer'
+        }).then(res=>{
+          this.setState({isImageUpdated2:true})
+          this.viewerLoadImage(res.data)
+          }).catch(err=>{console.log(err)}
+        )}
+      );
+    }     
+  }
+
+
+  handleDrag(event){
+    if (this.state.mouseEvent<0){
+      return;
+    }
+    if(this.state.isImageUpdated2 ===false){
+      return;
+    }
+
+    //Calcalate cursor position
+    var rect = document.getElementById("dicomImageThreeD").getBoundingClientRect();
+    this.state.curMousePosX= event.clientX - rect.left;
+    this.state.curMousePosY = event.clientY - rect.top;
+
+    //in case event position is smaller than 0
+    if(this.state.curMousePosX<0) this.state.curMousePosX =0;
+    if(this.state.curMousePosY<0) this.state.curMousePosY =0;
+
+    //console.log(this.state.curMousePosX);
+    //console.log(this.state.curMousePosY);
+
+    //check if first click
+    if(this.state.lastMousePosX<0) this.state.lastMousePosX = this.state.curMousePosX;
+    if(this.state.lastMousePosY<0) this.state.lastMousePosY = this.state.curMousePosY;
+
+    // console.log(this.state.lastMousePosX);
+    // console.log(this.state.lastMousePosY);
+
+    //Send message if 
+    if ((this.state.lastMousePosX === this.state.curMousePosX) && (this.state.lastMousePosY === this.state.curMousePosY))
+    {
+
+    }
+    else
+    {
+      if (this.state.mouseEvent === 0)
+        this.rotateView(this.props.series);
+      else if (this.state.mouseEvent === 1)
+        this.panView(this.props.series);
+      else if (this.state.mouseEvent === 2)
+        this.dollyView(this.props.series);
+    }
+
+    //Update last cursor position
+    this.state.lastMousePosX = this.state.curMousePosX;
+    this.state.lastMousePosY = this.state.curMousePosY;
   }
 
 
@@ -144,7 +302,41 @@ class ThreeDViewer extends React.Component {
   	return(
         <div className={classes.paper}>
             <div id="dicomImageThreeD" 
-              className={classNames(classes.threeDViewer, {[classes.drawerOpenThreeDViewer]: this.props.drawerOpen})}/>
+              className={classNames(classes.threeDViewer, {[classes.drawerOpenThreeDViewer]: this.props.drawerOpen})}
+              onMouseDown={(event)=>{
+                    var rect = document.getElementById("dicomImageThreeD").getBoundingClientRect();
+                    this.state.lastMousePosX= event.clientX - rect.left;
+                    this.state.lastMousePosY = event.clientY - rect.top;
+                    
+                    this.setState({mouseEvent:event.button});
+                    }}
+              onMouseUp={(event)=>{
+                      
+                      this.setState({mouseEvent:-1});
+                      this.handleDrag(event);
+                      }}
+              onMouseMove={(event)=>{this.handleDrag(event)}}
+              onWheel={(event)=>{}}
+              onContextMenu={event=>{event.preventDefault()}}
+              onMouseLeave={(event)=>{
+                      if (this.state.mouseEvent){
+                        this.setState({leaveCanvasOnDown:true})
+                      }
+                      else {
+                        this.setState({leaveCanvasOnDown:false})
+                      }}}
+              onMouseEnter={(event)=>{
+                      if (event.buttons === 1){
+                        if (this.state.leaveCanvasOnDown){
+                          this.setState({mouseEvent: -1})
+                        }
+                        else{
+                          this.setState({mouseEvent: -1})
+                        }
+                      } else {
+                        this.setState({mouseEvent: -1})
+                      }}}
+            />
         </div>            
       );
   };
