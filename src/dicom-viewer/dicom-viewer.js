@@ -49,6 +49,8 @@ import classNames from 'classnames';
 import SeriesPreviewVertical from '../components/SeriesPreviewVertical'
 import DicomHeaderDialog from './dicomHeaderDialog'
 
+import dcmViewer from './dcmViewer'
+
 const styles = theme=> ({
   root:{    
     width: '100vw',
@@ -130,16 +132,10 @@ class DicomViewer extends React.Component {
       loadingProgress: 100,
       infoDialog:false,
     };
-    
+    this.viewer = null;
   }
 
   componentWillReceiveProps(nextProps){
-    if (nextProps.drawerOpen){
-      const element = this.dicomImage;
-      cornerstoneTools.stopClip(element, 31);
-      this.setState(state=>({playingClip:false}));
-    }
-
     if (this.props.drawerOpen != nextProps.drawerOpen){
       console.log("drawer open: " + nextProps.drawerOpen)
       if (nextProps.drawerOpen){
@@ -148,11 +144,8 @@ class DicomViewer extends React.Component {
       else{
         this.dicomImage.style.width = 'calc(100vw - 2px - 170px)'
       }
-      cornerstone.resize(this.dicomImage)
     }
   }
-
-
 
   componentWillMount() {
 
@@ -208,33 +201,33 @@ class DicomViewer extends React.Component {
   }
 
   calculateOrientationMarkers(element, viewport, state) {
-    var enabledElement = cornerstone.getEnabledElement(element);
-    var imagePlaneMetaData = cornerstone.metaData.get('imagePlaneModule', enabledElement.image.imageId);
+    // var enabledElement = cornerstone.getEnabledElement(element);
+    // var imagePlaneMetaData = cornerstone.metaData.get('imagePlaneModule', enabledElement.image.imageId);
 
-    var rowString = cornerstoneTools.orientation.getOrientationString(state.rowCosine);
-    var columnString = cornerstoneTools.orientation.getOrientationString(state.columnCosine);
+    // var rowString = cornerstoneTools.orientation.getOrientationString(state.rowCosine);
+    // var columnString = cornerstoneTools.orientation.getOrientationString(state.columnCosine);
 
-    var oppositeRowString = cornerstoneTools.orientation.invertOrientationString(rowString);
-    var oppositeColumnString = cornerstoneTools.orientation.invertOrientationString(columnString);
+    // var oppositeRowString = cornerstoneTools.orientation.invertOrientationString(rowString);
+    // var oppositeColumnString = cornerstoneTools.orientation.invertOrientationString(columnString);
     
 
-    var markers = {
-      top: oppositeColumnString,
-      bottom: columnString,
-      left: oppositeRowString,
-      right: rowString
-    }
+    // var markers = {
+    //   top: oppositeColumnString,
+    //   bottom: columnString,
+    //   left: oppositeRowString,
+    //   right: rowString
+    // }
 
-    var topMid = document.querySelector('.mrtopmiddle .orientationMarker');
-    var bottomMid = document.querySelector('.mrbottommiddle .orientationMarker');
-    var rightMid = document.querySelector('.mrrightmiddle .orientationMarker');
-    var leftMid = document.querySelector('.mrleftmiddle .orientationMarker');
+    // var topMid = document.querySelector('.mrtopmiddle .orientationMarker');
+    // var bottomMid = document.querySelector('.mrbottommiddle .orientationMarker');
+    // var rightMid = document.querySelector('.mrrightmiddle .orientationMarker');
+    // var leftMid = document.querySelector('.mrleftmiddle .orientationMarker');
 
 
-    topMid.textContent = markers.top;
-    bottomMid.textContent = markers.bottom;
-    rightMid.textContent = markers.right;
-    leftMid.textContent = markers.left;
+    // topMid.textContent = markers.top;
+    // bottomMid.textContent = markers.bottom;
+    // rightMid.textContent = markers.right;
+    // leftMid.textContent = markers.left;
   }
 
   handleResize(event,dicomImage){
@@ -244,13 +237,13 @@ class DicomViewer extends React.Component {
 
       dicomImage.style.height = 'calc(100vh - 128px - 2px)'
       dicomImage.style.width = '100%'
-      try{
-        cornerstone.resize(dicomImage)          
-      }
-      catch(error)
-      {
-        console.log(error)
-      }
+      // try{
+      //   cornerstone.resize(dicomImage)          
+      // }
+      // catch(error)
+      // {
+      //   console.log(error)
+      // }
     }
   }
 
@@ -314,13 +307,23 @@ class DicomViewer extends React.Component {
   };
 
   dicomImageRef= el => {
-    this.setState({dicomImage: el});
+    if (el !== this.state.dicomImage){
+      this.setState({dicomImage: el});
+    }
   };
 
   onSelectSeries=(event, series)=>{
     this.setState({loadingProgress: 0})
     this.setState({selectedSeries: series})
-
+    if (this.viewer === null){
+      this.viewer = new dcmViewer(this.state.dicomImage);
+    }
+    if (series){
+      this.viewer.initialiseSeries(series);
+    }
+    else {
+      console.log('input series is empty');
+    }
   }
 
   render() {
@@ -332,52 +335,92 @@ class DicomViewer extends React.Component {
       <div className={classNames(classes.root, {[classes.drawerOpen]: this.props.drawerOpen,})}>
       <AppBar className={classes.appBar}>
       <Toolbar className={classes.toolbar}>          
-      <Button classes={{label: classes.label}} value="1" color="inherit" onClick={() => {}}>
+      <Button classes={{label: classes.label}} value="1" color="inherit" onClick={() => {
+        if (this.viewer){
+          this.viewer.toNavigateMode();
+        }
+      }}>
       <NavigationIcon />
       Navigate
       </Button>
 
-      <Button classes={{label: classes.label}} value="2" color="inherit" size="small" onClick={() => {}}>
+      <Button classes={{label: classes.label}} value="2" color="inherit" size="small" onClick={() => {
+        if (this.viewer){
+          this.viewer.toWindowLevelMode();
+        }
+      }}>
       <Brightness6Icon />
       Levels
       </Button>
 
-      <Button classes={{label: classes.label}} value="3" color="inherit" size="small" onClick={() => {}}>
+      <Button classes={{label: classes.label}} value="3" color="inherit" size="small" onClick={() => {
+        if (this.viewer){
+          this.viewer.toPanMode();
+        }
+      }}>
       <OpenWithIcon />
       Pan
       </Button>
 
-      <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => { }}>
+      <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => { 
+        if (this.viewer){
+          this.viewer.toZoomMode();
+        }
+      }}>
       <SearchIcon />
       Zoom
       </Button>
 
-      <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => { }}>
+      <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {
+        if (this.viewer){
+          this.viewer.toLengthMode();
+        }
+      }}>
       <LinearScaleIcon />
       Length
       </Button>
 
-      <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {}}>
+      <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {
+        if (this.viewer){
+          this.viewer.toAngleMode();
+        }
+      }}>
       <ArrowBackIosIcon />
       Angle
       </Button>
 
-      <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => { }}>
+      <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {
+        if (this.viewer){
+          this.viewer.toProbeMode();
+        }
+       }}>
       <AdjustIcon />
       Probe
       </Button>
 
-      <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {}}>
+      <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {
+        if (this.viewer){
+          this.viewer.toEllipticalROIMode();
+        }
+      }}>
       <PanoramaFishEyeIcon />
       Elliptical
       </Button>
 
-      <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {}}>
+      <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {
+        if (this.viewer){
+          this.viewer.toRectangleROIMode();
+        }
+      }}>
       <CropDinIcon />
       Rectangle
       </Button>
 
-      <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {}}>
+      <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {
+        if (this.viewer){
+          this.viewer.toFreeFormROIMode();
+        }
+      }}>
       <FreeFormIcon />
       Freeform
       </Button>
@@ -562,7 +605,7 @@ class DicomViewer extends React.Component {
               </div>
 
               );
-}
+  }
 }
 
 export default withStyles(styles)(DicomViewer);
