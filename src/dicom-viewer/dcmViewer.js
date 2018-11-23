@@ -1,13 +1,13 @@
 import * as cornerstone from "cornerstone-core";
 import * as cornerstoneTools from "cornerstone-tools";
+import * as cornerstoneMath from "cornerstone-math";
+import Hammer from "hammerjs";
 import * as dcmLoader from "./dcmLoader";
 
 
 export default class dcmViewer{
 	constructor(inputElement){
-		// this.imagePathArray=[];
-		// this.imageLoaderHintArray=[];
-		this.currentInteractionMode=1;
+		// this.currentInteractionMode=1;
 		this.rowCosine=[1,0,0];
 		this.columnCosine=[0,1,0];
 		this.currentLoaderHint="noImage";
@@ -15,7 +15,7 @@ export default class dcmViewer{
         this.stack = [];
 	}
 	displayImage(inputLoaderHint){
-        console.log(inputLoaderHint)
+        // console.log(inputLoaderHint)
 		cornerstone.loadImage(inputLoaderHint)
         .then(image => {
             cornerstone.enable(this.element)
@@ -31,9 +31,20 @@ export default class dcmViewer{
           return loaderHint+"://" + String(number);
         });
         dcmLoader.GlobalDcmLoadManager.loadSeries(inputOrderedImageList, loaderHint);
-        // this.imagePathArray = inputOrderedImageList
-        this.currentLoaderHint = inputLoaderHint
+        this.currentLoaderHint = inputLoaderHint;
 	}
+    updateImageDisplaySize(){
+        var viewPort = cornerstone.getViewport(this.element);
+        const currentImage = cornerstone.getImage(this.element);
+        if (currentImage){
+            viewPort.displayedArea.brhc = {x: currentImage.columns, y:currentImage.rows};
+            cornerstone.setViewport(this.element, viewPort);
+            cornerstone.fitToWindow(this.element);
+        }
+        else {
+            console.log("display image first");
+        }
+    }
     seriesImages(id){
         fetch("http://223.255.146.2:8042/orthanc/series/" + id)
         .then((res)=>{return res.json();})
@@ -105,7 +116,7 @@ export default class dcmViewer{
     internalInitializeViewer(){
         // Now we start enable cornerstoneTools
         const currentElement = this.element;
-        console.log(this.element);
+        this.updateImageDisplaySize();
         cornerstoneTools.mouseInput.enable(currentElement);
         cornerstoneTools.mouseWheelInput.enable(currentElement);
         const stack = this.stack;
@@ -118,6 +129,9 @@ export default class dcmViewer{
     toNavigateMode(){
         cornerstoneTools.stackScroll.activate(this.element,1);
     }
-
+    resizeImage(){
+        cornerstone.resize(this.element, true);
+        this.updateImageDisplaySize();
+    }
 }
 

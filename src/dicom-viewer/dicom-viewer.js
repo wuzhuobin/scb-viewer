@@ -133,7 +133,7 @@ class DicomViewer extends React.Component {
       columnCosine:[0,1,0],
       initialized:false,
       selectedSeries: null,
-      loader:dcmLoader.GlobalDcmLoadManager,
+      // loader:dcmLoader.GlobalDcmLoadManager,
       previousLoaderHint:null,
       dicomImage:null,
       loadingProgress: 100,
@@ -203,9 +203,9 @@ class DicomViewer extends React.Component {
   }
 
    calculateOrientationMarkers(element, viewport, state) {
-    // var enabledElement = cornerstone.getEnabledElement(element);
-    // var imagePlaneMetaData = cornerstone.metaData.get('imagePlaneModule', enabledElement.image.imageId);
-    // console.log(imagePlaneMetaData);
+    var enabledElement = cornerstone.getEnabledElement(element);
+    var imagePlaneMetaData = cornerstone.metaData.get('imagePlaneModule', enabledElement.image.imageId);
+    console.log(imagePlaneMetaData);
 
     var rowString = cornerstoneTools.orientation.getOrientationString(state.rowCosine);
     var columnString = cornerstoneTools.orientation.getOrientationString(state.columnCosine);
@@ -238,7 +238,7 @@ class DicomViewer extends React.Component {
     cornerstoneTools.external.cornerstone = cornerstone;
     cornerstoneTools.external.cornerstoneMath = cornerstoneMath;
     cornerstoneTools.external.Hammer = Hammer;
-    // this.setState({loader:dcmLoader.GlobalDcmLoadManager});
+    this.setState({loader:dcmLoader.GlobalDcmLoadManager});
   }
 
   componentWillUnmount(){
@@ -433,7 +433,7 @@ class DicomViewer extends React.Component {
     if (flagContinue===false){
       return;
     }
-    // cornerstone.enable(element);
+    cornerstone.enable(element);
 
     cornerstone.loadImage(this.state.imageLoaderHintsArray[stack.currentImageIdIndex]).then(image => {
       console.log(image)
@@ -444,15 +444,30 @@ class DicomViewer extends React.Component {
 
       // console.log(image.getPixelData());
       if (stack.currentImageIdIndex===parseInt((this.state.imageLoaderHintsArray.length / 2)|0)){
+        console.log(image);
         if (image.patientOri){
           this.setState({
           rowCosine:image.patientOri.slice(0,3),
           columnCosine:image.patientOri.slice(3,6),
         });
         }
+
         if (document.getElementById("mrtopleft")){
-          document.getElementById("mrtopleft").textContent = `Patient Name: ${image.patientName}`
+          document.getElementById("mrtopleft").textContent = `${image.patientName}`
         }
+
+        if (document.getElementById("mrtopright")){
+          document.getElementById("mrtopright").textContent = `${image.institutionName}`
+          document.getElementById("mrtopright").textContent += "\r\n";  
+          document.getElementById("mrtopright").textContent += `${image.studyDescription}`;  
+          document.getElementById("mrtopright").textContent += "\r\n";  
+          document.getElementById("mrtopright").textContent += `${image.seriesDescription}`;  
+          document.getElementById("mrtopright").textContent += "\r\n";  
+          document.getElementById("mrtopright").textContent += `${image.studyDate}`;  
+
+        }
+
+
       }
 
       element.style.height = 'calc(100vh - 128px - 2px)'
@@ -526,8 +541,7 @@ class DicomViewer extends React.Component {
 
     function onImageRendered(e) {
       const viewport = cornerstone.getViewport(e.target);
-
-
+      
       // var bottomLeftTag = document.getElementById("mrbottomleft"), bottomRightTag = document.getElementById("mrbottomright");
       // if (bottomLeftTag){
       //   bottomLeftTag.textContent = `WW/WC: ${Math.round(viewport.voi.windowWidth)}/${Math.round(viewport.voi.windowCenter)} , Slices: ${stack.currentImageIdIndex+1}/${stack.imageIds.length}`;
@@ -540,11 +554,14 @@ class DicomViewer extends React.Component {
       //document.getElementById("mrbottomleft").setAttribute('style', 'white-space: pre;');
       if (document.getElementById("mrbottomleft")){
         document.getElementById("mrbottomleft").textContent = `Slices: ${stack.currentImageIdIndex+1}/${stack.imageIds.length}`;
-        document.getElementById("mrbottomleft").textContent += "\r\n";
-        document.getElementById("mrbottomleft").textContent += `WW/WC: ${Math.round(viewport.voi.windowWidth)}/${Math.round(viewport.voi.windowCenter)}`;
+        
       }
+
       if (document.getElementById("mrbottomright")){
-        document.getElementById("mrbottomright").textContent = `Zoom: ${viewport.scale.toFixed(2)}`;
+        document.getElementById("mrbottomright").textContent = `Zoom: ${viewport.scale.toFixed(2)*100}%`;
+        document.getElementById("mrbottomright").textContent += "\r\n";
+        document.getElementById("mrbottomright").textContent += `W:${Math.round(viewport.voi.windowWidth)} L:${Math.round(viewport.voi.windowCenter)}`;
+        
       }
 
     }
@@ -692,90 +709,72 @@ class DicomViewer extends React.Component {
       <div className={classNames(classes.root, {[classes.drawerOpen]: this.props.drawerOpen,})}>
           <AppBar className={classes.appBar}>
             <Toolbar className={classes.toolbar}>          
-                    <Button classes={{label: classes.label}} value="1" color="inherit" onClick={() => { this.enableTool("stackScroll", 1);  cornerstoneTools.stackScrollTouchDrag.activate(this.dicomImage);}}>
+                    <Button classes={{label: classes.label}} value="1" color="inherit" onClick={() => {}}>
                       <NavigationIcon />
                       Navigate
                     </Button>
 
-                    <Button classes={{label: classes.label}} value="2" color="inherit" size="small" onClick={() => { this.enableTool("wwwc", 1);  cornerstoneTools.wwwcTouchDrag.activate(this.dicomImage); }}>
+                    <Button classes={{label: classes.label}} value="2" color="inherit" size="small" onClick={() => {}}>
                       <Brightness6Icon />
                       Levels
                     </Button>
 
-                    <Button classes={{label: classes.label}} value="3" color="inherit" size="small" onClick={() => {this.enableTool("pan", 3);  cornerstoneTools.panTouchDrag.activate(this.dicomImage); }}>
+                    <Button classes={{label: classes.label}} value="3" color="inherit" size="small" onClick={() => {}}>
                       <OpenWithIcon />
                       Pan
                     </Button>
               
-                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {this.enableTool("zoom", 5);  cornerstoneTools.zoomTouchDrag.activate(this.dicomImage); }}>
+                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => { }}>
                       <SearchIcon />
                       Zoom
                     </Button>
 
-                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {this.enableTool("length", 1); cornerstoneTools.lengthTouch.activate(this.dicomImage); }}>
+                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => { }}>
                       <LinearScaleIcon />
                       Length
                     </Button>
 
-                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {this.enableTool("simpleAngle", 1); cornerstoneTools.simpleAngleTouch.activate(this.dicomImage); }}>
+                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {}}>
                       <ArrowBackIosIcon />
                       Angle
                     </Button>
 
-                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {this.enableTool("probe", 1); cornerstoneTools.probeTouch.activate(this.dicomImage); }}>
+                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => { }}>
                       <AdjustIcon />
                       Probe
                     </Button>
                   
-                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {this.enableTool("ellipticalRoi", 1); cornerstoneTools.ellipticalRoiTouch.activate(this.dicomImage); }}>
+                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {}}>
                       <PanoramaFishEyeIcon />
                       Elliptical
                     </Button>
 
-                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {this.enableTool("rectangleRoi", 1); cornerstoneTools.rectangleRoiTouch.activate(this.dicomImage); }}>
+                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {}}>
                       <CropDinIcon />
                       Rectangle
                     </Button>
                    
-                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {this.enableTool("freehand", 1);}}>
+                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {}}>
                       <FreeFormIcon />
                       Freeform
                     </Button>
 
-                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {this.enableTool("highlight", 1);}}>
+                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {}}>
                       <CropFreeIcon />
                       Highlight
                     </Button>
 
-                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {this.enableTool("arrowAnnotate", 1); cornerstoneTools.arrowAnnotateTouch.activate(this.dicomImage);}}>
+                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {}}>
                       <AnnotateIcon />
                       Annotate
                     </Button>
 
                     <Button classes={{label: classes.label}} color="inherit" size="small"
                       onClick={() => {
-                        if(this.state.playingClip==false)
-                        {
-                          const element = this.dicomImage;
-                          cornerstoneTools.playClip(element, 31);
-                          this.state.playingClip=true;
-                        }
-                        else
-                        {
-                          const element = this.dicomImage;
-                          cornerstoneTools.stopClip(element, 31);
-                          this.state.playingClip=false;
-                        }
                       }}
                       >
                       <PlayIcon />
                       Play
-                    </Button>
-
-                    <DicomHeaderDialog id='dicomHeaderDialog' open={this.state.infoDialog} onClose={this.handleInfoDialogClose}/>
-                    <Button classes={{label: classes.label}} color="inherit" size="small" onClick={this.handleInfoDialogOpen}>
-                      <InfoIcon />
-                      Info
                     </Button>
 
                     <Button classes={{label: classes.label}} color="inherit" size="small" aria-owns={open ? "simple-popper" : null} aria-haspopup="true"
@@ -791,141 +790,55 @@ class DicomViewer extends React.Component {
                     >
 
                       <Button classes={{label: classes.label}} color="inherit" size="small" 
-                          onClick={() => {
-                            const element = this.dicomImage;
-                            var viewport = cornerstone.getViewport(element);
-                            if (viewport.invert === true) {
-                                viewport.invert = false;
-                            } else {
-                                viewport.invert = true;
-                            }
-                            cornerstone.setViewport(element, viewport);}}
+                          onClick={() => {}}
                             >
                         <InvertIcon />
                         Invert
                       </Button>
 
                       <Button classes={{label: classes.label}} color="inherit" size="small" 
-                        onClick={() => {
-
-                          this.anonymized=!this.anonymized;
-
-                          const element = this.dicomImage;
-                          var viewport = cornerstone.getViewport(element);
-
-                          if(this.anonymized != true)
-                          {
-                            document.getElementById("mrbottomleft").style.visibility = "visible";
-                            document.getElementById("mrbottomright").style.visibility = "visible";
-                            document.getElementById("mrtopleft").style.visibility = "visible";
-                            document.getElementById("mrtopright").style.visibility = "visible";
-                          }
-                          else
-                          {
-                            document.getElementById("mrbottomleft").style.visibility = "hidden";
-                            document.getElementById("mrbottomright").style.visibility = "hidden";;
-                            document.getElementById("mrtopleft").style.visibility = "hidden";
-                            document.getElementById("mrtopright").style.visibility = "hidden";
-                          }
-                        }}>
+                        onClick={() => {                 }}>
                         <TextIcon />
                         Text
                       </Button>
 
                       <Button classes={{label: classes.label}} color="inherit" size="small" 
-                        onClick={() => {
-                          const element = this.dicomImage;
-                          const viewport = cornerstone.getViewport(element);
-                          viewport.rotation+=90;
-                          cornerstone.setViewport(element, viewport);
-
-                          var leftMid = document.querySelector('.mrleftmiddle .orientationMarker');
-                          var topMid = document.querySelector('.mrtopmiddle .orientationMarker');
-                          var rightMid = document.querySelector('.mrrightmiddle .orientationMarker');
-                          var bottomMid = document.querySelector('.mrbottommiddle .orientationMarker');
-                          
-                          var temp = bottomMid.textContent;
-                          bottomMid.textContent = rightMid.textContent;
-                          rightMid.textContent=topMid.textContent;
-                          topMid.textContent=leftMid.textContent;
-                          leftMid.textContent=temp;}}
+                        onClick={() => {}}
                           >
                         <RotateRightIcon />
                         Rotate
                       </Button>
 
                       <Button classes={{label: classes.label}} color="inherit" size="small" 
-                        onClick={() => {
-                          const element = this.dicomImage;
-                          const viewport = cornerstone.getViewport(element);
-                          viewport.vflip = !viewport.vflip;
-                          cornerstone.setViewport(element, viewport);
-
-                          var topMid = document.querySelector('.mrtopmiddle .orientationMarker');
-                          var bottomMid = document.querySelector('.mrbottommiddle .orientationMarker');
-                          var temp = topMid.textContent;
-                          topMid.textContent = bottomMid.textContent;
-                          bottomMid.textContent = temp;}}
+                        onClick={() => {}}
                           >
                         <VFlipIcon />
                         Flip V
                       </Button>
 
                       <Button classes={{label: classes.label}} color="inherit" size="small" 
-                        onClick={() => {
-                          const element = this.dicomImage;
-                          const viewport = cornerstone.getViewport(element);
-                          viewport.hflip = !viewport.hflip;
-                          cornerstone.setViewport(element, viewport);
-
-                          var rightMid = document.querySelector('.mrrightmiddle .orientationMarker');
-                          var leftMid = document.querySelector('.mrleftmiddle .orientationMarker');
-                          var temp = rightMid.textContent;
-                          rightMid.textContent = leftMid.textContent;
-                          leftMid.textContent = temp;}}
+                        onClick={() => {}}
                           >
                         <HFlipIcon />
                         Flip H
                       </Button>
 
                       <Button classes={{label: classes.label}} color="inherit" size="small" 
-                        onClick={() => {
-                            const element = this.dicomImage;
-                            cornerstoneTools.saveAs(element, "image.png");}}
+                        onClick={() => {}}
                             >
                         <SaveIcon />
                         Export
                       </Button>
 
                       <Button classes={{label: classes.label}} color="inherit" size="small" 
-                          onClick={() => {
-                            const element = this.dicomImage;
-                            cornerstoneTools.clearToolState(element, "length");
-                            cornerstoneTools.clearToolState(element, "simpleAngle");
-                            cornerstoneTools.clearToolState(element, "probe");
-                            cornerstoneTools.clearToolState(element, "ellipticalRoi");
-                            cornerstoneTools.clearToolState(element, "rectangleRoi");
-                            cornerstoneTools.clearToolState(element, "freehand");
-                            cornerstoneTools.clearToolState(element, "arrowAnnotate");
-                            cornerstoneTools.clearToolState(element, "highlight");
-                            cornerstone.updateImage(element);}}
+                          onClick={() => {}}
                           >
                         <ClearIcon />
                         Clear
                       </Button>
 
                       <Button classes={{label: classes.label}} color="inherit" size="small" 
-                        onClick={() => {
-                          const element = this.dicomImage;
-                          cornerstone.reset(element);
-
-                          const viewport = cornerstone.getViewport(element);
-                          viewport.hflip = false;
-                          viewport.vflip = false;
-                          viewport.rotation = 0;
-                          cornerstone.setViewport(element, viewport);
-                          this.calculateOrientationMarkers(element, viewport,this.state);
-                          }}
+                        onClick={() => {                          }}
                           >
                         <ReplayIcon />
                         Reset
@@ -976,20 +889,20 @@ class DicomViewer extends React.Component {
                 }}
               />
 
-              <div id="mrtopleft" style={{ position: "absolute", top: "0.5%", left: "0.5%" }}>
-                Patient Name: Chan Tai Man
+              <div id="mrtopleft" style={{ position: "absolute", top: "0.5%", left: "0.5%", whiteSpace: 'pre' }}>
+                
               </div>
               
-              <div id="mrtopright" style={{ position: "absolute", top: "0.5%", right: "0.5%" }}>
-                Hospital: PWH
+              <div id="mrtopright" style={{ position: "absolute", top: "0.5%", right: "0.5%", whiteSpace: 'pre', textAlign:"right" }}>
+                
               </div>
               
-              <div id="mrbottomright" style={{ position: "absolute", bottom: "0.5%", right: "0.5%" }}>
-                Zoom:
+              <div id="mrbottomright" style={{ position: "absolute", bottom: "0.5%", right: "0.5%", whiteSpace: 'pre', textAlign:"right"  }}>
+               
               </div>
 
               <div id="mrbottomleft" style={{ position: "absolute", bottom: "0.5%", left: "0.5%", whiteSpace: 'pre'}}>
-                WW/WC:
+               
               </div>
 
               <div class="mrbottommiddle orientationMarkerDiv" style={{ position: "absolute", bottom: "0.5%", left: "50%" }}>
@@ -1034,3 +947,8 @@ export default withStyles(styles)(DicomViewer);
 
 //<div class="orientationMarkers" style={{borderStyle:"solid", borderColor:"red",position: "absolute", top: "0%", left: "0%", width: viewerWidth, height: viewerHeight}}>
 
+                    // <DicomHeaderDialog id='dicomHeaderDialog' open={this.state.infoDialog} onClose={this.handleInfoDialogClose}/>
+                    // <Button classes={{label: classes.label}} color="inherit" size="small" onClick={this.handleInfoDialogOpen}>
+                    //   <InfoIcon />
+                    //   Info
+                    // </Button>

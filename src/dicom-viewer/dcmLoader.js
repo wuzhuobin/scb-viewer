@@ -1,9 +1,18 @@
-import daikon from "daikon";
+// import daikon from "daikon";
+import * as daikon from "daikon";
 import pngjs from "pngjs";
 import * as cornerstone from "cornerstone-core";
 import * as cornerstoneTools from "cornerstone-tools";
 import * as cornerstoneMath from "cornerstone-math";
 
+function getString(inputObject){
+	if (inputObject === null){
+		return '';
+	}
+	else {
+		return inputObject.toString();
+	}
+}
 
 function getArrayMinMax(a){
 	const dataArray = a;
@@ -103,6 +112,8 @@ class dcmLoader{
 							const spacing = image.getPixelSpacing();
 							const imageData = image.getInterpretedData();
 							var imageMin, imageMax, colSpacing = 1, rowSpacing = 1, imageDir = [1,0,0,0,1,0], imagePos = [0,0,0], name = '';
+							var imageSliceThickness = '', imageStudyDescription = '', imageSeriesDescription = '', imageRows = '', imageColumns = '';
+							var imageStudyDate = '', imageProtocolName = '', imageInstitutionName = '', imageSeriesNumber = '', imageSliceLocation = '';
 							if (image.getImageMin() && image.getImageMax()){
 								imageMin = image.getImageMin();
 								imageMax = image.getImageMax();
@@ -125,6 +136,36 @@ class dcmLoader{
 							if (image.getPatientName()){
 								name = image.getPatientName();
 							}
+							if (image.getTag(0x0018, 0x0050)){
+								imageSliceThickness = getString(image.getTag(0x0018, 0x0050)['value']);
+							}
+							if (image.getTag(0x0008, 0x1030)){
+								imageStudyDescription = getString(image.getTag(0x0008, 0x1030)['value']);
+							}
+							if (image.getTag(0x0008, 0x103E)){
+								imageSeriesDescription = getString(image.getTag(0x0008, 0x103E)['value']);
+							}
+							if (image.getTag(0x0028, 0x0010)){
+								imageRows = getString(image.getTag(0x0028, 0x0010)['value']);
+							}
+							if (image.getTag(0x0028, 0x0011)){
+								imageColumns = getString(image.getTag(0x0028, 0x0011)['value']);
+							}
+							if (image.getTag(0x0008, 0x0020)){
+								imageStudyDate = getString(image.getTag(0x0008, 0x0020)['value']);
+							}
+							if (image.getTag(0x0018, 0x0030)){
+								imageProtocolName = getString(image.getTag(0x0018, 0x0030)['value']);
+							}
+							if (image.getTag(0x0008, 0x0080)){
+								imageInstitutionName = getString(image.getTag(0x0008, 0x0080)['value']);
+							}
+							if (image.getTag(0x0020, 0x0011)){
+								imageSeriesNumber = getString(image.getTag(0x0020, 0x0011)['value']);
+							}
+							if (image.getTag(0x0020, 0x1041)){
+								imageSliceLocation = getString(image.getTag(0x0020, 0x1041)['value']);
+							}
 							self.numLoaded++;
 							resolve({
 								minPixelValue: imageMin,
@@ -142,6 +183,14 @@ class dcmLoader{
 								color:false,
 								columnPixelSpacing: colSpacing,
 								rowPixelSpacing: rowSpacing,
+								sliceThickness:imageSliceThickness,
+								studyDescription : imageStudyDescription,
+								seriesDescription: imageSeriesDescription,
+								studyDate:imageStudyDate,
+								protocolName: imageProtocolName,
+								institutionName: imageInstitutionName,
+								seriesNumber:imageSeriesNumber,
+								sliceLocation: imageSliceLocation,
 								sizeInBytes: image.getRows()*image.getCols()*2,
 							});
 						}
