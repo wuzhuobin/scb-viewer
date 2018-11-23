@@ -13,6 +13,8 @@ export default class dcmViewer{
 		this.currentLoaderHint="noImage";
         this.element = inputElement;
         this.stack = [];
+        this.playingClip = null;
+        this.currentMode = null;
         cornerstone.enable(inputElement);
         cornerstoneTools.external.cornerstone = cornerstone;
         cornerstoneTools.external.cornerstoneMath = cornerstoneMath;
@@ -93,33 +95,37 @@ export default class dcmViewer{
         const self = this;
         const cacheInputSeries = inputSeries;
 
-        this.getImagePathList(1,1,cacheInputSeries)
-        .then((queryList)=>{
-            var cacheImagePathArray = [];
-            var loaderHint = cacheInputSeries;
-            if (!queryList){
-                loaderHint = "noImage";
-                queryList = ['http://223.255.146.2:8042/orthanc/instances/e24b90b6-a1f5ec14-9a4d7922-e7061ba6-cb87193c/file'];
-            }
-            const cacheimageLoaderHintsArray = [...Array(queryList.length).keys()].map(function(number){
-                return loaderHint+"://" + String(number);
-            });
-            console.log(cacheimageLoaderHintsArray);
-            for (let i=0;i<queryList.length;i++){
-                cacheImagePathArray.push(queryList[i]);
-            }
-            dcmLoader.GlobalDcmLoadManager.loadSeries(cacheImagePathArray,loaderHint);
-            const middleIndex = parseInt((cacheimageLoaderHintsArray.length / 2)|0);
-            this.stack = {
-                currentImageIdIndex : middleIndex,
-                imageIds: cacheimageLoaderHintsArray,
-            }
-            return this.displayImage(cacheimageLoaderHintsArray[middleIndex]);
+        var returningPromise = new Promise((resolve,reject)=>{
+            this.getImagePathList(1,1,cacheInputSeries)
+            .then((queryList)=>{
+                var cacheImagePathArray = [];
+                var loaderHint = cacheInputSeries;
+                if (!queryList){
+                    loaderHint = "noImage";
+                    queryList = ['http://223.255.146.2:8042/orthanc/instances/e24b90b6-a1f5ec14-9a4d7922-e7061ba6-cb87193c/file'];
+                }
+                const cacheimageLoaderHintsArray = [...Array(queryList.length).keys()].map(function(number){
+                    return loaderHint+"://" + String(number);
+                });
+                console.log(cacheimageLoaderHintsArray);
+                for (let i=0;i<queryList.length;i++){
+                    cacheImagePathArray.push(queryList[i]);
+                }
+                dcmLoader.GlobalDcmLoadManager.loadSeries(cacheImagePathArray,loaderHint);
+                const middleIndex = parseInt((cacheimageLoaderHintsArray.length / 2)|0);
+                this.stack = {
+                    currentImageIdIndex : middleIndex,
+                    imageIds: cacheimageLoaderHintsArray,
+                }
+                return this.displayImage(cacheimageLoaderHintsArray[middleIndex]);
+            })
+            .then((res)=>{
+                this.internalInitializeViewer();
+                this.toNavigateMode();
+                resolve("done");
+            })
         })
-        .then((res)=>{
-            this.internalInitializeViewer();
-            this.toNavigateMode();
-        })
+        return returningPromise;
     }
     internalInitializeViewer(){
         // Now we start enable cornerstoneTools
@@ -139,30 +145,30 @@ export default class dcmViewer{
     }
     disableAllMode(){
         try{
-            cornerstoneTools.zoom.deactivate(this.element);
-            cornerstoneTools.pan.deactivate(this.element);
+            // console.log(cornerstoneTools.getElementToolStateManager(this.element))
+            cornerstoneTools.stackScroll.disable(this.element);
+            cornerstoneTools.zoom.disable(this.element);
+            cornerstoneTools.pan.disable(this.element);
             cornerstoneTools.wwwc.disable(this.element);
+
             cornerstoneTools.probe.deactivate(this.element,1);
             cornerstoneTools.length.deactivate(this.element,1);
             cornerstoneTools.ellipticalRoi.deactivate(this.element,1);
             cornerstoneTools.rectangleRoi.deactivate(this.element,1);
             cornerstoneTools.simpleAngle.deactivate(this.element,1);
+            cornerstoneTools.arrowAnnotate.deactivate(this.element,1);
+            cornerstoneTools.highlight.disable(this.element);
+
             if (cornerstoneTools.getToolState(this.element, 'freehand')){
                 const a = cornerstoneTools.getToolState(this.element, 'freehand');
                 if (a.data){
-                    console.log(a.data);
-                    if (a.data.active){
+                    if (a.data){
                         cornerstoneTools.freehand.deactivate(this.element,1);
+                        cornerstoneTools.freehand.disable(this.element);
+                        cornerstoneTools.freehand.enable(this.element);
                     }
                 }
             }
-            // cornerstoneTools.freehand.deactivate(this.element,1);
-            // cornerstoneTools.arrowAnnotate.deactivate(this.element,1);
-            // cornerstoneTools.highlight.disable(this.element);
-            // cornerstoneTools.highlight.deactivate(this.element,1);
-            cornerstoneTools.stackScroll.deactivate(this.element, 1);
-            cornerstoneTools.pan.deactivate(this.element); // 2 is middle mouse button
-            cornerstoneTools.zoom.deactivate(this.element); // 4 is right mouse button
         }
         catch(err){
             console.log("CornerstoneTools disabling failed");
@@ -173,62 +179,170 @@ export default class dcmViewer{
         cornerstoneTools.stackScroll.activate(this.element,1);
         cornerstoneTools.pan.activate(this.element, 2); // 2 is middle mouse button
         cornerstoneTools.zoom.activate(this.element, 4); // 4 is right mouse button
+        this.currentMode = 'navigate';
 
     }
     toPanMode(){
         this.disableAllMode();
         cornerstoneTools.pan.activate(this.element, 3);
         cornerstoneTools.zoom.activate(this.element, 4); // 4 is right mouse button
+        this.currentMode = 'pan';
     }
     toZoomMode(){
         this.disableAllMode();
         cornerstoneTools.pan.activate(this.element, 2);
         cornerstoneTools.zoom.activate(this.element,5);
+        this.currentMode = 'zoom';
     }
     toWindowLevelMode(){
         this.disableAllMode();
         cornerstoneTools.wwwc.activate(this.element,1);
         cornerstoneTools.pan.activate(this.element, 2); // 2 is middle mouse button
         cornerstoneTools.zoom.activate(this.element, 4); // 4 is right mouse button
+        this.currentMode = 'wwwc';
     }
     toLengthMode(){
         this.disableAllMode();
+        cornerstoneTools.length.enable(this.element);
         cornerstoneTools.length.activate(this.element,1);
         cornerstoneTools.pan.activate(this.element, 2); // 2 is middle mouse button
         cornerstoneTools.zoom.activate(this.element, 4); // 4 is right mouse button
+        this.currentMode = 'length';
     }
     toAngleMode(){
         this.disableAllMode();
+        cornerstoneTools.simpleAngle.enable(this.element);
         cornerstoneTools.simpleAngle.activate(this.element,1);
         cornerstoneTools.pan.activate(this.element, 2); // 2 is middle mouse button
         cornerstoneTools.zoom.activate(this.element, 4); // 4 is right mouse button
+        this.currentMode = 'angle';
     }
     toProbeMode(){
         this.disableAllMode();
+        cornerstoneTools.probe.enable(this.element);
         cornerstoneTools.probe.activate(this.element,1);
         cornerstoneTools.pan.activate(this.element, 2); // 2 is middle mouse button
         cornerstoneTools.zoom.activate(this.element, 4); // 4 is right mouse button
+        this.currentMode = 'probe';
     }
     toEllipticalROIMode(){
         this.disableAllMode();
+        cornerstoneTools.ellipticalRoi.enable(this.element);
         cornerstoneTools.ellipticalRoi.activate(this.element,1);
         cornerstoneTools.pan.activate(this.element, 2); // 2 is middle mouse button
         cornerstoneTools.zoom.activate(this.element, 4); // 4 is right mouse button
+        this.currentMode = 'ellipticalRoi';
     }
     toRectangleROIMode(){
         this.disableAllMode();
+        cornerstoneTools.rectangleRoi.enable(this.element);
         cornerstoneTools.rectangleRoi.activate(this.element,1);
         cornerstoneTools.pan.activate(this.element, 2); // 2 is middle mouse button
         cornerstoneTools.zoom.activate(this.element, 4); // 4 is right mouse button
+        this.currentMode = 'rectangleRoi';
     }
     toFreeFormROIMode(){
         this.disableAllMode();
+        cornerstoneTools.freehand.enable(this.element);
         cornerstoneTools.freehand.activate(this.element,1);
         cornerstoneTools.pan.activate(this.element, 2); // 2 is middle mouse button
         cornerstoneTools.zoom.activate(this.element, 4); // 4 is right mouse button
-        // console.log(cornerstoneTools.getToolState(this.element, 'rectangleRoi'));
-        // console.log(cornerstoneTools.getToolState(this.element, 'ellipticalRoi'));
-        // console.log(cornerstoneTools.getToolState(this.element, 'probe'));
+        this.currentMode = 'freehand';
+    }
+    toHighLightMode(){
+        this.disableAllMode();
+        cornerstoneTools.highlight.enable(this.element);
+        cornerstoneTools.highlight.activate(this.element,1);
+        cornerstoneTools.pan.activate(this.element, 2); // 2 is middle mouse button
+        cornerstoneTools.zoom.activate(this.element, 4); // 4 is right mouse button
+        this.currentMode = 'highlight';
+    }
+    toArrowAnnotateMode(){
+        this.disableAllMode();
+        cornerstoneTools.arrowAnnotate.enable(this.element);
+        cornerstoneTools.arrowAnnotate.activate(this.element,1);
+        cornerstoneTools.pan.activate(this.element, 2); // 2 is middle mouse button
+        cornerstoneTools.zoom.activate(this.element, 4); // 4 is right mouse button
+        this.currentMode = 'arrowAnnotate';
+    }
+    toPlayMode(){
+        this.disableAllMode();
+        if (this.playingClip){
+            cornerstoneTools.stopClip(this.element);
+            this.playingClip = null;
+            cornerstoneTools.pan.activate(this.element, 2); // 2 is middle mouse button
+            cornerstoneTools.zoom.activate(this.element, 4); // 4 is right mouse button
+        }
+        else {
+            this.playingClip = {
+                previousMode: this.currentMode,
+            }
+            cornerstoneTools.playClip(this.element,24);
+            this.currentMode = 'playClip';
+        }
+    }
+    invertImage(){
+        var viewPort = cornerstone.getViewport(this.element);
+        if (viewPort){
+            viewPort.invert = !viewPort.invert;
+        }
+        cornerstone.setViewport(this.element, viewPort)
+    }
+    vflipImage(){
+        var viewPort = cornerstone.getViewport(this.element);
+        if (viewPort){
+            viewPort.vflip = !viewPort.vflip;
+        }
+        cornerstone.setViewport(this.element, viewPort)
+    }
+    rotateImage(){
+        var viewPort = cornerstone.getViewport(this.element);
+        if (viewPort){
+            viewPort.rotation += 90;
+        }
+        cornerstone.setViewport(this.element, viewPort)
+    }
+    hflipImage(){
+        var viewPort = cornerstone.getViewport(this.element);
+        if (viewPort){
+            viewPort.hflip = !viewPort.hflip;
+        }
+        cornerstone.setViewport(this.element, viewPort)
+    }
+    exportImage(){
+        try{
+            cornerstoneTools.saveAs(this.element,"image.png");
+        }
+        catch(error){
+            console.log("Export image failed");
+        }
+    }
+    clearImage(){
+        cornerstoneTools.clearToolState(this.element, "length");
+        cornerstoneTools.clearToolState(this.element, "simpleAngle");
+        cornerstoneTools.clearToolState(this.element, "probe");
+        cornerstoneTools.clearToolState(this.element, "ellipticalRoi");
+        cornerstoneTools.clearToolState(this.element, "rectangleRoi");
+        cornerstoneTools.clearToolState(this.element, "freehand");
+        cornerstoneTools.clearToolState(this.element, "arrowAnnotate");
+        cornerstone.updateImage(this.element);
+    }
+    resetImage(){
+        cornerstone.reset(this.element);
+        var viewPort = cornerstone.getViewport(this.element);
+        console.log(viewPort);
+    }
+    getImage(){
+        return cornerstone.getImage(this.element);
+    }
+    getElement(){
+        return this.element;
+    }
+    static getOrientationString(inputCosine){
+        return cornerstoneTools.orientation.getOrientationString(inputCosine);
+    }
+    static invertOrientationString(inputString){
+        return cornerstoneTools.orientation.invertOrientationString(inputString);
     }
     resizeImage(){
         cornerstone.resize(this.element, true);

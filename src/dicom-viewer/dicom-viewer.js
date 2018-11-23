@@ -138,12 +138,17 @@ class DicomViewer extends React.Component {
   componentWillReceiveProps(nextProps){
     if (this.props.drawerOpen != nextProps.drawerOpen){
       console.log("drawer open: " + nextProps.drawerOpen)
-      if (nextProps.drawerOpen){
-        this.dicomImage.style.width = 'calc(100vw - 240px - 2px - 170px)'
+      if (this.viewer && this.state.dicomImage){
+        var element = this.state.dicomImage;
+        if (nextProps.drawerOpen){
+          element.style.width = 'calc(100vw - 240px - 2px - 170px)';
+        }
+        else{
+          element.style.width = 'calc(100vw - 2px - 170px)';
+        }
+        this.viewer.resizeImage();
       }
-      else{
-        this.dicomImage.style.width = 'calc(100vw - 2px - 170px)'
-      }
+
     }
   }
 
@@ -152,24 +157,13 @@ class DicomViewer extends React.Component {
   }
 
   componentWillUnmount(){
-
+    window.removeEventListener('resize', this.handleResize);
   }
 
   componentDidMount() {
+    window.addEventListener('resize', this.handleResize);
   }
 
-
-  handleClick(event){
-    this.setState({
-      anchorEl: event.currentTarget
-    });
-  };
-
-  handleClose(){
-    this.setState({
-      anchorEl: null
-    });
-  };
 
   rotateMarker(div, rotation) {
     var rotationCSS = {
@@ -200,52 +194,43 @@ class DicomViewer extends React.Component {
     });
   }
 
-  calculateOrientationMarkers(element, viewport, state) {
-    // var enabledElement = cornerstone.getEnabledElement(element);
-    // var imagePlaneMetaData = cornerstone.metaData.get('imagePlaneModule', enabledElement.image.imageId);
-
-    // var rowString = cornerstoneTools.orientation.getOrientationString(state.rowCosine);
-    // var columnString = cornerstoneTools.orientation.getOrientationString(state.columnCosine);
-
-    // var oppositeRowString = cornerstoneTools.orientation.invertOrientationString(rowString);
-    // var oppositeColumnString = cornerstoneTools.orientation.invertOrientationString(columnString);
-    
-
-    // var markers = {
-    //   top: oppositeColumnString,
-    //   bottom: columnString,
-    //   left: oppositeRowString,
-    //   right: rowString
-    // }
-
-    // var topMid = document.querySelector('.mrtopmiddle .orientationMarker');
-    // var bottomMid = document.querySelector('.mrbottommiddle .orientationMarker');
-    // var rightMid = document.querySelector('.mrrightmiddle .orientationMarker');
-    // var leftMid = document.querySelector('.mrleftmiddle .orientationMarker');
-
-
-    // topMid.textContent = markers.top;
-    // bottomMid.textContent = markers.bottom;
-    // rightMid.textContent = markers.right;
-    // leftMid.textContent = markers.left;
-  }
-
-  handleResize(event,dicomImage){
-    if (dicomImage)
-    {
-      console.log('updateSize')
-
-      dicomImage.style.height = 'calc(100vh - 128px - 2px)'
-      dicomImage.style.width = '100%'
-      // try{
-      //   cornerstone.resize(dicomImage)          
-      // }
-      // catch(error)
-      // {
-      //   console.log(error)
-      // }
+  calculateOrientationMarkers() {
+    if (this.viewer){
+      const currentImage = this.viewer.getImage();
+      if (currentImage){
+          if (currentImage.patientOri){
+            const rowString = dcmViewer.getOrientationString(currentImage.patientOri.slice(0,3));
+            const columnString = dcmViewer.getOrientationString(currentImage.patientOri.slice(3,6));
+            const oppositeRowString = dcmViewer.invertOrientationString(rowString);
+            const oppositeColumnString = dcmViewer.invertOrientationString(columnString);
+            var topMid = document.querySelector('.mrtopmiddle .orientationMarker');
+            var bottomMid = document.querySelector('.mrbottommiddle .orientationMarker');
+            var rightMid = document.querySelector('.mrrightmiddle .orientationMarker');
+            var leftMid = document.querySelector('.mrleftmiddle .orientationMarker');
+            if (topMid){
+              topMid.textContent = oppositeColumnString;
+            }
+            if (bottomMid){
+              bottomMid.textContent = columnString;
+            }
+            if (rightMid){
+              rightMid.textContent = rowString;
+            }
+            if (leftMid){
+              leftMid.textContent = oppositeRowString;
+            }
+        }
+        else {
+          console.log("No image orientation info loaded");
+        }
+      }
+      else {
+        console.log("Image not loaded");
+      }
     }
   }
+
+
 
   handleInfoDialogOpen(){
     this.setState({infoDialog: true});
@@ -300,6 +285,28 @@ class DicomViewer extends React.Component {
   } 
 
 
+  handleResize=()=>{
+    if (this.viewer && this.state.dicomImage)
+    {
+      var element = this.state.dicomImage;
+      element.style.height = 'calc(100vh - 128px - 2px)';
+      element.style.width = '100%';
+      this.viewer.resizeImage();
+    }
+  }
+
+  handleClick = (event)=>{
+    this.setState({
+      anchorEl: event.currentTarget
+    });
+  };
+
+  handleClose= ()=>{
+    this.setState({
+      anchorEl: null
+    });
+  };
+
   dicomImageRef= el => {
     if (el !== this.state.dicomImage){
       this.setState({dicomImage: el});
@@ -313,7 +320,10 @@ class DicomViewer extends React.Component {
       this.viewer = new dcmViewer(this.state.dicomImage);
     }
     if (series){
-      this.viewer.initialiseSeries(series);
+      this.viewer.initialiseSeries(series)
+      .then((res)=>{
+        this.calculateOrientationMarkers();
+      })
     }
     else {
       console.log('input series is empty');
@@ -419,18 +429,29 @@ class DicomViewer extends React.Component {
       Freeform
       </Button>
 
-      <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {}}>
+      <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {
+        if (this.viewer){
+          this.viewer.toHighLightMode();
+        }
+      }}>
       <CropFreeIcon />
       Highlight
       </Button>
 
-      <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {}}>
+      <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {
+        if (this.viewer){
+          this.viewer.toArrowAnnotateMode();
+        }
+      }}>
       <AnnotateIcon />
       Annotate
       </Button>
 
       <Button classes={{label: classes.label}} color="inherit" size="small"
       onClick={() => {
+        if (this.viewer){
+          this.viewer.toPlayMode();
+        }
       }}
       >
       <PlayIcon />
@@ -450,55 +471,112 @@ class DicomViewer extends React.Component {
       >
 
       <Button classes={{label: classes.label}} color="inherit" size="small" 
-      onClick={() => {}}
+      onClick={() => {
+        if (this.viewer){
+          this.viewer.invertImage();
+        }
+      }}
       >
       <InvertIcon />
       Invert
       </Button>
 
       <Button classes={{label: classes.label}} color="inherit" size="small" 
-      onClick={() => {                 }}>
+      onClick={() => {
+        this.calculateOrientationMarkers(null,null,null);
+      }}>
       <TextIcon />
       Text
       </Button>
 
       <Button classes={{label: classes.label}} color="inherit" size="small" 
-      onClick={() => {}}
+      onClick={() => {
+        if (this.viewer){
+          this.viewer.rotateImage();
+          var topMid = document.querySelector('.mrtopmiddle .orientationMarker');
+          var bottomMid = document.querySelector('.mrbottommiddle .orientationMarker');
+          var rightMid = document.querySelector('.mrrightmiddle .orientationMarker');
+          var leftMid = document.querySelector('.mrleftmiddle .orientationMarker');
+          if (topMid && bottomMid && rightMid && leftMid){
+            var temp = bottomMid.textContent;
+            bottomMid.textContent = rightMid.textContent;
+            rightMid.textContent=topMid.textContent;
+            topMid.textContent=leftMid.textContent;
+            leftMid.textContent=temp;
+          }
+        }
+      }}
       >
       <RotateRightIcon />
       Rotate
       </Button>
 
       <Button classes={{label: classes.label}} color="inherit" size="small" 
-      onClick={() => {}}
+      onClick={() => {
+        if (this.viewer){
+          this.viewer.vflipImage();
+          var topMid = document.querySelector('.mrtopmiddle .orientationMarker');
+          var bottomMid = document.querySelector('.mrbottommiddle .orientationMarker');
+          if (topMid && bottomMid){
+            const temp = topMid.textContent;
+            topMid.textContent = bottomMid.textContent;
+            bottomMid.textContent = temp;
+          }
+        }
+      }}
       >
       <VFlipIcon />
       Flip V
       </Button>
 
       <Button classes={{label: classes.label}} color="inherit" size="small" 
-      onClick={() => {}}
+      onClick={() => {
+        if (this.viewer){
+          this.viewer.hflipImage();
+          var rightMid = document.querySelector('.mrrightmiddle .orientationMarker');
+          var leftMid = document.querySelector('.mrleftmiddle .orientationMarker');
+          if (rightMid && leftMid){
+            const temp = rightMid.textContent;
+            rightMid.textContent = leftMid.textContent;
+            leftMid.textContent = temp;
+          }
+        }
+      }}
       >
       <HFlipIcon />
       Flip H
       </Button>
 
       <Button classes={{label: classes.label}} color="inherit" size="small" 
-      onClick={() => {}}
+      onClick={() => {
+        if (this.viewer){
+          this.viewer.exportImage();
+        }
+      }}
       >
       <SaveIcon />
       Export
       </Button>
 
       <Button classes={{label: classes.label}} color="inherit" size="small" 
-      onClick={() => {}}
+      onClick={() => {
+        if (this.viewer){
+          this.viewer.clearImage();
+        }
+      }}
       >
       <ClearIcon />
       Clear
       </Button>
 
       <Button classes={{label: classes.label}} color="inherit" size="small" 
-      onClick={() => {                          }}
+      onClick={() => {
+        if (this.viewer){
+          this.viewer.resetImage();
+          this.calculateOrientationMarkers();
+        }
+
+      }}
       >
       <ReplayIcon />
       Reset
