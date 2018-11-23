@@ -109,7 +109,7 @@ class MprViewer extends React.Component {
         if (this.singleViewer === null){
           this.singleViewer = new pngViewer(element, this.cornerstoneInstance);
           this.singleViewer.name = 'Axial';
-          this.viewerLoadImage('http://192.168.1.108:8081/0002.png');
+          // this.viewerLoadImage('http://192.168.1.108:8081/0002.png');
         }
       }
       else {
@@ -135,7 +135,7 @@ class MprViewer extends React.Component {
           this.singleViewer = new pngViewer(element, this.cornerstoneInstance);
           // this.singleViewer.element = document.getElementById('dicomImageSagittal');
           this.singleViewer.name = 'Sagittal';
-          this.viewerLoadImage('http://192.168.1.108:8081/0001.jpg');
+          // this.viewerLoadImage('http://192.168.1.108:8081/0001.jpg');
         }
       }
       else {
@@ -182,6 +182,11 @@ class MprViewer extends React.Component {
   }
 
   setCursor = () =>{
+    // check if within bound first
+    if (!this.props.cursor3D.cursorWithinBound()){
+      return
+    }
+
     var canvas;
     var element = this.state.dicomImage
     if (this.props.orientation === "Axial"){
@@ -287,25 +292,27 @@ class MprViewer extends React.Component {
         if (this.props.ijkPos[0] === nextProps.ijkPos[0] && this.props.ijkPos[1] === nextProps.ijkPos[1]){
           return;
         }
-          var canvas = document.getElementById("canvasAxial")
-          this.props.cursor3D.setViewportAxialSize(canvas.width,canvas.height);
+        
+        var canvas = document.getElementById("canvasAxial")
+        this.props.cursor3D.setViewportAxialSize(canvas.width,canvas.height);
 
-          this.props.cursor3D.update()
-          this.setState({
-            "cursorViewportX": this.props.cursor3D.getAxialViewportPosition()[0],
-            "cursorViewportY": this.props.cursor3D.getAxialViewportPosition()[1]
+        this.props.cursor3D.update()
+
+        this.setState({
+          "cursorViewportX": this.props.cursor3D.getAxialViewportPosition()[0],
+          "cursorViewportY": this.props.cursor3D.getAxialViewportPosition()[1]
         }, ()=>{
-          
           this.setCursor()
           // change slice
           var ijkPos = this.props.cursor3D.getIjkPositionFromAxial(this.state.cursorViewportX, this.state.cursorViewportY)
-            this.setState({slice: ijkPos[2]}, ()=>{
+          if ((this.state.slice | 0) === (ijkPos[2] | 0)){
+            return;
+          }
+          this.setState({slice: ijkPos[2]}, ()=>{
             if (nextProps.series){
                 this.loadSlice()
-              }
-          })
-        }
-        )
+            }
+          })})
       }
       if (this.props.orientation === "Sagittal"){
         if (this.props.ijkPos[1] === nextProps.ijkPos[1] && this.props.ijkPos[2] === nextProps.ijkPos[2]){
@@ -315,20 +322,24 @@ class MprViewer extends React.Component {
         this.props.cursor3D.setViewportSagittalSize(canvas.width,canvas.height);
 
         this.props.cursor3D.update()
-        this.setState({
-          "cursorViewportX": this.props.cursor3D.getSagittalViewportPosition()[0],
-          "cursorViewportY": this.props.cursor3D.getSagittalViewportPosition()[1]
-      }, ()=>{
-          
-          this.setCursor()
-          // change slice
-          var ijkPos = this.props.cursor3D.getIjkPositionFromSagittal(this.state.cursorViewportX, this.state.cursorViewportY)
+
+          this.setState({
+            "cursorViewportX": this.props.cursor3D.getSagittalViewportPosition()[0],
+            "cursorViewportY": this.props.cursor3D.getSagittalViewportPosition()[1]
+        }, ()=>{
+            
+            this.setCursor()
+            // change slice
+            var ijkPos = this.props.cursor3D.getIjkPositionFromSagittal(this.state.cursorViewportX, this.state.cursorViewportY)
+            if ((this.state.slice | 0) === (ijkPos[0] | 0)){
+              return;
+            }
             this.setState({slice: ijkPos[0]}, ()=>{
-            if (nextProps.series){
-                this.loadSlice()
-              }
+              if (nextProps.series){
+                  this.loadSlice()
+                }
+            })
           })
-        })
       }
       if (this.props.orientation === "Coronal"){
         if (this.props.ijkPos[0] === nextProps.ijkPos[0] && this.props.ijkPos[2] === nextProps.ijkPos[2]){
@@ -339,21 +350,24 @@ class MprViewer extends React.Component {
         this.props.cursor3D.setViewportCoronalSize(canvas.width,canvas.height);
 
         this.props.cursor3D.update()
+
         this.setState({
           "cursorViewportX": this.props.cursor3D.getCoronalViewportPosition()[0],
           "cursorViewportY": this.props.cursor3D.getCoronalViewportPosition()[1]
-      }, ()=>{
-          
-          this.setCursor()
-          // change slice
-          var ijkPos = this.props.cursor3D.getIjkPositionFromCoronal(this.state.cursorViewportX, this.state.cursorViewportY)
+          }, ()=>{
+            this.setCursor()
+            // change slice
+            var ijkPos = this.props.cursor3D.getIjkPositionFromCoronal(this.state.cursorViewportX, this.state.cursorViewportY)
+            if ((this.state.slice | 0) === (ijkPos[1] | 0)){
+              return;
+            }
             this.setState({slice: ijkPos[1]}, ()=>{
-            if (nextProps.series){
-                this.loadSlice()
-              }
-          })
-        })
-      }
+              if (nextProps.series){
+                  this.loadSlice()
+                }
+              })
+            })
+        }
     }
 
       if (this.state.dicomImage){
@@ -486,7 +500,10 @@ class MprViewer extends React.Component {
 
       this.props.cursor3D.update()
       var ijkPos = this.props.cursor3D.getIjkPositionFromAxial(this.state.cursorViewportX, this.state.cursorViewportY)
-      this.props.onCursorChange()
+      
+      if (this.props.cursor3D.cursorWithinBound()){
+        this.props.onCursorChange()
+      }
     }
     if (orientation === "Sagittal"){
       var canvas = document.getElementById("canvasSagittal")
@@ -494,54 +511,114 @@ class MprViewer extends React.Component {
 
       this.props.cursor3D.update()
       var ijkPos = this.props.cursor3D.getIjkPositionFromSagittal(this.state.cursorViewportX, this.state.cursorViewportY)
-      this.props.onCursorChange()
+     
+      if (this.props.cursor3D.cursorWithinBound()){
+        this.props.onCursorChange()
+      }
     }
     if (orientation === "Coronal"){
       var canvas = document.getElementById("canvasCoronal")
       this.props.cursor3D.setViewportCoronalSize(canvas.width, canvas.height) 
 
       this.props.cursor3D.update()
-      var worldPos = this.props.cursor3D.getIjkPositionFromCoronal(this.state.cursorViewportX, this.state.cursorViewportY)
-      this.props.onCursorChange()
+      var ijkPos = this.props.cursor3D.getIjkPositionFromCoronal(this.state.cursorViewportX, this.state.cursorViewportY)
+      if (this.props.cursor3D.cursorWithinBound()){
+        this.props.onCursorChange()
+      }
     }
-
   }
 
   handleWheelChange(event, orientation){
     if (event.deltaY < 0 ){
       // mouse wheel up
-      console.log("wheel up")
+      // console.log("wheel up")
       // update cursor position
+      // if (!this.props.cursor3D.cursorWithinBound()){
+      //   return;
+      // }
+
       if (this.props.orientation === "Axial"){
-        this.props.cursor3D.ijkPositionZ = this.props.cursor3D.ijkPositionZ + 1;
+        // check if at bound 
+        if (Math.round(this.props.cursor3D.getIjkPosition()[2]) < this.props.cursor3D.sizeZ-1){
+          // console.log("within z axis bound")
+          this.props.cursor3D.setIjkPosition(
+            this.props.cursor3D.getIjkPosition()[0],
+            this.props.cursor3D.getIjkPosition()[1],
+            this.props.cursor3D.getIjkPosition()[2] + 1)
+          this.setCursor()
+          this.setState({slice: this.state.slice + 1}, ()=>{this.loadSlice();console.log(this.state.slice)})
+        }
       }else if(this.props.orientation === "Sagittal"){
-        this.props.cursor3D.ijkPositionX = this.props.cursor3D.ijkPositionX + 1;
+        // check if at bound 
+        if (Math.round(this.props.cursor3D.getIjkPosition()[0]) < this.props.cursor3D.sizeX-1){
+          // console.log("within x axis bound")
+          this.props.cursor3D.setIjkPosition(
+            this.props.cursor3D.getIjkPosition()[0] + 1,
+            this.props.cursor3D.getIjkPosition()[1],
+            this.props.cursor3D.getIjkPosition()[2])
+          this.setCursor()
+          this.setState({slice: this.state.slice + 1}, ()=>{this.loadSlice();console.log(this.state.slice)})
+        }
       }else if(this.props.orientation === "Coronal"){
-        this.props.cursor3D.ijkPositionY = this.props.cursor3D.ijkPositionY + 1;
-      }
+        // check if at bound 
+        if (Math.round(this.props.cursor3D.getIjkPosition()[1]) < this.props.cursor3D.sizeY-1){
+          // console.log("within y axis bound")
+          this.props.cursor3D.setIjkPosition(
+          this.props.cursor3D.getIjkPosition()[0],
+          this.props.cursor3D.getIjkPosition()[1] + 1,
+          this.props.cursor3D.getIjkPosition()[2])
+          this.setCursor()
+          this.setState({slice: this.state.slice + 1}, ()=>{this.loadSlice();console.log(this.state.slice)})
+      }}
 
       this.props.cursor3D.update(); 
       this.props.onCursorChange();
       this.setCursor();
-      this.setState({slice: this.state.slice + 1}, ()=>{this.loadSlice()})
+      
     }
     if (event.deltaY > 0){
       // mouse wheel down
-      console.log("wheel down")
+      // console.log("wheel down")
 
+      // update cursor position
       if (this.props.orientation === "Axial"){
-        this.props.cursor3D.ijkPositionZ = this.props.cursor3D.ijkPositionZ - 1;
+        // check if at bound 
+        if (Math.round(this.props.cursor3D.getIjkPosition()[2]) >= 1){
+          // console.log("within z axis bound")
+          this.props.cursor3D.setIjkPosition(
+            this.props.cursor3D.getIjkPosition()[0],
+            this.props.cursor3D.getIjkPosition()[1],
+            this.props.cursor3D.getIjkPosition()[2] - 1)
+          this.setCursor()
+          this.setState({slice: this.state.slice - 1}, ()=>{this.loadSlice()})
+        }
       }else if(this.props.orientation === "Sagittal"){
-        this.props.cursor3D.ijkPositionX = this.props.cursor3D.ijkPositionX - 1;
+        // check if at bound 
+        if (Math.round(this.props.cursor3D.getIjkPosition()[0]) >= 1){
+          // console.log("within x axis bound")
+          this.props.cursor3D.setIjkPosition(
+          this.props.cursor3D.getIjkPosition()[0] - 1,
+          this.props.cursor3D.getIjkPosition()[1],
+          this.props.cursor3D.getIjkPosition()[2])
+          this.setCursor()
+          this.setState({slice: this.state.slice - 1}, ()=>{this.loadSlice()})
+        }
       }else if(this.props.orientation === "Coronal"){
-        this.props.cursor3D.ijkPositionY = this.props.cursor3D.ijkPositionY - 1;
+        // check if at bound 
+        if (Math.round(this.props.cursor3D.getIjkPosition()[1]) >= 1){
+          // console.log("within y axis bound")
+          this.props.cursor3D.setIjkPosition(
+          this.props.cursor3D.getIjkPosition()[0],
+          this.props.cursor3D.getIjkPosition()[1] - 1,
+          this.props.cursor3D.getIjkPosition()[2])
+          this.setCursor()
+          this.setState({slice: this.state.slice - 1}, ()=>{this.loadSlice()})
+        }
       }
 
       this.props.cursor3D.update(); 
       this.props.onCursorChange();
       this.setCursor();
-
-      this.setState({slice: this.state.slice - 1}, ()=>{this.loadSlice()})
     }
   }
 
