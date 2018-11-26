@@ -45,7 +45,7 @@ class Content extends React.Component {
     constructor(props){
         super(props);
         this.state = {
-            page: 3,
+            page: 0,
             series: null,
             socket: null,
         };
