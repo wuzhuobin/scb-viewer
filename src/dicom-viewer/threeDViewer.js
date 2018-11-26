@@ -118,7 +118,7 @@ class ThreeDViewer extends React.Component {
       this.setState({isImageUpdated2:false},()=>{
         axios({
         method: 'post',
-        url: 'http://192.168.1.112:8080/api/getVolumeRendering',
+        url: 'http://223.255.146.2:8081/api/getVolumeRendering',
         data: {
           series: series,
           id: this.props.socket.id,
@@ -159,7 +159,7 @@ class ThreeDViewer extends React.Component {
       this.setState({isImageUpdated2:false},()=>{
         axios({
         method: 'post',
-        url: 'http://192.168.1.112:8080/api/getVolumeRendering',
+        url: 'http://223.255.146.2:8081/api/getVolumeRendering',
         data: {
           series: series,
           id: this.props.socket.id,
@@ -200,7 +200,7 @@ class ThreeDViewer extends React.Component {
       this.setState({isImageUpdated2:false},()=>{
         axios({
         method: 'post',
-        url: 'http://192.168.1.112:8080/api/getVolumeRendering',
+        url: 'http://223.255.146.2:8081/api/getVolumeRendering',
         data: {
           series: series,
           id: this.props.socket.id,

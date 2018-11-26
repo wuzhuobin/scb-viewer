@@ -211,7 +211,7 @@ class MprViewer extends React.Component {
     if (this.props.orientation === "Axial"){
       axios({
         method: 'post',
-        url: 'http://192.168.1.112:8080/api/getReslice',
+        url: 'http://223.255.146.2:8081/api/getReslice',
         data: {
           series: this.props.series,
           id: this.props.socket.id,
@@ -231,7 +231,7 @@ class MprViewer extends React.Component {
     }else if (this.props.orientation === "Sagittal"){
       axios({
         method: 'post',
-        url: 'http://192.168.1.112:8080/api/getReslice',
+        url: 'http://223.255.146.2:8081/api/getReslice',
         data: {
           series: this.props.series,
           id: this.props.socket.id,
@@ -250,7 +250,7 @@ class MprViewer extends React.Component {
     }else if (this.props.orientation === "Coronal"){
       axios({
         method: 'post',
-        url: 'http://192.168.1.112:8080/api/getReslice',
+        url: 'http://223.255.146.2:8081/api/getReslice',
         data: {
           series: this.props.series,
           id: this.props.socket.id,

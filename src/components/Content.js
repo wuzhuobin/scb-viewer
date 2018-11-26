@@ -67,7 +67,7 @@ class Content extends React.Component {
 
     componentDidMount(){
       // websocket to mpr backend
-      var endPoint = "http://192.168.1.112:8080"
+      var endPoint = "http://223.255.146.2:8081"
       const socket = socketIOClient(endPoint)
       socket.on('connect', ()=>{
         this.setState({socket: socket});

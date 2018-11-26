@@ -104,7 +104,7 @@ class DicomViewer3D extends React.Component {
       this.setState({loadingMessage: "Loading"})
       var loadingPromise = axios({
           method: 'post',
-          url: 'http://192.168.1.112:8080/api/loadDicom',
+          url: 'http://223.255.146.2:8081/api/loadDicom',
           // timeout: 1 * 1000,
           data: {
             series: series,
@@ -118,7 +118,7 @@ class DicomViewer3D extends React.Component {
             // get image header
             axios({
               method: 'get',
-              url: 'http://192.168.1.112:8080/api/getImageHeader',
+              url: 'http://223.255.146.2:8081/api/getImageHeader',
               params:{
                 id: this.props.socket.id,
                 series: series,
