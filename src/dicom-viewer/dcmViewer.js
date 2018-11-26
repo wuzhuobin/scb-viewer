@@ -12,16 +12,36 @@ export default class dcmViewer{
 		this.columnCosine=[0,1,0];
 		this.currentLoaderHint="noImage";
         this.element = inputElement;
-        this.stack = [];
+        this.stack = null;
         this.playingClip = null;
         this.currentMode = null;
+        this.renderedCallBack = null;
+        this.timer = null;
         cornerstone.enable(inputElement);
         cornerstoneTools.external.cornerstone = cornerstone;
         cornerstoneTools.external.cornerstoneMath = cornerstoneMath;
         cornerstoneTools.external.Hammer = Hammer;
-
-
 	}
+    destructor(){
+        if (this.element){
+            if (this.renderedCallBack){
+                try{
+                    this.element.removeEventListener("cornerstoneimagerendered", this.callBack);
+                }
+                catch(error){
+                    console.log("Failed to remove callBack");
+                }
+            }
+            if (this.timer){
+                try{
+                    clearInterval(this.timer);
+                }
+                catch(error){
+                    console.log("Failed to remove timeout");
+                }
+            }
+        }
+    }
 	displayImage(inputLoaderHint){
 		const returningPromise = new Promise((resolve,reject)=>{cornerstone.loadImage(inputLoaderHint)
         .then(image => {
@@ -112,6 +132,7 @@ export default class dcmViewer{
                     cacheImagePathArray.push(queryList[i]);
                 }
                 dcmLoader.GlobalDcmLoadManager.loadSeries(cacheImagePathArray,loaderHint);
+                this.currentLoaderHint = loaderHint;
                 const middleIndex = parseInt((cacheimageLoaderHintsArray.length / 2)|0);
                 this.stack = {
                     currentImageIdIndex : middleIndex,
@@ -329,8 +350,8 @@ export default class dcmViewer{
     }
     resetImage(){
         cornerstone.reset(this.element);
-        var viewPort = cornerstone.getViewport(this.element);
-        console.log(viewPort);
+        // var viewPort = cornerstone.getViewport(this.element);
+        // console.log(viewPort);
     }
     getImage(){
         return cornerstone.getImage(this.element);
@@ -347,6 +368,60 @@ export default class dcmViewer{
     resizeImage(){
         cornerstone.resize(this.element, true);
         this.updateImageDisplaySize();
+    }
+    setRenderedCallBack(inputCallBack){
+        if (this.element){
+            this.renderedCallBack = inputCallBack;
+            this.element.addEventListener("cornerstoneimagerendered", inputCallBack);
+        }
+    }
+    setTimeoutCallBack(inputCallBack, interval){
+        if (this.timer){
+            clearInterval(this.timer);
+        }
+        this.timer = setInterval(inputCallBack, interval);
+    }
+    clearTimer(){
+        if (this.timer){
+            clearInterval(this.timer);
+        }
+    }
+    getZoom(){
+        if (this.element){
+            const viewport = cornerstone.getViewport(this.element);
+            return viewport.scale;
+        }
+        return '';
+
+    }
+    getWW(){
+        if (this.element){
+            const viewport = cornerstone.getViewport(this.element);
+            if (viewport.voi){
+                return viewport.voi.windowWidth;
+            }
+        }
+        return '';
+    }
+    getWC(){
+        if (this.element){
+            const viewport = cornerstone.getViewport(this.element);
+            if (viewport.voi){
+                return viewport.voi.windowWidth;
+            }
+        }
+        return '';
+    }
+    getLoadingProgress(){
+        const hitIndex = dcmLoader.GlobalDcmLoadManager.findSeries(this.currentLoaderHint);
+        if (hitIndex===null){
+            return 0;
+        }
+        const loader = dcmLoader.GlobalDcmLoadManager.loadedBuffer[hitIndex].dcmLoader;
+        if (loader){
+            return loader.numLoaded/loader.numDcm;
+        }
+        return 0;
     }
 }
 

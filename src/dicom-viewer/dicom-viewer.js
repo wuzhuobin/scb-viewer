@@ -1,9 +1,5 @@
 import React from "react";
 import Hammer from "hammerjs";
-import * as cornerstone from "cornerstone-core";
-import * as cornerstoneTools from "cornerstone-tools";
-import * as cornerstoneMath from "cornerstone-math";
-import * as dcmLoader from "./dcmLoader";
 import {withStyles} from '@material-ui/core/styles'
 // import exampleImageIdLoader from "./exampleImageIdLoader";
 import {Snackbar} from '@material-ui/core';
@@ -123,16 +119,14 @@ class DicomViewer extends React.Component {
     super(props);
     this.state={
       username: '',
-      anonymized: false,
       anchorEl:null,
-      rowCosine:[1,0,0],
-      columnCosine:[0,1,0],
       selectedSeries: null,
       dicomImage:null,
       loadingProgress: 100,
       infoDialog:false,
     };
     this.viewer = null;
+    this.anonymized = false;
   }
 
   componentWillReceiveProps(nextProps){
@@ -230,7 +224,37 @@ class DicomViewer extends React.Component {
     }
   }
 
-
+  updateAnnotation(){
+    if (this.viewer){
+      const currentImage = this.viewer.getImage();
+      if (currentImage){
+        var topLeft = document.getElementById("mrtopleft");
+        var topRight = document.getElementById("mrtopright");
+        if (topLeft && currentImage.patientName){
+          topLeft.textContent = currentImage.patientName;
+        }
+        if (topRight){
+          topRight.textContent = '';
+          if (currentImage.institutionName){
+            topRight.textContent+=`${currentImage.institutionName}`;
+          }
+          topRight.textContent+="\r\n";
+          if (currentImage.studyDescription){
+            topRight.textContent+=`${currentImage.studyDescription}`;
+          }
+          topRight.textContent+="\r\n";
+          if (currentImage.seriesDescription){
+            topRight.textContent+=`${currentImage.seriesDescription}`;
+          }
+          topRight.textContent+="\r\n";
+          if (currentImage.studyDate){
+            topRight.textContent+=`${currentImage.studyDate}`;
+          }
+          topRight.textContent+="\r\n";
+        }
+      }
+    }
+  }
 
   handleInfoDialogOpen(){
     this.setState({infoDialog: true});
@@ -323,11 +347,50 @@ class DicomViewer extends React.Component {
       this.viewer.initialiseSeries(series)
       .then((res)=>{
         this.calculateOrientationMarkers();
+        this.updateAnnotation();
+        this.viewer.setRenderedCallBack(this.onImageRendered);
+        this.viewer.setTimeoutCallBack(this.loadingProgressUpdater, 1000);
       })
     }
     else {
       console.log('input series is empty');
     }
+  }
+
+  onImageRendered= ()=>{
+    var bottomLeft = document.getElementById("mrbottomleft");
+    var bottomRight = document.getElementById("mrbottomright");
+    if (this.viewer){
+      if (bottomLeft){
+        const stack = this.viewer.stack;
+        if (stack){
+          bottomLeft.textContent = `Slices: ${stack.currentImageIdIndex+1}/${stack.imageIds.length}`;
+        }
+      }
+      if (bottomRight){
+        // console.log(this.viewer.getZoom());
+        bottomRight.textContent = `Zoom: ${this.viewer.getZoom().toFixed(2)*100}%`;
+        bottomRight.textContent += "\r\n";
+        bottomRight.textContent +=`W:${Math.round(this.viewer.getWW())} L:${Math.round(this.viewer.getWC())}`
+
+      }
+    }
+    
+  }
+
+  loadingProgressUpdater = ()=>{
+    const curLoadProgress = Math.round(100*this.viewer.getLoadingProgress());
+    // console.log(curLoadProgress);
+    this.setState({loadingProgress:curLoadProgress});
+    if (curLoadProgress == 100){
+      try{
+        this.viewer.clearTimer();
+      }
+      catch(error){
+        console.log("Stop timer failed");
+      }
+    }
+
   }
 
   render() {
@@ -483,7 +546,36 @@ class DicomViewer extends React.Component {
 
       <Button classes={{label: classes.label}} color="inherit" size="small" 
       onClick={() => {
-        this.calculateOrientationMarkers(null,null,null);
+          this.anonymized=!this.anonymized;
+
+          var bottomLeft = document.getElementById("mrbottomleft");
+          var bottomRight = document.getElementById("mrbottomright");
+          var topLeft = document.getElementById("mrtopleft");
+          var topRight = document.getElementById("mrtopright");
+          var correctedVisibility = "hidden"
+          if (this.anonymized){
+            correctedVisibility = "visible";
+          }
+          if (bottomLeft){
+            if (bottomLeft.style){
+              bottomLeft.style.visibility = correctedVisibility;
+            }
+          }
+          if (bottomRight){
+            if (bottomRight.style){
+              bottomRight.style.visibility = correctedVisibility;
+            }
+          }
+          if (topLeft){
+            if (topLeft.style){
+              topLeft.style.visibility = correctedVisibility;
+            }
+          }
+          if (topRight){
+            if (topRight.style){
+              topRight.style.visibility = correctedVisibility;
+            }
+          }
       }}>
       <TextIcon />
       Text
@@ -663,8 +755,8 @@ class DicomViewer extends React.Component {
                 </div>
                 <Snackbar
                 anchorOrigin={{vertical:'bottom',horizontal:'right'}}
-              // open={this.state.loadingProgress < 100}
-              open={true}
+              open={this.state.loadingProgress < 100}
+              // open={true}
               ContentProps={{
                 'aria-describedby': 'message-id',
                 className: classes.loadingProgressSnackbar
