@@ -11,6 +11,9 @@ const styles = theme => ({
     height: 170,
     width: '100%',
     backgroundColor: theme.palette.secondary.main,
+    MozUserSelect:'none',
+    WebkitUserSelect:'none',
+    msUserSelect:'none',
 	},
   demo:{
     height: 170,
@@ -27,6 +30,9 @@ const styles = theme => ({
     borderColor: theme.palette.secondary.light,
     borderWidth: '2px',
     '&:hover': {borderColor: theme.palette.primary.light,},
+    MozUserSelect:'none',
+    WebkitUserSelect:'none',
+    msUserSelect:'none',
   },
   xsItem: {
 
@@ -40,7 +46,10 @@ const styles = theme => ({
     paddingLeft: 5,
     paddingBottom: 5,
     transform: "translateY(-100%)",
-    position: 'relative'
+    position: 'relative',
+    MozUserSelect:'none',
+    WebkitUserSelect:'none',
+    msUserSelect:'none',
   },
 })
 

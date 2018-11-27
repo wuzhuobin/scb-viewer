@@ -77,9 +77,13 @@ const styles = theme => ({
     overflow: 'auto',
     color: theme.palette.secondary.contrastText,
     backgroundColor: theme.palette.secondary.main,
-    height: 'calc(100% - 172px)'
+    height: 'calc(100% - 172px)',
+    MozUserSelect:'none',
+    WebkitUserSelect:'none',
+    msUserSelect:'none',
   },
   tablePagination: {
+
   },
   tablePaginationCaption: {
     color: theme.palette.primary.contrastText
@@ -160,7 +164,7 @@ class EnhancedTableHead extends React.Component{
         <TableHead >
             <TableRow>
               <TableCell style={{color: '#6fcbff', fontWeight: 'bold', borderColor:'#151a1f'}}/>
-              <TableCell key='patientName' numeric={false} sortDirection='asc' style={{color: '#6fcbff', fontWeight: 'bold', borderColor:'#151a1f'}}>
+              <TableCell key='patientName' numeric={false} sortDirection='asc' style={{color: '#6fcbff', fontWeight: 'bold', borderColor:'#151a1f', MozUserSelect:'none', WebkitUserSelect:'none', msUserSelect:'none'}}>
                 <TableSortLabel
                   active={true}
                   style={{color: '#6fcbff', fontWeight: 'bold', borderColor:'#151a1f'}}
@@ -168,13 +172,13 @@ class EnhancedTableHead extends React.Component{
                   Patient ID
                 </TableSortLabel>
               </TableCell>
-              <TableCell style={{color: '#6fcbff', fontWeight: 'bold', borderColor:'#151a1f'}}>Patient Name</TableCell>
-              <TableCell style={{color: '#6fcbff', fontWeight: 'bold', borderColor:'#151a1f'}}>Date of Birth</TableCell>
-              <TableCell style={{color: '#6fcbff', fontWeight: 'bold', borderColor:'#151a1f'}}>Gender</TableCell>
-              <TableCell style={{color: '#6fcbff', fontWeight: 'bold', borderColor:'#151a1f'}}>Study</TableCell>
-              <TableCell style={{color: '#6fcbff', fontWeight: 'bold', borderColor:'#151a1f'}}>Institution</TableCell>
-              <TableCell style={{color: '#6fcbff', fontWeight: 'bold', borderColor:'#151a1f'}}>Requested Procedure</TableCell>
-              <TableCell style={{color: '#6fcbff', fontWeight: 'bold', borderColor:'#151a1f'}}>Study Date</TableCell>
+              <TableCell style={{color: '#6fcbff', fontWeight: 'bold', borderColor:'#151a1f', MozUserSelect:'none', WebkitUserSelect:'none', msUserSelect:'none'}}>Patient Name</TableCell>
+              <TableCell style={{color: '#6fcbff', fontWeight: 'bold', borderColor:'#151a1f', MozUserSelect:'none', WebkitUserSelect:'none', msUserSelect:'none'}}>Date of Birth</TableCell>
+              <TableCell style={{color: '#6fcbff', fontWeight: 'bold', borderColor:'#151a1f', MozUserSelect:'none', WebkitUserSelect:'none', msUserSelect:'none'}}>Gender</TableCell>
+              <TableCell style={{color: '#6fcbff', fontWeight: 'bold', borderColor:'#151a1f', MozUserSelect:'none', WebkitUserSelect:'none', msUserSelect:'none'}}>Study</TableCell>
+              <TableCell style={{color: '#6fcbff', fontWeight: 'bold', borderColor:'#151a1f', MozUserSelect:'none', WebkitUserSelect:'none', msUserSelect:'none'}}>Institution</TableCell>
+              <TableCell style={{color: '#6fcbff', fontWeight: 'bold', borderColor:'#151a1f', MozUserSelect:'none', WebkitUserSelect:'none', msUserSelect:'none'}}>Requested Procedure</TableCell>
+              <TableCell style={{color: '#6fcbff', fontWeight: 'bold', borderColor:'#151a1f', MozUserSelect:'none', WebkitUserSelect:'none', msUserSelect:'none'}}>Study Date</TableCell>
             </TableRow>       
           </TableHead>
           )
@@ -304,6 +308,9 @@ class Images extends React.Component {
                 selectIcon: classes.tablePaginationSelectIcon,
                 select: classes.tablePaginationSelect,
                 actions: classes.tablePaginationActions,
+                MozUserSelect:'none',
+                WebkitUserSelect:'none',
+                msUserSelect:'none',
               }}
               // ActionsComponent={TablePaginationActionsWrapped}
             />

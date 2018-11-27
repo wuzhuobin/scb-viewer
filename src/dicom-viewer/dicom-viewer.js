@@ -716,39 +716,42 @@ class DicomViewer extends React.Component {
                   top: 0,
                   left: 0,
                   position: "relative",
+                  MozUserSelect:'none',
+                  WebkitUserSelect:'none',
+                  msUserSelect:'none',
                 }}
                 />
 
 
-              <div id="mrtopleft" style={{ position: "absolute", top: "0.5%", left: "0.5%", whiteSpace: 'pre' }}>
+              <div id="mrtopleft" style={{ position: "absolute", top: "0.5%", left: "0.5%", whiteSpace: 'pre', MozUserSelect:'none', WebkitUserSelect:'none', msUserSelect:'none'}}>
                 
               </div>
               
-              <div id="mrtopright" style={{ position: "absolute", top: "0.5%", right: "0.5%", whiteSpace: 'pre', textAlign:"right" }}>
+              <div id="mrtopright" style={{ position: "absolute", top: "0.5%", right: "0.5%", whiteSpace: 'pre', textAlign:"right" , MozUserSelect:'none', WebkitUserSelect:'none', msUserSelect:'none'}}>
                 
               </div>
               
-              <div id="mrbottomright" style={{ position: "absolute", bottom: "0.5%", right: "0.5%", whiteSpace: 'pre', textAlign:"right"  }}>
+              <div id="mrbottomright" style={{ position: "absolute", bottom: "0.5%", right: "0.5%", whiteSpace: 'pre', textAlign:"right" , MozUserSelect:'none', WebkitUserSelect:'none', msUserSelect:'none' }}>
                
               </div>
 
-              <div id="mrbottomleft" style={{ position: "absolute", bottom: "0.5%", left: "0.5%", whiteSpace: 'pre'}}>
+              <div id="mrbottomleft" style={{ position: "absolute", bottom: "0.5%", left: "0.5%", whiteSpace: 'pre', MozUserSelect:'none', WebkitUserSelect:'none', msUserSelect:'none'}}>
                
               </div>
 
-                <div class="mrbottommiddle orientationMarkerDiv" style={{ position: "absolute", bottom: "0.5%", left: "50%" }}>
+                <div class="mrbottommiddle orientationMarkerDiv" style={{ position: "absolute", bottom: "0.5%", left: "50%", MozUserSelect:'none', WebkitUserSelect:'none', msUserSelect:'none' }}>
                 <span class="orientationMarker">Q</span>
                 </div>
 
-                <div class="mrleftmiddle orientationMarkerDiv" style={{ position: "absolute", bottom: "50%", left: "0.5%" }}>
+                <div class="mrleftmiddle orientationMarkerDiv" style={{ position: "absolute", bottom: "50%", left: "0.5%", MozUserSelect:'none', WebkitUserSelect:'none', msUserSelect:'none' }}>
                 <span class="orientationMarker">Q</span>
                 </div>
 
-                <div class="mrtopmiddle orientationMarkerDiv" style={{ position: "absolute", top: "0.5%", left: "50%" }}>
+                <div class="mrtopmiddle orientationMarkerDiv" style={{ position: "absolute", top: "0.5%", left: "50%", MozUserSelect:'none', WebkitUserSelect:'none', msUserSelect:'none' }}>
                 <span class="orientationMarker">Q</span>
                 </div>
 
-                <div  class="mrrightmiddle orientationMarkerDiv" style={{ position: "absolute", bottom: "50%", right: "0.5%" }}>
+                <div  class="mrrightmiddle orientationMarkerDiv" style={{ position: "absolute", bottom: "50%", right: "0.5%" , MozUserSelect:'none', WebkitUserSelect:'none', msUserSelect:'none'}}>
                 <span class="orientationMarker">Q</span>
                 </div>
 

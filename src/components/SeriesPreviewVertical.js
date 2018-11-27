@@ -33,6 +33,9 @@ const styles = theme => ({
     borderWidth: '2px',
     borderColor: theme.palette.secondary.light,
     '&:hover': {borderColor: theme.palette.primary.light,},
+    MozUserSelect:'none',
+	WebkitUserSelect:'none',
+	msUserSelect:'none',
   },
   paperSelected:{
     borderColor: theme.palette.primary.main,
@@ -107,7 +110,8 @@ class SeriesPreviewVertical extends React.Component {
 				{seriesInfo.map((serie, index) => (
                   <GridListTile key={serie.id} item>
 	                  <Paper className={classNames(classes.paper, {[classes.paperSelected]: serie.id==this.props.selectedSeries})} 
-	                  onClick={event => this.props.onSelectSeries(event, serie.id)}>
+	                  	onClick={event => this.props.onSelectSeries(event, serie.id)}
+	                  	onContextMenu={event=>{event.preventDefault()}}>
 	                    <img src={imgs[index]} height="140px" width="140px"></img>
 	                    <div className={classes.seriesContent}>
 	                        <Typography className={classes.text}>

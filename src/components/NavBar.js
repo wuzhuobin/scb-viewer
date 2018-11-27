@@ -39,6 +39,9 @@ const styles = theme=> ({
       },
      grow: {
         flexGrow: 1,
+        MozUserSelect:'none',
+        WebkitUserSelect:'none',
+        msUserSelect:'none',
      },
     menuButton:{
         marginLeft: -12,
