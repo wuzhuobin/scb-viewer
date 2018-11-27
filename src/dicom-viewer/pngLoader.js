@@ -88,7 +88,7 @@ export class pngLoader{
 			var png = new pngjs.PNG().parse(inputArrayBuffer,function(error,data){
 				if (error){
 					const parser = jpgjs.decode(inputArrayBuffer);
-					console.log(parser);
+					// console.log(parser);
 					var array = parser.data;
 					const range = getArrayMinMax(array);
 					resolve({
@@ -206,7 +206,7 @@ export class pngManager{
 		const signatureLocation1 = String(imageId).indexOf("://");
 		const currentLoaderHint = String(imageId).substring(0,signatureLocation1)
 		const currentIndex = GlobalPngLoadManager.findSeries(currentLoaderHint);
-		console.log(imageId)
+		// console.log(imageId)
 		if (inputImagePath.length < 1000){
 			// console.log(inputImagePath)
 			return {

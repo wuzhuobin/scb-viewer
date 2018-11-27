@@ -86,10 +86,9 @@ class ThreeDViewer extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    console.log("receivedProps");
-      // if (true){
-      if (this.state.dicomImage){
-        if (this.props.drawerOpen != nextProps.drawerOpen){
+    // console.log("receivedProps");
+    if (this.state.dicomImage){
+      if (this.props.drawerOpen != nextProps.drawerOpen){
         if (nextProps.drawerOpen){
             this.state.dicomImage.style.width = 'calc(50vw - 120px - 85px - 3px)'
         }
@@ -105,8 +104,6 @@ class ThreeDViewer extends React.Component {
     }
   }
 
-
-
   rotateView(series){
     var curMousePosX = this.state.curMousePosX
     var curMousePosY = this.state.curMousePosY
@@ -118,7 +115,7 @@ class ThreeDViewer extends React.Component {
       this.setState({isImageUpdated2:false},()=>{
         axios({
         method: 'post',
-        url: 'http://223.255.146.2:8081/api/getVolumeRendering',
+        url: 'http://223.255.146.2:8083/api/getVolumeRendering',
         data: {
           series: series,
           id: this.props.socket.id,
@@ -200,7 +197,7 @@ class ThreeDViewer extends React.Component {
       this.setState({isImageUpdated2:false},()=>{
         axios({
         method: 'post',
-        url: 'http://223.255.146.2:8081/api/getVolumeRendering',
+        url: 'http://223.255.146.2:8083/api/getVolumeRendering',
         data: {
           series: series,
           id: this.props.socket.id,
