@@ -161,6 +161,8 @@ class MprViewer extends React.Component {
       this.cornerstoneInstance = null;
     }
 
+    window.removeEventListener("resize", (event)=>{this.handleResize(event, this.state.dicomImage)})
+
   }
 
   setCursor = () =>{
@@ -211,7 +213,7 @@ class MprViewer extends React.Component {
     if (this.props.orientation === "Axial"){
       axios({
         method: 'post',
-        url: 'http://223.255.146.2:8081/api/getReslice',
+        url: 'http://223.255.146.2:8083/api/getReslice',
         data: {
           series: this.props.series,
           id: this.props.socket.id,
@@ -231,7 +233,7 @@ class MprViewer extends React.Component {
     }else if (this.props.orientation === "Sagittal"){
       axios({
         method: 'post',
-        url: 'http://223.255.146.2:8081/api/getReslice',
+        url: 'http://223.255.146.2:8083/api/getReslice',
         data: {
           series: this.props.series,
           id: this.props.socket.id,
@@ -250,7 +252,7 @@ class MprViewer extends React.Component {
     }else if (this.props.orientation === "Coronal"){
       axios({
         method: 'post',
-        url: 'http://223.255.146.2:8081/api/getReslice',
+        url: 'http://223.255.146.2:8083/api/getReslice',
         data: {
           series: this.props.series,
           id: this.props.socket.id,
@@ -442,6 +444,8 @@ class MprViewer extends React.Component {
     }
 
 
+
+
   handleResize(event, dicomImage){
     console.log('handleResize');
     // this.viewerLoadImage('http://192.168.1.108:8081/0001.png');
@@ -534,7 +538,7 @@ class MprViewer extends React.Component {
             this.props.cursor3D.getIjkPosition()[1],
             this.props.cursor3D.getIjkPosition()[2] + 1)
           this.setCursor()
-          this.setState({slice: this.state.slice + 1}, ()=>{this.loadSlice();console.log(this.state.slice)})
+          this.setState({slice: this.state.slice + 1}, ()=>{this.loadSlice();})
         }
       }else if(this.props.orientation === "Sagittal"){
         // check if at bound 
@@ -545,7 +549,7 @@ class MprViewer extends React.Component {
             this.props.cursor3D.getIjkPosition()[1],
             this.props.cursor3D.getIjkPosition()[2])
           this.setCursor()
-          this.setState({slice: this.state.slice + 1}, ()=>{this.loadSlice();console.log(this.state.slice)})
+          this.setState({slice: this.state.slice + 1}, ()=>{this.loadSlice();})
         }
       }else if(this.props.orientation === "Coronal"){
         // check if at bound 
@@ -556,7 +560,7 @@ class MprViewer extends React.Component {
           this.props.cursor3D.getIjkPosition()[1] + 1,
           this.props.cursor3D.getIjkPosition()[2])
           this.setCursor()
-          this.setState({slice: this.state.slice + 1}, ()=>{this.loadSlice();console.log(this.state.slice)})
+          this.setState({slice: this.state.slice + 1}, ()=>{this.loadSlice();})
       }}
 
       this.props.cursor3D.update(); 

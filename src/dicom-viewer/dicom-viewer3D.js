@@ -104,7 +104,7 @@ class DicomViewer3D extends React.Component {
       this.setState({loadingMessage: "Loading"})
       var loadingPromise = axios({
           method: 'post',
-          url: 'http://223.255.146.2:8081/api/loadDicom',
+          url: 'http://223.255.146.2:8083/api/loadDicom',
           // timeout: 1 * 1000,
           data: {
             series: series,
@@ -118,7 +118,7 @@ class DicomViewer3D extends React.Component {
             // get image header
             axios({
               method: 'get',
-              url: 'http://223.255.146.2:8081/api/getImageHeader',
+              url: 'http://223.255.146.2:8083/api/getImageHeader',
               params:{
                 id: this.props.socket.id,
                 series: series,
@@ -128,7 +128,7 @@ class DicomViewer3D extends React.Component {
               this.state.cursor3D.setSize(res.data.Size[0],res.data.Size[1],res.data.Size[2])
               this.state.cursor3D.setIjkPosition(res.data.Size[0]/2,res.data.Size[1]/2, res.data.Size[2]/2)
 
-              console.log(this.state.cursor3D.getIjkPosition())
+              // console.log(this.state.cursor3D.getIjkPosition())
               this.setState({ijkPos: this.state.cursor3D.getIjkPosition()})
               this.setState({loadingProgress: 100})
               this.setState({serverStatus: "MPR Loading Success", serverStatusOpen:true})
@@ -140,6 +140,10 @@ class DicomViewer3D extends React.Component {
           // console.log("server side load complete: " + this.state.selectedSeries)
       }).catch((err)=>{
         // server side error
+        if (!err.response){
+          return;
+        }
+
         if (err.response.status === 500){
           // console.log("error 500")
           // console.log(err.response)
