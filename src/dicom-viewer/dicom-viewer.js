@@ -108,6 +108,11 @@ const styles = theme=> ({
       borderRadius:"3px",
       borderWidth:"1px",
       borderColor: theme.palette.primary.main,
+
+      '&paper':{borderStyle: "solid",
+      borderRadius:"3px",
+      borderWidth:"1px",
+      borderColor: theme.palette.primary.main,}
     },
     loadingProgressSnackbar:{
       minWidth: 100
@@ -538,6 +543,7 @@ class DicomViewer extends React.Component {
         if (this.viewer){
           this.viewer.invertImage();
         }
+        this.handleClose()
       }}
       >
       <InvertIcon />
@@ -576,7 +582,8 @@ class DicomViewer extends React.Component {
               topRight.style.visibility = correctedVisibility;
             }
           }
-      }}>
+          this.handleClose()
+        }}>
       <TextIcon />
       Text
       </Button>
@@ -597,6 +604,7 @@ class DicomViewer extends React.Component {
             leftMid.textContent=temp;
           }
         }
+        this.handleClose()
       }}
       >
       <RotateRightIcon />
@@ -615,6 +623,7 @@ class DicomViewer extends React.Component {
             bottomMid.textContent = temp;
           }
         }
+        this.handleClose()
       }}
       >
       <VFlipIcon />
@@ -633,6 +642,7 @@ class DicomViewer extends React.Component {
             leftMid.textContent = temp;
           }
         }
+        this.handleClose()
       }}
       >
       <HFlipIcon />
@@ -644,6 +654,7 @@ class DicomViewer extends React.Component {
         if (this.viewer){
           this.viewer.exportImage();
         }
+        this.handleClose()
       }}
       >
       <SaveIcon />
@@ -655,6 +666,7 @@ class DicomViewer extends React.Component {
         if (this.viewer){
           this.viewer.clearImage();
         }
+        this.handleClose()
       }}
       >
       <ClearIcon />
@@ -667,7 +679,7 @@ class DicomViewer extends React.Component {
           this.viewer.resetImage();
           this.calculateOrientationMarkers();
         }
-
+        this.handleClose()
       }}
       >
       <ReplayIcon />

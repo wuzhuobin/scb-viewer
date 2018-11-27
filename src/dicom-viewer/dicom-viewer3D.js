@@ -1,15 +1,17 @@
 import React from "react";
 import classNames from 'classnames';
 import {withStyles} from '@material-ui/core/styles'
-import {AppBar,Toolbar, Button, Grid, Snackbar}  from '@material-ui/core';
+import {AppBar,Toolbar, Button, Grid, Snackbar, Popover, Paper}  from '@material-ui/core';
 import SeriesPreviewVertical from '../components/SeriesPreviewVertical'
 import {NavigationOutlined} from '@material-ui/icons';
 import MprViewer from './MprViewer'
 import ThreeDViewer from './threeDViewer'
 import SearchIcon from '@material-ui/icons/Search';
+import TuneIcon from '@material-ui/icons/Tune';
 import Brightness6Icon from '@material-ui/icons/Brightness6Outlined';
 import axios from 'axios';
 import Cursor3D from "./cursor3D";
+import Slider from '@material-ui/lab/Slider';
 
 const styles = theme=> ({
     root:{    
@@ -59,6 +61,8 @@ class DicomViewer3D extends React.Component {
   {
     super(props);
     this.state = {
+      anchorPreset:null,
+      anchorShift:null,
       selectedSeries: null,
       loadingProgress: 100,
       loadingMessage: "Loading...",
@@ -68,6 +72,9 @@ class DicomViewer3D extends React.Component {
       displaySEries: null,
       cursor3D: new Cursor3D(),
       ijkPos: [0,0,0],
+      shift: 0,
+      preset: 1,
+      opacity:1,
    	};
   }
 
@@ -170,6 +177,30 @@ class DicomViewer3D extends React.Component {
     this.setState({serverStatusOpen: false})
   }
 
+  handlePresetOpen = (event)=>{
+    this.setState({
+      anchorPreset: event.currentTarget
+    });
+  }
+
+  handlePresetClose= ()=>{
+    this.setState({
+      anchorPreset: null
+    });
+  }
+
+  handleShiftOpen = (event)=>{
+    this.setState({
+      anchorShift: event.currentTarget
+    });
+  }
+
+  handleShiftClose= ()=>{
+    this.setState({
+      anchorShift: null
+    });
+  }
+
   onCursorChange = () =>{
     // console.log("cursor change")
     // console.log(this.state.cursor3D.getIjkPosition())
@@ -178,16 +209,177 @@ class DicomViewer3D extends React.Component {
 
     render() {
       const {drawerOpen, series, classes} = this.props
-      const {cursor3D, ijkPos} = this.state
+      const {cursor3D, ijkPos, preset, opacity, shift} = this.state
+      const { anchorPreset, anchorShift } = this.state;
+      const openPreset = Boolean(anchorPreset)
+      const openShift = Boolean(anchorShift)
 
     	return(
         <div className={classNames(classes.root, {[classes.drawerOpen]: this.props.drawerOpen,})}>
             <AppBar className={classes.appBar}>
               <Toolbar>
+                
                 <Button classes={{label: classes.label}} color="inherit" >
                   <NavigationOutlined />
                   Navigate
                 </Button>
+
+                <Button classes={{label: classes.label}} color="inherit" size="small" aria-owns={openPreset ? "simple-popper" : null} aria-haspopup="true"
+                  onClick={this.handlePresetOpen}>
+                  <TuneIcon />
+                  Preset
+                </Button>
+
+                <Popover id="simple-popper" classes={classes.popover} open={openPreset} anchorEl={anchorPreset}
+                  anchorOrigin={{ vertical: "bottom", horizontal: "center"}}
+                  transformOrigin={{vertical: "top", horizontal: "center"}}
+                  onClose={this.handlePresetClose}
+                >
+                    <Button classes={{label: classes.label}} color="inherit" size="small" 
+                      onClick={() => {this.setState({preset:1}); this.handlePresetClose()}}
+                    >
+                      CT_AAA
+                    </Button>
+                    <Button classes={{label: classes.label}} color="inherit" size="small" 
+                      onClick={() => {this.setState({preset:2}); this.handlePresetClose()}}
+                    >
+                      CT_AAA2
+                    </Button>
+                    <Button classes={{label: classes.label}} color="inherit" size="small" 
+                      onClick={() => {this.setState({preset:3}); this.handlePresetClose()}}
+                    >
+                      CT_BONE
+                    </Button>
+                    <Button classes={{label: classes.label}} color="inherit" size="small" 
+                      onClick={() => {this.setState({preset:4}); this.handlePresetClose()}}
+                    >
+                      CT_BONES
+                    </Button>
+                    <Button classes={{label: classes.label}} color="inherit" size="small" 
+                      onClick={() => {this.setState({preset:5}); this.handlePresetClose()}}
+                    >
+                      CT_CARDIAC
+                    </Button>
+                    <Button classes={{label: classes.label}} color="inherit" size="small" 
+                      onClick={() => {this.setState({preset:6}); this.handlePresetClose()}}
+                    >
+                      CT_CHEST_CONTRAST_ENHANCED
+                    </Button>
+                    <Button classes={{label: classes.label}} color="inherit" size="small" 
+                      onClick={() => {this.setState({preset:9}); this.handlePresetClose()}}
+                    >
+                      CT_CHEST_VESSELS
+                    </Button>
+                    <Button classes={{label: classes.label}} color="inherit" size="small" 
+                      onClick={() => {this.setState({preset:10}); this.handlePresetClose()}}
+                    >
+                      CT_CORONARY_ARTERIES
+                    </Button>
+                    <Button classes={{label: classes.label}} color="inherit" size="small" 
+                      onClick={() => {this.setState({preset:11}); this.handlePresetClose()}}
+                    >
+                      CT_CORONARY_ARTERIES3
+                    </Button>
+                    <Button classes={{label: classes.label}} color="inherit" size="small" 
+                      onClick={() => {this.setState({preset:13}); this.handlePresetClose()}}
+                    >
+                      CT_CROPPED_VOLUME_BONE
+                    </Button>
+                    <Button classes={{label: classes.label}} color="inherit" size="small" 
+                      onClick={() => {this.setState({preset:14}); this.handlePresetClose()}}
+                    >
+                      CT_LIVER_VASCULATURE
+                    </Button>
+                    <Button classes={{label: classes.label}} color="inherit" size="small" 
+                      onClick={() => {this.setState({preset:15}); this.handlePresetClose()}}
+                    >
+                      CT_LUNG
+                    </Button>
+                    <Button classes={{label: classes.label}} color="inherit" size="small" 
+                      onClick={() => {this.setState({preset:17}); this.handlePresetClose()}}
+                    >
+                      CT_MUSCLE
+                    </Button>
+                    <Button classes={{label: classes.label}} color="inherit" size="small" 
+                      onClick={() => {this.setState({preset:18}); this.handlePresetClose()}}
+                    >
+                      CT_SOFT_TISSUE
+                    </Button>
+                    <Button classes={{label: classes.label}} color="inherit" size="small" 
+                      onClick={() => {this.setState({preset:20}); this.handlePresetClose()}}
+                    >
+                      MR_ANGIO
+                    </Button>
+                    <Button classes={{label: classes.label}} color="inherit" size="small" 
+                      onClick={() => {this.setState({preset:21}); this.handlePresetClose()}}
+                    >
+                      MR_DEFAULT
+                    </Button>
+                </Popover>   
+
+                <Button classes={{label: classes.label}} color="inherit" size="small" aria-owns={openShift ? "simple-popper2" : null} aria-haspopup="true"
+                  onClick={this.handleShiftOpen}>
+                  <TuneIcon />
+                  Shift
+                </Button>
+
+                <Popover id="simple-popper2" classes={classes.popover} open={openShift} anchorEl={anchorShift}
+                  anchorOrigin={{ vertical: "bottom", horizontal: "center"}}
+                  transformOrigin={{vertical: "top", horizontal: "center"}}
+                  onClose={this.handleShiftClose}
+                >
+                  <Button classes={{label: classes.label}} color="inherit" size="small" 
+                    onClick={() => {this.setState({shift:-200}); this.handleShiftClose()}}
+                  >
+                    -200
+                  </Button>                 
+                  <Button classes={{label: classes.label}} color="inherit" size="small" 
+                    onClick={() => {this.setState({shift:-100}); this.handleShiftClose()}}
+                  >
+                    -100
+                  </Button>  
+                  <Button classes={{label: classes.label}} color="inherit" size="small" 
+                    onClick={() => {this.setState({shift:-50}); this.handleShiftClose()}}
+                  >
+                    -50
+                  </Button>                 
+                  <Button classes={{label: classes.label}} color="inherit" size="small" 
+                    onClick={() => {this.setState({shift:0}); this.handleShiftClose()}}
+                  >
+                    0
+                  </Button>   
+                  <Button classes={{label: classes.label}} color="inherit" size="small" 
+                    onClick={() => {this.setState({shift:50}); this.handleShiftClose()}}
+                  >
+                    50
+                  </Button>     
+                  <Button classes={{label: classes.label}} color="inherit" size="small" 
+                    onClick={() => {this.setState({shift:100}); this.handleShiftClose()}}
+                  >
+                    100
+                  </Button>  
+                  <Button classes={{label: classes.label}} color="inherit" size="small" 
+                    onClick={() => {this.setState({shift:200}); this.handleShiftClose()}}
+                  >
+                    200
+                  </Button>    
+                  <Button classes={{label: classes.label}} color="inherit" size="small" 
+                    onClick={() => {this.setState({shift:500}); this.handleShiftClose()}}
+                  >
+                    500
+                  </Button>    
+                  <Button classes={{label: classes.label}} color="inherit" size="small" 
+                    onClick={() => {this.setState({shift:1000}); this.handleShiftClose()}}
+                  >
+                    1000
+                  </Button>    
+                  <Button classes={{label: classes.label}} color="inherit" size="small" 
+                    onClick={() => {this.setState({shift:3000}); this.handleShiftClose()}}
+                  >
+                    3000
+                  </Button>    
+                </Popover>  
+
               </Toolbar>
           </AppBar>
 
@@ -218,7 +410,12 @@ class DicomViewer3D extends React.Component {
                   <ThreeDViewer
                   series={this.state.displaySeries} 
                   socket={this.props.socket} 
-                  drawerOpen={drawerOpen}/>
+                  drawerOpen={drawerOpen}
+                  preset={preset}
+                  shift={shift}
+                  opacity={opacity}
+                  />
+
                 </Grid>
                 <Grid item xs={6}>
                   <MprViewer 

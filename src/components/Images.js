@@ -308,9 +308,6 @@ class Images extends React.Component {
                 selectIcon: classes.tablePaginationSelectIcon,
                 select: classes.tablePaginationSelect,
                 actions: classes.tablePaginationActions,
-                MozUserSelect:'none',
-                WebkitUserSelect:'none',
-                msUserSelect:'none',
               }}
               // ActionsComponent={TablePaginationActionsWrapped}
             />
