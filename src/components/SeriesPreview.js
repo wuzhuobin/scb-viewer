@@ -1,7 +1,6 @@
 import React from "react";
 
-import {Grid, Paper, CardContent, Typography} from '@material-ui/core';
-import {ExpandMore, ExpandLess} from '@material-ui/icons'
+import {Grid, Paper, Typography} from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
 import PACS from "orthanc";
 
@@ -111,7 +110,7 @@ class SeriesPreview extends React.Component {
    
     render() {
     	const {series, imgs} = this.state
-    	const {onSelectSeries, study, classes} = this.props
+    	const {classes} = this.props
 
     	return(
     	    <Grid container className={classes.root}>
@@ -125,7 +124,7 @@ class SeriesPreview extends React.Component {
                 {series.map((serie, index) => (
                   <Grid key={serie.id} item>
                   <Paper className={classes.paper} onDoubleClick={event => this.handleSeriesDoubleClick(event, [serie.id])}>
-                    <img src={imgs[index]} height="140px" width="140px"></img>
+                    <img src={imgs[index]} height="140px" width="140px" alt=""></img>
                     <div className={classes.seriesContent}>
                         <Typography className={classes.text}>
                           {serie.bodyPart}

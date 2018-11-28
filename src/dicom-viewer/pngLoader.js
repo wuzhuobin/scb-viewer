@@ -1,5 +1,4 @@
 import * as pngjs from "pngjs";
-import * as cornerstone from "cornerstone-core";
 import * as jpgjs from "jpeg-js"
 
 function getArrayMinMax(a){

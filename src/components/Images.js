@@ -1,33 +1,31 @@
 import React from "react";
 
-import {Button, Divider, Typography, TextField, Table, TableBody, TableCell, TableHead, TableRow, TablePagination,
+import {Button, Divider, Table, TableBody, TableCell, TableHead, TableRow, TablePagination,
 TableSortLabel, IconButton, Menu, MenuItem} from '@material-ui/core';
-import {CloudUpload, ExpandMore, LastPage, FirstPage, KeyboardArrowRight, KeyboardArrowLeft, MoreVert} from '@material-ui/icons'
+import {CloudUpload, MoreVert} from '@material-ui/icons'
 
 import { withStyles } from '@material-ui/core/styles';
-import PropTypes from 'prop-types';
 import Upload from './Upload';
-import Patients from './Patients';
 import SeriesPreview from './SeriesPreview';
 import PACS from 'orthanc';
 
-function getToday(){
-  var today = new Date();
-  var dd = today.getDate();
-  var mm = today.getMonth()+1; //January is 0!
-  var yyyy = today.getFullYear();
+// function getToday(){
+//   var today = new Date();
+//   var dd = today.getDate();
+//   var mm = today.getMonth()+1; //January is 0!
+//   var yyyy = today.getFullYear();
 
-  if(dd<10) {
-      dd = '0'+dd
-  } 
+//   if(dd<10) {
+//       dd = '0'+dd
+//   } 
 
-  if(mm<10) {
-      mm = '0'+mm
-  }
+//   if(mm<10) {
+//       mm = '0'+mm
+//   }
 
-  today = yyyy + '-' + mm + '-' + dd;
-  return today
-}
+//   today = yyyy + '-' + mm + '-' + dd;
+//   return today
+// }
 
 const styles = theme => ({
   root: {
@@ -157,8 +155,6 @@ class EnhancedTableHead extends React.Component{
     }
 
     render(){
-      const {} = this.state
-      const {classes} = this.props
       
       return(
         <TableHead >
@@ -205,7 +201,6 @@ class Images extends React.Component {
   }
 
   componentDidMount(){
-    let patients = [];
     PACS.allPatients((patientIdjsons) => {
       let patientPromises = [];
       for (let i = 0; i < patientIdjsons.length; ++i) {
@@ -287,7 +282,7 @@ class Images extends React.Component {
   }
 
   render() {
-    const {menuAnchorEl, menuOpen, selectedStudy, studies} = this.state
+    const {menuAnchorEl, menuOpen, selectedStudy} = this.state
     const {onSelectSeries, classes} = this.props
 
     return (

@@ -1,13 +1,10 @@
 import React from "react";
-import Hammer from "hammerjs";
 import {withStyles} from '@material-ui/core/styles'
 // import exampleImageIdLoader from "./exampleImageIdLoader";
 import {Snackbar} from '@material-ui/core';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Button from '@material-ui/core/Button';
-import Checkbox from '@material-ui/core/Checkbox';
-import Tooltip from '@material-ui/core/Tooltip';
 import Brightness6Icon from '@material-ui/icons/Brightness6Outlined';
 import OpenWithIcon from '@material-ui/icons/OpenWith';
 import SearchIcon from '@material-ui/icons/Search';
@@ -30,20 +27,12 @@ import SaveIcon from '@material-ui/icons/SaveAlt';
 import TextIcon from '@material-ui/icons/Title';
 import FreeFormIcon from '@material-ui/icons/RoundedCorner';
 import PlayIcon from '@material-ui/icons/PlayArrowOutlined';
-import InfoIcon from '@material-ui/icons/Info';
 
 import Paper from '@material-ui/core/Paper';
-import Grid from '@material-ui/core/Grid';
-import Card from '@material-ui/core/Card';
-import CardContent from '@material-ui/core/CardContent';
-import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
-import ToggleButton from '@material-ui/lab/ToggleButton';
 import Popover from "@material-ui/core/Popover";
-import Typography from '@material-ui/core/Typography';
 import classNames from 'classnames';
 
 import SeriesPreviewVertical from '../components/SeriesPreviewVertical'
-import DicomHeaderDialog from './dicomHeaderDialog'
 
 import dcmViewer from './dcmViewer'
 
@@ -130,7 +119,7 @@ class DicomViewer extends React.Component {
   }
 
   componentWillReceiveProps(nextProps){
-    if (this.props.drawerOpen != nextProps.drawerOpen){
+    if (this.props.drawerOpen !== nextProps.drawerOpen){
       console.log("drawer open: " + nextProps.drawerOpen)
       if (this.viewer && this.state.dicomImage){
         var element = this.state.dicomImage;
@@ -382,7 +371,7 @@ class DicomViewer extends React.Component {
     const curLoadProgress = Math.round(100*this.viewer.getLoadingProgress());
     // console.log(curLoadProgress);
     this.setState({loadingProgress:curLoadProgress});
-    if (curLoadProgress == 100){
+    if (curLoadProgress === 100){
       try{
         this.viewer.clearTimer();
       }
@@ -394,7 +383,7 @@ class DicomViewer extends React.Component {
   }
 
   render() {
-    const {selectedSeries, series, classes, theme} = this.props
+    const {series, classes} = this.props
     const { anchorEl } = this.state;
     const open = Boolean(anchorEl)
 

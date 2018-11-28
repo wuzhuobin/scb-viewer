@@ -1,11 +1,8 @@
 import React from "react";
 import classNames from 'classnames';
 import {withStyles} from '@material-ui/core/styles'
-import {Paper}  from '@material-ui/core'
 // import exampleImageIdLoader from "./exampleImageIdLoader";
 import * as cornerstone from "cornerstone-core";
-import * as cornerstoneTools from "cornerstone-tools";
-import * as cornerstoneMath from "cornerstone-math";
 import pngViewer from "./pngViewer";
 import axios from 'axios';
 
@@ -38,7 +35,8 @@ class ThreeDViewer extends React.Component {
       curMousePosY: -1,  //indicate first click
       lastMousePosX: -1,  //indicate first click
       lastMousePosY: -1,  //indicate first click
-      isImageUpdated2: true
+      isImageUpdated2: true,
+      value: 20,  //postive number indicate shift range -ve to +ve
    	};
     this.cornerstoneInstance = cornerstone;
     this.singleViewer = null;
@@ -88,9 +86,10 @@ class ThreeDViewer extends React.Component {
   componentWillReceiveProps(nextProps) {
     // console.log("receivedProps");
     if (this.state.dicomImage){
-      if (this.props.drawerOpen != nextProps.drawerOpen){
+      if (this.props.drawerOpen !== nextProps.drawerOpen){
         if (nextProps.drawerOpen){
-            this.state.dicomImage.style.width = 'calc(50vw - 120px - 85px - 3px)'
+          this.state.dicomImage.style.width = 'calc(50vw - 120px - 85px - 3px)'
+            
         }
         else{
           this.state.dicomImage.style.width = 'calc(50vw - 85px - 3px)'
@@ -99,18 +98,17 @@ class ThreeDViewer extends React.Component {
       }
     }
 
-    if (this.props.series != nextProps.series){
+    if (this.props.series !== nextProps.series){
         this.rotateView(nextProps.series);
     }
 
   }
 
   componentDidUpdate(prevProps, prevState){
-    if (this.props.preset != prevProps.preset ||
-      this.props.shift != prevProps.shift||
-      this.props.opacity != prevProps.opacity){
+    if (this.props.preset !== prevProps.preset ||
+      this.props.shift !== prevProps.shift||
+      this.props.opacity !== prevProps.opacity){
         this.rotateView(this.props.series)
-        console.log("dfghjkdfghjk")
     }
   }
 
@@ -152,7 +150,6 @@ class ThreeDViewer extends React.Component {
         }).then(res=>{
           this.setState({isImageUpdated2:true})
           this.viewerLoadImage(res.data)
-          console.log("fghjktghjkghjk")
           }).catch(err=>{console.log(err)}
         )}
       );
@@ -314,7 +311,7 @@ class ThreeDViewer extends React.Component {
   }
 
   render() {
-    const {drawerOpen, orientation, classes} = this.props
+    const {classes} = this.props
 
   	return(
         <div className={classes.paper}>

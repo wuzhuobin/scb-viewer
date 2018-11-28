@@ -2,8 +2,6 @@
 import * as daikon from "daikon";
 import pngjs from "pngjs";
 import * as cornerstone from "cornerstone-core";
-import * as cornerstoneTools from "cornerstone-tools";
-import * as cornerstoneMath from "cornerstone-math";
 
 function getString(inputObject){
 	if (inputObject === null){

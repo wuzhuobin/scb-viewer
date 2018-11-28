@@ -1,14 +1,12 @@
 import React from "react";
 import classNames from 'classnames';
 import {withStyles} from '@material-ui/core/styles'
-import {AppBar,Toolbar, Button, Grid, Snackbar, Popover, Paper}  from '@material-ui/core';
+import {AppBar,Toolbar, Button, Grid, Snackbar, Popover}  from '@material-ui/core';
 import SeriesPreviewVertical from '../components/SeriesPreviewVertical'
 import {NavigationOutlined} from '@material-ui/icons';
 import MprViewer from './MprViewer'
 import ThreeDViewer from './threeDViewer'
-import SearchIcon from '@material-ui/icons/Search';
 import TuneIcon from '@material-ui/icons/Tune';
-import Brightness6Icon from '@material-ui/icons/Brightness6Outlined';
 import axios from 'axios';
 import Cursor3D from "./cursor3D";
 import Slider from '@material-ui/lab/Slider';
@@ -54,6 +52,12 @@ const styles = theme=> ({
     loadingProgressSnackbar:{
 
     },
+
+    slider: {
+      padding: '22px 10px',
+      width: 200,
+    },
+
 })
 
 class DicomViewer3D extends React.Component {
@@ -209,7 +213,7 @@ class DicomViewer3D extends React.Component {
 
     render() {
       const {drawerOpen, series, classes} = this.props
-      const {cursor3D, ijkPos, preset, opacity, shift} = this.state
+      const {cursor3D, ijkPos, preset, opacity, shift,value} = this.state
       const { anchorPreset, anchorShift } = this.state;
       const openPreset = Boolean(anchorPreset)
       const openShift = Boolean(anchorShift)
@@ -327,58 +331,26 @@ class DicomViewer3D extends React.Component {
                   anchorOrigin={{ vertical: "bottom", horizontal: "center"}}
                   transformOrigin={{vertical: "top", horizontal: "center"}}
                   onClose={this.handleShiftClose}
-                >
-                  <Button classes={{label: classes.label}} color="inherit" size="small" 
-                    onClick={() => {this.setState({shift:-200}); this.handleShiftClose()}}
-                  >
-                    -200
-                  </Button>                 
-                  <Button classes={{label: classes.label}} color="inherit" size="small" 
-                    onClick={() => {this.setState({shift:-100}); this.handleShiftClose()}}
-                  >
-                    -100
-                  </Button>  
-                  <Button classes={{label: classes.label}} color="inherit" size="small" 
-                    onClick={() => {this.setState({shift:-50}); this.handleShiftClose()}}
-                  >
-                    -50
-                  </Button>                 
-                  <Button classes={{label: classes.label}} color="inherit" size="small" 
-                    onClick={() => {this.setState({shift:0}); this.handleShiftClose()}}
-                  >
-                    0
-                  </Button>   
-                  <Button classes={{label: classes.label}} color="inherit" size="small" 
-                    onClick={() => {this.setState({shift:50}); this.handleShiftClose()}}
-                  >
-                    50
-                  </Button>     
-                  <Button classes={{label: classes.label}} color="inherit" size="small" 
-                    onClick={() => {this.setState({shift:100}); this.handleShiftClose()}}
-                  >
-                    100
-                  </Button>  
-                  <Button classes={{label: classes.label}} color="inherit" size="small" 
-                    onClick={() => {this.setState({shift:200}); this.handleShiftClose()}}
-                  >
-                    200
-                  </Button>    
-                  <Button classes={{label: classes.label}} color="inherit" size="small" 
-                    onClick={() => {this.setState({shift:500}); this.handleShiftClose()}}
-                  >
-                    500
-                  </Button>    
-                  <Button classes={{label: classes.label}} color="inherit" size="small" 
-                    onClick={() => {this.setState({shift:1000}); this.handleShiftClose()}}
-                  >
-                    1000
-                  </Button>    
-                  <Button classes={{label: classes.label}} color="inherit" size="small" 
-                    onClick={() => {this.setState({shift:3000}); this.handleShiftClose()}}
-                  >
-                    3000
-                  </Button>    
+                >    
+
+                  <Slider
+                    classes={{ container: classes.slider }}
+                    value={value}
+                    aria-labelledby="label"
+                    onChange={(event,value)=>{
+                      var val = (value-20)*5; //val could be position or negative, while 5 is a multiplier, 
+                      this.setState({ value }); 
+                      this.setState({shift:val})
+                    }}
+                    onDragEnd={(event)=>{
+                      this.handleShiftClose();
+                    }}
+                  />
+
+
                 </Popover>  
+
+
 
               </Toolbar>
           </AppBar>
