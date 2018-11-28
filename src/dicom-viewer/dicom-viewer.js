@@ -152,6 +152,9 @@ class DicomViewer extends React.Component {
 
   componentWillUnmount(){
     window.removeEventListener('resize', this.handleResize);
+    if (this.viewer){
+      this.viewer.destructor();
+    }
   }
 
   componentDidMount() {
@@ -264,50 +267,12 @@ class DicomViewer extends React.Component {
     this.setState({infoDialog:false});
   }
 
-  getImagePathList(IP,Port,Path1){//sync request for now
-    // return new Promise(function(resolve,reject){
-    //   resolve(['http://127.0.0.1:8080/0100.dcm','http://127.0.0.1:8080/0010.dcm','http://127.0.0.1:8080/1400.dcm','http://127.0.0.1:8080/0250.dcm','http://127.0.0.1:8080/0410.dcm']);
-    // })
-
-    // return new Promise(function(resolve,reject){
-    //   resolve(['http://192.168.1.108:8080/0002.png']);
-    // })
-
-    if (Path1===null){
-      return new Promise(function(resolve,reject){resolve(["http://223.255.146.2:8042/orthanc/instances/fedab2d3-b15265e7-fa7f9b03-55568349-ef5d91ad/file"])});
+  updateImage(){
+    const curImage = this.viewer.getImage();
+    if (curImage.color){//<-- indicator of faulty image
+      this.viewer.reloadImage();
     }
-    else{
-      return new Promise(function(resolve,reject){
-        var queryResult =   fetch("http://223.255.146.2:8042/orthanc/series/" + Path1+ "/ordered-slices").then(
-          (res)=>{return res.json();}).then((json)=>{ 
-            let cacheImagePathArray = [];
-            for(let i = 0; i < json.Dicom.length; ++i){
-              let path = "http://223.255.146.2:8042/orthanc" + json.Dicom[i]; 
-              cacheImagePathArray.push(path);
-            }
-        // console.log(cacheImagePathArray);
-        return cacheImagePathArray;
-      });
-          resolve(queryResult);
-
-        });
-    }
-
   }
-
-  seriesImages(id){
-    fetch("http://223.255.146.2:8042/orthanc/series/" + id)
-    .then((res)=>{return res.json();})
-    .then((json)=>{ 
-      let cacheImagePathArray = [];
-      for(let i = 0; i < json.Instances.length; ++i){
-        let path = "http://192.168.1.126:3000/orthanc/instances/" + json.Instances[i] + "/file"; 
-        cacheImagePathArray.push(path);
-      }
-      return cacheImagePathArray;
-    });
-  } 
-
 
   handleResize=()=>{
     if (this.viewer && this.state.dicomImage)
@@ -357,10 +322,13 @@ class DicomViewer extends React.Component {
     }
   }
 
+
+
   onImageRendered= ()=>{
     var bottomLeft = document.getElementById("mrbottomleft");
     var bottomRight = document.getElementById("mrbottomright");
     if (this.viewer){
+      this.updateImage();
       if (bottomLeft){
         const stack = this.viewer.stack;
         if (stack){
@@ -372,7 +340,6 @@ class DicomViewer extends React.Component {
         bottomRight.textContent = `Zoom: ${this.viewer.getZoom().toFixed(2)*100}%`;
         bottomRight.textContent += "\r\n";
         bottomRight.textContent +=`W:${Math.round(this.viewer.getWW())} L:${Math.round(this.viewer.getWC())}`
-
       }
     }
     
