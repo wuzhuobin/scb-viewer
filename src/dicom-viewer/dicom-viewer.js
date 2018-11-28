@@ -108,11 +108,6 @@ const styles = theme=> ({
       borderRadius:"3px",
       borderWidth:"1px",
       borderColor: theme.palette.primary.main,
-
-      '&paper':{borderStyle: "solid",
-      borderRadius:"3px",
-      borderWidth:"1px",
-      borderColor: theme.palette.primary.main,}
     },
     loadingProgressSnackbar:{
       minWidth: 100
