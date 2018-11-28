@@ -1,15 +1,15 @@
 import React from "react";
 import classNames from 'classnames';
 import {withStyles} from '@material-ui/core/styles'
-import {AppBar,Toolbar, Button, Grid, Snackbar}  from '@material-ui/core';
+import {AppBar,Toolbar, Button, Grid, Snackbar, Popover}  from '@material-ui/core';
 import SeriesPreviewVertical from '../components/SeriesPreviewVertical'
 import {NavigationOutlined} from '@material-ui/icons';
 import MprViewer from './MprViewer'
 import ThreeDViewer from './threeDViewer'
-import SearchIcon from '@material-ui/icons/Search';
-import Brightness6Icon from '@material-ui/icons/Brightness6Outlined';
+import TuneIcon from '@material-ui/icons/Tune';
 import axios from 'axios';
 import Cursor3D from "./cursor3D";
+import Slider from '@material-ui/lab/Slider';
 
 const styles = theme=> ({
     root:{    
@@ -52,6 +52,12 @@ const styles = theme=> ({
     loadingProgressSnackbar:{
 
     },
+
+    slider: {
+      padding: '22px 10px',
+      width: 200,
+    },
+
 })
 
 class DicomViewer3D extends React.Component {
@@ -59,6 +65,8 @@ class DicomViewer3D extends React.Component {
   {
     super(props);
     this.state = {
+      anchorPreset:null,
+      anchorShift:null,
       selectedSeries: null,
       loadingProgress: 100,
       loadingMessage: "Loading...",
@@ -68,6 +76,9 @@ class DicomViewer3D extends React.Component {
       displaySEries: null,
       cursor3D: new Cursor3D(),
       ijkPos: [0,0,0],
+      shift: 0,
+      preset: 1,
+      opacity:1,
    	};
   }
 
@@ -104,7 +115,7 @@ class DicomViewer3D extends React.Component {
       this.setState({loadingMessage: "Loading"})
       var loadingPromise = axios({
           method: 'post',
-          url: 'http://192.168.1.112:8080/api/loadDicom',
+          url: 'http://223.255.146.2:8083/api/loadDicom',
           // timeout: 1 * 1000,
           data: {
             series: series,
@@ -118,7 +129,7 @@ class DicomViewer3D extends React.Component {
             // get image header
             axios({
               method: 'get',
-              url: 'http://192.168.1.112:8080/api/getImageHeader',
+              url: 'http://223.255.146.2:8083/api/getImageHeader',
               params:{
                 id: this.props.socket.id,
                 series: series,
@@ -128,7 +139,7 @@ class DicomViewer3D extends React.Component {
               this.state.cursor3D.setSize(res.data.Size[0],res.data.Size[1],res.data.Size[2])
               this.state.cursor3D.setIjkPosition(res.data.Size[0]/2,res.data.Size[1]/2, res.data.Size[2]/2)
 
-              console.log(this.state.cursor3D.getIjkPosition())
+              // console.log(this.state.cursor3D.getIjkPosition())
               this.setState({ijkPos: this.state.cursor3D.getIjkPosition()})
               this.setState({loadingProgress: 100})
               this.setState({serverStatus: "MPR Loading Success", serverStatusOpen:true})
@@ -140,6 +151,10 @@ class DicomViewer3D extends React.Component {
           // console.log("server side load complete: " + this.state.selectedSeries)
       }).catch((err)=>{
         // server side error
+        if (!err.response){
+          return;
+        }
+
         if (err.response.status === 500){
           // console.log("error 500")
           // console.log(err.response)
@@ -166,6 +181,30 @@ class DicomViewer3D extends React.Component {
     this.setState({serverStatusOpen: false})
   }
 
+  handlePresetOpen = (event)=>{
+    this.setState({
+      anchorPreset: event.currentTarget
+    });
+  }
+
+  handlePresetClose= ()=>{
+    this.setState({
+      anchorPreset: null
+    });
+  }
+
+  handleShiftOpen = (event)=>{
+    this.setState({
+      anchorShift: event.currentTarget
+    });
+  }
+
+  handleShiftClose= ()=>{
+    this.setState({
+      anchorShift: null
+    });
+  }
+
   onCursorChange = () =>{
     // console.log("cursor change")
     // console.log(this.state.cursor3D.getIjkPosition())
@@ -174,16 +213,145 @@ class DicomViewer3D extends React.Component {
 
     render() {
       const {drawerOpen, series, classes} = this.props
-      const {cursor3D, ijkPos} = this.state
+      const {cursor3D, ijkPos, preset, opacity, shift,value} = this.state
+      const { anchorPreset, anchorShift } = this.state;
+      const openPreset = Boolean(anchorPreset)
+      const openShift = Boolean(anchorShift)
 
     	return(
         <div className={classNames(classes.root, {[classes.drawerOpen]: this.props.drawerOpen,})}>
             <AppBar className={classes.appBar}>
               <Toolbar>
+                
                 <Button classes={{label: classes.label}} color="inherit" >
                   <NavigationOutlined />
                   Navigate
                 </Button>
+
+                <Button classes={{label: classes.label}} color="inherit" size="small" aria-owns={openPreset ? "simple-popper" : null} aria-haspopup="true"
+                  onClick={this.handlePresetOpen}>
+                  <TuneIcon />
+                  Preset
+                </Button>
+
+                <Popover id="simple-popper" classes={classes.popover} open={openPreset} anchorEl={anchorPreset}
+                  anchorOrigin={{ vertical: "bottom", horizontal: "center"}}
+                  transformOrigin={{vertical: "top", horizontal: "center"}}
+                  onClose={this.handlePresetClose}
+                >
+                    <Button classes={{label: classes.label}} color="inherit" size="small" 
+                      onClick={() => {this.setState({preset:1}); this.handlePresetClose()}}
+                    >
+                      CT_AAA
+                    </Button>
+                    <Button classes={{label: classes.label}} color="inherit" size="small" 
+                      onClick={() => {this.setState({preset:2}); this.handlePresetClose()}}
+                    >
+                      CT_AAA2
+                    </Button>
+                    <Button classes={{label: classes.label}} color="inherit" size="small" 
+                      onClick={() => {this.setState({preset:3}); this.handlePresetClose()}}
+                    >
+                      CT_BONE
+                    </Button>
+                    <Button classes={{label: classes.label}} color="inherit" size="small" 
+                      onClick={() => {this.setState({preset:4}); this.handlePresetClose()}}
+                    >
+                      CT_BONES
+                    </Button>
+                    <Button classes={{label: classes.label}} color="inherit" size="small" 
+                      onClick={() => {this.setState({preset:5}); this.handlePresetClose()}}
+                    >
+                      CT_CARDIAC
+                    </Button>
+                    <Button classes={{label: classes.label}} color="inherit" size="small" 
+                      onClick={() => {this.setState({preset:6}); this.handlePresetClose()}}
+                    >
+                      CT_CHEST_CONTRAST_ENHANCED
+                    </Button>
+                    <Button classes={{label: classes.label}} color="inherit" size="small" 
+                      onClick={() => {this.setState({preset:9}); this.handlePresetClose()}}
+                    >
+                      CT_CHEST_VESSELS
+                    </Button>
+                    <Button classes={{label: classes.label}} color="inherit" size="small" 
+                      onClick={() => {this.setState({preset:10}); this.handlePresetClose()}}
+                    >
+                      CT_CORONARY_ARTERIES
+                    </Button>
+                    <Button classes={{label: classes.label}} color="inherit" size="small" 
+                      onClick={() => {this.setState({preset:11}); this.handlePresetClose()}}
+                    >
+                      CT_CORONARY_ARTERIES3
+                    </Button>
+                    <Button classes={{label: classes.label}} color="inherit" size="small" 
+                      onClick={() => {this.setState({preset:13}); this.handlePresetClose()}}
+                    >
+                      CT_CROPPED_VOLUME_BONE
+                    </Button>
+                    <Button classes={{label: classes.label}} color="inherit" size="small" 
+                      onClick={() => {this.setState({preset:14}); this.handlePresetClose()}}
+                    >
+                      CT_LIVER_VASCULATURE
+                    </Button>
+                    <Button classes={{label: classes.label}} color="inherit" size="small" 
+                      onClick={() => {this.setState({preset:15}); this.handlePresetClose()}}
+                    >
+                      CT_LUNG
+                    </Button>
+                    <Button classes={{label: classes.label}} color="inherit" size="small" 
+                      onClick={() => {this.setState({preset:17}); this.handlePresetClose()}}
+                    >
+                      CT_MUSCLE
+                    </Button>
+                    <Button classes={{label: classes.label}} color="inherit" size="small" 
+                      onClick={() => {this.setState({preset:18}); this.handlePresetClose()}}
+                    >
+                      CT_SOFT_TISSUE
+                    </Button>
+                    <Button classes={{label: classes.label}} color="inherit" size="small" 
+                      onClick={() => {this.setState({preset:20}); this.handlePresetClose()}}
+                    >
+                      MR_ANGIO
+                    </Button>
+                    <Button classes={{label: classes.label}} color="inherit" size="small" 
+                      onClick={() => {this.setState({preset:21}); this.handlePresetClose()}}
+                    >
+                      MR_DEFAULT
+                    </Button>
+                </Popover>   
+
+                <Button classes={{label: classes.label}} color="inherit" size="small" aria-owns={openShift ? "simple-popper2" : null} aria-haspopup="true"
+                  onClick={this.handleShiftOpen}>
+                  <TuneIcon />
+                  Shift
+                </Button>
+
+                <Popover id="simple-popper2" classes={classes.popover} open={openShift} anchorEl={anchorShift}
+                  anchorOrigin={{ vertical: "bottom", horizontal: "center"}}
+                  transformOrigin={{vertical: "top", horizontal: "center"}}
+                  onClose={this.handleShiftClose}
+                >    
+
+                  <Slider
+                    classes={{ container: classes.slider }}
+                    value={value}
+                    aria-labelledby="label"
+                    onChange={(event,value)=>{
+                      var val = (value-20)*5; //val could be position or negative, while 5 is a multiplier, 
+                      this.setState({ value }); 
+                      this.setState({shift:val})
+                    }}
+                    onDragEnd={(event)=>{
+                      this.handleShiftClose();
+                    }}
+                  />
+
+
+                </Popover>  
+
+
+
               </Toolbar>
           </AppBar>
 
@@ -214,7 +382,12 @@ class DicomViewer3D extends React.Component {
                   <ThreeDViewer
                   series={this.state.displaySeries} 
                   socket={this.props.socket} 
-                  drawerOpen={drawerOpen}/>
+                  drawerOpen={drawerOpen}
+                  preset={preset}
+                  shift={shift}
+                  opacity={opacity}
+                  />
+
                 </Grid>
                 <Grid item xs={6}>
                   <MprViewer 

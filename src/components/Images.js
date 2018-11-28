@@ -1,33 +1,31 @@
 import React from "react";
 
-import {Button, Divider, Typography, TextField, Table, TableBody, TableCell, TableHead, TableRow, TablePagination,
+import {Button, Divider, Table, TableBody, TableCell, TableHead, TableRow, TablePagination,
 TableSortLabel, IconButton, Menu, MenuItem} from '@material-ui/core';
-import {CloudUpload, ExpandMore, LastPage, FirstPage, KeyboardArrowRight, KeyboardArrowLeft, MoreVert} from '@material-ui/icons'
+import {CloudUpload, MoreVert} from '@material-ui/icons'
 
 import { withStyles } from '@material-ui/core/styles';
-import PropTypes from 'prop-types';
 import Upload from './Upload';
-import Patients from './Patients';
 import SeriesPreview from './SeriesPreview';
 import PACS from 'orthanc';
 
-function getToday(){
-  var today = new Date();
-  var dd = today.getDate();
-  var mm = today.getMonth()+1; //January is 0!
-  var yyyy = today.getFullYear();
+// function getToday(){
+//   var today = new Date();
+//   var dd = today.getDate();
+//   var mm = today.getMonth()+1; //January is 0!
+//   var yyyy = today.getFullYear();
 
-  if(dd<10) {
-      dd = '0'+dd
-  } 
+//   if(dd<10) {
+//       dd = '0'+dd
+//   } 
 
-  if(mm<10) {
-      mm = '0'+mm
-  }
+//   if(mm<10) {
+//       mm = '0'+mm
+//   }
 
-  today = yyyy + '-' + mm + '-' + dd;
-  return today
-}
+//   today = yyyy + '-' + mm + '-' + dd;
+//   return today
+// }
 
 const styles = theme => ({
   root: {
@@ -77,9 +75,13 @@ const styles = theme => ({
     overflow: 'auto',
     color: theme.palette.secondary.contrastText,
     backgroundColor: theme.palette.secondary.main,
-    height: 'calc(100% - 172px)'
+    height: 'calc(100% - 172px)',
+    MozUserSelect:'none',
+    WebkitUserSelect:'none',
+    msUserSelect:'none',
   },
   tablePagination: {
+
   },
   tablePaginationCaption: {
     color: theme.palette.primary.contrastText
@@ -153,14 +155,12 @@ class EnhancedTableHead extends React.Component{
     }
 
     render(){
-      const {} = this.state
-      const {classes} = this.props
       
       return(
         <TableHead >
             <TableRow>
               <TableCell style={{color: '#6fcbff', fontWeight: 'bold', borderColor:'#151a1f'}}/>
-              <TableCell key='patientName' numeric={false} sortDirection='asc' style={{color: '#6fcbff', fontWeight: 'bold', borderColor:'#151a1f'}}>
+              <TableCell key='patientName' numeric={false} sortDirection='asc' style={{color: '#6fcbff', fontWeight: 'bold', borderColor:'#151a1f', MozUserSelect:'none', WebkitUserSelect:'none', msUserSelect:'none'}}>
                 <TableSortLabel
                   active={true}
                   style={{color: '#6fcbff', fontWeight: 'bold', borderColor:'#151a1f'}}
@@ -168,13 +168,13 @@ class EnhancedTableHead extends React.Component{
                   Patient ID
                 </TableSortLabel>
               </TableCell>
-              <TableCell style={{color: '#6fcbff', fontWeight: 'bold', borderColor:'#151a1f'}}>Patient Name</TableCell>
-              <TableCell style={{color: '#6fcbff', fontWeight: 'bold', borderColor:'#151a1f'}}>Date of Birth</TableCell>
-              <TableCell style={{color: '#6fcbff', fontWeight: 'bold', borderColor:'#151a1f'}}>Gender</TableCell>
-              <TableCell style={{color: '#6fcbff', fontWeight: 'bold', borderColor:'#151a1f'}}>Study</TableCell>
-              <TableCell style={{color: '#6fcbff', fontWeight: 'bold', borderColor:'#151a1f'}}>Institution</TableCell>
-              <TableCell style={{color: '#6fcbff', fontWeight: 'bold', borderColor:'#151a1f'}}>Requested Procedure</TableCell>
-              <TableCell style={{color: '#6fcbff', fontWeight: 'bold', borderColor:'#151a1f'}}>Study Date</TableCell>
+              <TableCell style={{color: '#6fcbff', fontWeight: 'bold', borderColor:'#151a1f', MozUserSelect:'none', WebkitUserSelect:'none', msUserSelect:'none'}}>Patient Name</TableCell>
+              <TableCell style={{color: '#6fcbff', fontWeight: 'bold', borderColor:'#151a1f', MozUserSelect:'none', WebkitUserSelect:'none', msUserSelect:'none'}}>Date of Birth</TableCell>
+              <TableCell style={{color: '#6fcbff', fontWeight: 'bold', borderColor:'#151a1f', MozUserSelect:'none', WebkitUserSelect:'none', msUserSelect:'none'}}>Gender</TableCell>
+              <TableCell style={{color: '#6fcbff', fontWeight: 'bold', borderColor:'#151a1f', MozUserSelect:'none', WebkitUserSelect:'none', msUserSelect:'none'}}>Study</TableCell>
+              <TableCell style={{color: '#6fcbff', fontWeight: 'bold', borderColor:'#151a1f', MozUserSelect:'none', WebkitUserSelect:'none', msUserSelect:'none'}}>Institution</TableCell>
+              <TableCell style={{color: '#6fcbff', fontWeight: 'bold', borderColor:'#151a1f', MozUserSelect:'none', WebkitUserSelect:'none', msUserSelect:'none'}}>Requested Procedure</TableCell>
+              <TableCell style={{color: '#6fcbff', fontWeight: 'bold', borderColor:'#151a1f', MozUserSelect:'none', WebkitUserSelect:'none', msUserSelect:'none'}}>Study Date</TableCell>
             </TableRow>       
           </TableHead>
           )
@@ -201,7 +201,6 @@ class Images extends React.Component {
   }
 
   componentDidMount(){
-    let patients = [];
     PACS.allPatients((patientIdjsons) => {
       let patientPromises = [];
       for (let i = 0; i < patientIdjsons.length; ++i) {
@@ -283,7 +282,7 @@ class Images extends React.Component {
   }
 
   render() {
-    const {menuAnchorEl, menuOpen, selectedStudy, studies} = this.state
+    const {menuAnchorEl, menuOpen, selectedStudy} = this.state
     const {onSelectSeries, classes} = this.props
 
     return (

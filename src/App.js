@@ -2,14 +2,12 @@ import React, { Component } from 'react';
 import NavBar from './components/NavBar';
 import Login from './components/Login';
 import Content from './components/Content';
-import DicomViewer from "./dicom-viewer";
 
 import {withStyles} from '@material-ui/core/styles'
-import classNames from 'classnames';
 
 import { createMuiTheme, MuiThemeProvider  } from '@material-ui/core/styles'
 
-import {blue, grey, red} from '@material-ui/core/colors';
+import {red} from '@material-ui/core/colors';
 import './App.css';
 
 const MyTheme = createMuiTheme({
@@ -81,10 +79,6 @@ const styles = theme=> ({
     },
 })
 
-const theme = theme=>({
-}
-)
-
 class App extends Component {
   constructor(props){
         super(props);
@@ -124,7 +118,7 @@ class App extends Component {
   }
 
   render() {
-    const {classes, theme} = this.props
+    const {classes} = this.props
     const {auth, open} = this.state
 
     return (

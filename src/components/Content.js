@@ -1,10 +1,8 @@
 import React from 'react'
-import {List, ListItem, ListItemIcon, ListItemText, Drawer, Divider} from '@material-ui/core'
 import {withStyles} from '@material-ui/core/styles'
 import Images from './Images';
 import DicomViewer from "../dicom-viewer";
 import DicomViewer3D from "../dicom-viewer/dicom-viewer3D";
-import {Collections, Portrait, Visibility} from '@material-ui/icons'
 import classNames from 'classnames';
 import DrawerMenu from "./DrawerMenu";
 import Projects from './Projects';
@@ -45,7 +43,7 @@ class Content extends React.Component {
     constructor(props){
         super(props);
         this.state = {
-            page: 3,
+            page: 0,
             series: null,
             socket: null,
         };
@@ -67,7 +65,7 @@ class Content extends React.Component {
 
     componentDidMount(){
       // websocket to mpr backend
-      var endPoint = "http://192.168.1.112:8080"
+      var endPoint = "http://223.255.146.2:8081"
       const socket = socketIOClient(endPoint)
       socket.on('connect', ()=>{
         this.setState({socket: socket});
@@ -76,7 +74,7 @@ class Content extends React.Component {
     }
  
     render(){
-        const {series, open, onDrawerClose, classes} = this.props
+        const {open, onDrawerClose, classes} = this.props
         const {page, socket} = this.state
 
         return(

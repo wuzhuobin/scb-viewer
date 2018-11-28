@@ -1,13 +1,10 @@
 import React from "react";
-import Hammer from "hammerjs";
 import {withStyles} from '@material-ui/core/styles'
 // import exampleImageIdLoader from "./exampleImageIdLoader";
 import {Snackbar} from '@material-ui/core';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Button from '@material-ui/core/Button';
-import Checkbox from '@material-ui/core/Checkbox';
-import Tooltip from '@material-ui/core/Tooltip';
 import Brightness6Icon from '@material-ui/icons/Brightness6Outlined';
 import OpenWithIcon from '@material-ui/icons/OpenWith';
 import SearchIcon from '@material-ui/icons/Search';
@@ -30,20 +27,12 @@ import SaveIcon from '@material-ui/icons/SaveAlt';
 import TextIcon from '@material-ui/icons/Title';
 import FreeFormIcon from '@material-ui/icons/RoundedCorner';
 import PlayIcon from '@material-ui/icons/PlayArrowOutlined';
-import InfoIcon from '@material-ui/icons/Info';
 
 import Paper from '@material-ui/core/Paper';
-import Grid from '@material-ui/core/Grid';
-import Card from '@material-ui/core/Card';
-import CardContent from '@material-ui/core/CardContent';
-import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
-import ToggleButton from '@material-ui/lab/ToggleButton';
 import Popover from "@material-ui/core/Popover";
-import Typography from '@material-ui/core/Typography';
 import classNames from 'classnames';
 
 import SeriesPreviewVertical from '../components/SeriesPreviewVertical'
-import DicomHeaderDialog from './dicomHeaderDialog'
 
 import dcmViewer from './dcmViewer'
 
@@ -130,7 +119,7 @@ class DicomViewer extends React.Component {
   }
 
   componentWillReceiveProps(nextProps){
-    if (this.props.drawerOpen != nextProps.drawerOpen){
+    if (this.props.drawerOpen !== nextProps.drawerOpen){
       console.log("drawer open: " + nextProps.drawerOpen)
       if (this.viewer && this.state.dicomImage){
         var element = this.state.dicomImage;
@@ -349,7 +338,7 @@ class DicomViewer extends React.Component {
     const curLoadProgress = Math.round(100*this.viewer.getLoadingProgress());
     // console.log(curLoadProgress);
     this.setState({loadingProgress:curLoadProgress});
-    if (curLoadProgress == 100){
+    if (curLoadProgress === 100){
       try{
         this.viewer.clearTimer();
       }
@@ -361,7 +350,7 @@ class DicomViewer extends React.Component {
   }
 
   render() {
-    const {selectedSeries, series, classes, theme} = this.props
+    const {series, classes} = this.props
     const { anchorEl } = this.state;
     const open = Boolean(anchorEl)
 
@@ -505,6 +494,7 @@ class DicomViewer extends React.Component {
         if (this.viewer){
           this.viewer.invertImage();
         }
+        this.handleClose()
       }}
       >
       <InvertIcon />
@@ -543,7 +533,8 @@ class DicomViewer extends React.Component {
               topRight.style.visibility = correctedVisibility;
             }
           }
-      }}>
+          this.handleClose()
+        }}>
       <TextIcon />
       Text
       </Button>
@@ -564,6 +555,7 @@ class DicomViewer extends React.Component {
             leftMid.textContent=temp;
           }
         }
+        this.handleClose()
       }}
       >
       <RotateRightIcon />
@@ -582,6 +574,7 @@ class DicomViewer extends React.Component {
             bottomMid.textContent = temp;
           }
         }
+        this.handleClose()
       }}
       >
       <VFlipIcon />
@@ -600,6 +593,7 @@ class DicomViewer extends React.Component {
             leftMid.textContent = temp;
           }
         }
+        this.handleClose()
       }}
       >
       <HFlipIcon />
@@ -611,6 +605,7 @@ class DicomViewer extends React.Component {
         if (this.viewer){
           this.viewer.exportImage();
         }
+        this.handleClose()
       }}
       >
       <SaveIcon />
@@ -622,6 +617,7 @@ class DicomViewer extends React.Component {
         if (this.viewer){
           this.viewer.clearImage();
         }
+        this.handleClose()
       }}
       >
       <ClearIcon />
@@ -634,7 +630,7 @@ class DicomViewer extends React.Component {
           this.viewer.resetImage();
           this.calculateOrientationMarkers();
         }
-
+        this.handleClose()
       }}
       >
       <ReplayIcon />
@@ -683,39 +679,42 @@ class DicomViewer extends React.Component {
                   top: 0,
                   left: 0,
                   position: "relative",
+                  MozUserSelect:'none',
+                  WebkitUserSelect:'none',
+                  msUserSelect:'none',
                 }}
                 />
 
 
-              <div id="mrtopleft" style={{ position: "absolute", top: "0.5%", left: "0.5%", whiteSpace: 'pre' }}>
+              <div id="mrtopleft" style={{ position: "absolute", top: "0.5%", left: "0.5%", whiteSpace: 'pre', MozUserSelect:'none', WebkitUserSelect:'none', msUserSelect:'none'}}>
                 
               </div>
               
-              <div id="mrtopright" style={{ position: "absolute", top: "0.5%", right: "0.5%", whiteSpace: 'pre', textAlign:"right" }}>
+              <div id="mrtopright" style={{ position: "absolute", top: "0.5%", right: "0.5%", whiteSpace: 'pre', textAlign:"right" , MozUserSelect:'none', WebkitUserSelect:'none', msUserSelect:'none'}}>
                 
               </div>
               
-              <div id="mrbottomright" style={{ position: "absolute", bottom: "0.5%", right: "0.5%", whiteSpace: 'pre', textAlign:"right"  }}>
+              <div id="mrbottomright" style={{ position: "absolute", bottom: "0.5%", right: "0.5%", whiteSpace: 'pre', textAlign:"right" , MozUserSelect:'none', WebkitUserSelect:'none', msUserSelect:'none' }}>
                
               </div>
 
-              <div id="mrbottomleft" style={{ position: "absolute", bottom: "0.5%", left: "0.5%", whiteSpace: 'pre'}}>
+              <div id="mrbottomleft" style={{ position: "absolute", bottom: "0.5%", left: "0.5%", whiteSpace: 'pre', MozUserSelect:'none', WebkitUserSelect:'none', msUserSelect:'none'}}>
                
               </div>
 
-                <div class="mrbottommiddle orientationMarkerDiv" style={{ position: "absolute", bottom: "0.5%", left: "50%" }}>
+                <div class="mrbottommiddle orientationMarkerDiv" style={{ position: "absolute", bottom: "0.5%", left: "50%", MozUserSelect:'none', WebkitUserSelect:'none', msUserSelect:'none' }}>
                 <span class="orientationMarker">Q</span>
                 </div>
 
-                <div class="mrleftmiddle orientationMarkerDiv" style={{ position: "absolute", bottom: "50%", left: "0.5%" }}>
+                <div class="mrleftmiddle orientationMarkerDiv" style={{ position: "absolute", bottom: "50%", left: "0.5%", MozUserSelect:'none', WebkitUserSelect:'none', msUserSelect:'none' }}>
                 <span class="orientationMarker">Q</span>
                 </div>
 
-                <div class="mrtopmiddle orientationMarkerDiv" style={{ position: "absolute", top: "0.5%", left: "50%" }}>
+                <div class="mrtopmiddle orientationMarkerDiv" style={{ position: "absolute", top: "0.5%", left: "50%", MozUserSelect:'none', WebkitUserSelect:'none', msUserSelect:'none' }}>
                 <span class="orientationMarker">Q</span>
                 </div>
 
-                <div  class="mrrightmiddle orientationMarkerDiv" style={{ position: "absolute", bottom: "50%", right: "0.5%" }}>
+                <div  class="mrrightmiddle orientationMarkerDiv" style={{ position: "absolute", bottom: "50%", right: "0.5%" , MozUserSelect:'none', WebkitUserSelect:'none', msUserSelect:'none'}}>
                 <span class="orientationMarker">Q</span>
                 </div>
 

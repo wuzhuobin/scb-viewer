@@ -4,7 +4,6 @@ import { withStyles } from '@material-ui/core/styles';
 import axios from 'axios';
 
 import {Dialog, DialogTitle, DialogActions, List, ListItem, ListItemText, CircularProgress, Button} from '@material-ui/core';
-import {Close, Add} from '@material-ui/icons'
 
 const styles = theme => ({
   root: {
@@ -70,7 +69,7 @@ class Upload extends React.Component {
 
 	  	axios.post('http://192.168.1.126:3000/orthanc/instances', formData)
 	      .then(res => {
-	        if (res.data.Status == "Success" || res.data.Status == "AlreadyStored")
+	        if (res.data.Status === "Success" || res.data.Status === "AlreadyStored")
 	        {
 	        	successCount++;
 	        }
@@ -83,6 +82,7 @@ class Upload extends React.Component {
 
 	        uploadTask.progress = progress.toFixed(2);
 
+          
           this.state.uploadTasks[taskId] = uploadTask;
           this.forceUpdate();
 	      }).catch((error)=>{

@@ -23,7 +23,7 @@ export default class pngViewer{
     displayImage(inputPath){
         const path = this.name+"://"+ this.currentId.pad();
         pngLoader.GlobalPngLoadManager.loadSeries([inputPath], this.name);
-        console.log(inputPath)
+        // console.log(inputPath)
         this.cornerstoneInstance.loadImage(path, inputPath)
         .then(image => {
             // this.cornerstoneInstance.enable(this.element);

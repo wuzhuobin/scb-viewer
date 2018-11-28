@@ -92,8 +92,6 @@ class Cursor3D{
 		var viewportRatioCoronal = this.viewportCoronalSizeX/this.viewportCoronalSizeY
 		var sizeRatioCoronal = this.sizeX/this.sizeZ;
 
-		console.log("size ratio",sizeRatioSagittal,sizeRatioCoronal)
-
 		// determine offset in viewport coordinate
 		if (sizeRatioAxial >= viewportRatioAxial){
 			this.offsetAxialX = 0;
@@ -168,9 +166,19 @@ class Cursor3D{
 		// 	])
 	}
 
-	setIjkPosition(x,y,z){
-		console.log(x,y,z)
+	cursorWithinBound(){
+		if (Math.round(this.ijkPositionX) >=0 && Math.round(this.ijkPositionX)<this.sizeX && 
+	        Math.round(this.ijkPositionY) >=0 && Math.round(this.ijkPositionY)<this.sizeY && 
+	        Math.round(this.ijkPositionZ) >=0 && Math.round(this.ijkPositionZ)<this.sizeZ){
+			// console.log("within bound: ",this.ijkPositionX,this.ijkPositionY,this.ijkPositionZ)
+    		return true;
+      	}else{
+      		// console.log("outside bound: ",this.ijkPositionX,this.ijkPositionY,this.ijkPositionZ)
+      		return false;
+      	}
+	}
 
+	setIjkPosition(x,y,z){
 		this.ijkPositionX = x;
 		this.ijkPositionY = y;
 		this.ijkPositionZ = z;

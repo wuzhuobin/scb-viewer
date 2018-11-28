@@ -113,7 +113,7 @@ export default class dcmViewer{
         .then((json)=>{
             let cacheImagePathArray = [];
             for(let i=0;i<json.Instances.length;++i){
-                let path =  "http://192.168.1.126:3000/orthanc/instances/" + json.Instances[i] + "/file"; 
+                let path =  "http://223.255.146.2:8042/orthanc/instances/" + json.Instances[i] + "/file"; 
                 cacheImagePathArray.push(path);
             }
             return cacheImagePathArray;

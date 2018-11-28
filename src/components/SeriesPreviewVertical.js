@@ -1,7 +1,6 @@
 import React from "react";
 import classNames from 'classnames';
-import {Grid,GridList, GridListTile, Paper, CardContent, Typography} from '@material-ui/core';
-import {ExpandMore, ExpandLess} from '@material-ui/icons'
+import {GridList, GridListTile, Paper, Typography} from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
 import PACS from "orthanc";
 
@@ -33,6 +32,9 @@ const styles = theme => ({
     borderWidth: '2px',
     borderColor: theme.palette.secondary.light,
     '&:hover': {borderColor: theme.palette.primary.light,},
+    MozUserSelect:'none',
+	WebkitUserSelect:'none',
+	msUserSelect:'none',
   },
   paperSelected:{
     borderColor: theme.palette.primary.main,
@@ -98,17 +100,18 @@ class SeriesPreviewVertical extends React.Component {
     }
 
 	render() {
-		const {seriesInfo, imgs, selectedId} = this.state
-    	const {selectedSeries, selectedSeriesonSelectSeries, study, classes} = this.props
+		const {seriesInfo, imgs} = this.state
+    	const {classes} = this.props
 
 		return(
 		    <div className={classes.root}>
 		      <GridList cellHeight={160} className={classes.gridContainer1} cols={1}>
 				{seriesInfo.map((serie, index) => (
                   <GridListTile key={serie.id} item>
-	                  <Paper className={classNames(classes.paper, {[classes.paperSelected]: serie.id==this.props.selectedSeries})} 
-	                  onClick={event => this.props.onSelectSeries(event, serie.id)}>
-	                    <img src={imgs[index]} height="140px" width="140px"></img>
+	                  <Paper className={classNames(classes.paper, {[classes.paperSelected]: serie.id===this.props.selectedSeries})} 
+	                  	onClick={event => this.props.onSelectSeries(event, serie.id)}
+	                  	onContextMenu={event=>{event.preventDefault()}}>
+	                    <img src={imgs[index]} height="140px" width="140px" alt=""></img>
 	                    <div className={classes.seriesContent}>
 	                        <Typography className={classes.text}>
 	                          {serie.bodyPart}
