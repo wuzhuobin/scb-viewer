@@ -667,6 +667,7 @@ class DicomViewer extends React.Component {
           unselectable="on"
           onSelectStart={() => false}
           onMouseDown={() => false}
+          onContextMenu={event=>{event.preventDefault()}}
           >
 
           <div
