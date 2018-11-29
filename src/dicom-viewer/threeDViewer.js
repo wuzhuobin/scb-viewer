@@ -120,7 +120,6 @@ class ThreeDViewer extends React.Component {
     var curMousePosY = this.state.curMousePosY
     var lastMousePosX = this.state.lastMousePosX
     var lastMousePosY = this.state.lastMousePosY
-
     if (this.state.isImageUpdated2 === true)
     {
       this.setState({isImageUpdated2:false},()=>{
@@ -150,7 +149,10 @@ class ThreeDViewer extends React.Component {
         }).then(res=>{
           this.setState({isImageUpdated2:true})
           this.viewerLoadImage(res.data)
-          }).catch(err=>{console.log(err)}
+          }).catch(err=>{
+          	this.setState({isImageUpdated2:true});
+          	console.log(err);
+          }
         )}
       );
     }     
@@ -194,7 +196,10 @@ class ThreeDViewer extends React.Component {
         }).then(res=>{
           this.setState({isImageUpdated2:true})
           this.viewerLoadImage(res.data)
-          }).catch(err=>{console.log(err)}
+          }).catch(err=>{
+          	this.setState({isImageUpdated2:true});
+          	console.log(err);
+          }
         )}
       );
     }     
@@ -238,7 +243,10 @@ class ThreeDViewer extends React.Component {
         }).then(res=>{
           this.setState({isImageUpdated2:true})
           this.viewerLoadImage(res.data)
-          }).catch(err=>{console.log(err)}
+          }).catch(err=>{
+          	console.log(err);
+          	this.setState({isImageUpdated2:true});
+          }
         )}
       );
     }     
