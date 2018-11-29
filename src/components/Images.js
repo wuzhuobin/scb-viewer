@@ -368,6 +368,14 @@ class Images extends React.Component {
                   })}}>
                 Open in MPR Viewer
               </MenuItem>
+              <MenuItem onClick={(event)=>{
+                PACS.studyInfo(this.state.selectedStudy).then((json)=>{
+                  let series = json.Series;
+                  onSelectSeries(event, series, "implant");
+                  })}}>
+                Open in Implant Planner
+              </MenuItem>
+
             </Menu>
             </TableBody>
           </Table>
