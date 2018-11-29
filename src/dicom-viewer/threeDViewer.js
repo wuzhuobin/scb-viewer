@@ -1,11 +1,8 @@
 import React from "react";
 import classNames from 'classnames';
 import {withStyles} from '@material-ui/core/styles'
-import {Paper}  from '@material-ui/core'
 // import exampleImageIdLoader from "./exampleImageIdLoader";
 import * as cornerstone from "cornerstone-core";
-import * as cornerstoneTools from "cornerstone-tools";
-import * as cornerstoneMath from "cornerstone-math";
 import pngViewer from "./pngViewer";
 import axios from 'axios';
 
@@ -39,6 +36,7 @@ class ThreeDViewer extends React.Component {
       lastMousePosX: -1,  //indicate first click
       lastMousePosY: -1,  //indicate first click
       isImageUpdated2: true,
+      value: 20,  //postive number indicate shift range -ve to +ve
    	};
     this.cornerstoneInstance = cornerstone;
     this.singleViewer = null;
@@ -88,9 +86,10 @@ class ThreeDViewer extends React.Component {
   componentWillReceiveProps(nextProps) {
     // console.log("receivedProps");
     if (this.state.dicomImage){
-      if (this.props.drawerOpen != nextProps.drawerOpen){
+      if (this.props.drawerOpen !== nextProps.drawerOpen){
         if (nextProps.drawerOpen){
-            this.state.dicomImage.style.width = 'calc(50vw - 120px - 85px - 3px)'
+          this.state.dicomImage.style.width = 'calc(50vw - 120px - 85px - 3px)'
+            
         }
         else{
           this.state.dicomImage.style.width = 'calc(50vw - 85px - 3px)'
@@ -99,12 +98,24 @@ class ThreeDViewer extends React.Component {
       }
     }
 
-    if (this.props.series != nextProps.series){
+    if (this.props.series !== nextProps.series){
         this.rotateView(nextProps.series);
+    }
+
+  }
+
+  componentDidUpdate(prevProps, prevState){
+    if (this.props.preset !== prevProps.preset ||
+      this.props.shift !== prevProps.shift||
+      this.props.opacity !== prevProps.opacity){
+        this.rotateView(this.props.series)
     }
   }
 
   rotateView(series){
+    var curPreset = this.props.preset
+    var curOpacity = this.props.opacity
+    var curShift = this.props.shift
     var curMousePosX = this.state.curMousePosX
     var curMousePosY = this.state.curMousePosY
     var lastMousePosX = this.state.lastMousePosX
@@ -119,9 +130,9 @@ class ThreeDViewer extends React.Component {
         data: {
           series: series,
           id: this.props.socket.id,
-          input:{ preset: 1, 
-                  shift: 0, 
-                  opacity: 1,
+          input:{ preset: curPreset, 
+                  shift: curShift, 
+                  opacity: curOpacity,
                   size:[this.state.dicomImage.clientWidth, this.state.dicomImage.clientHeight],
                   rotate:{ 
                   current: [ -lastMousePosX, lastMousePosY ],
@@ -146,6 +157,9 @@ class ThreeDViewer extends React.Component {
   }
 
   dollyView(series){
+    var curPreset = this.state.preset
+    var curOpacity = this.state.opacity
+    var curShift = this.state.shift
     var curMousePosX = this.state.curMousePosX
     var curMousePosY = this.state.curMousePosY
     var lastMousePosX = this.state.lastMousePosX
@@ -156,13 +170,13 @@ class ThreeDViewer extends React.Component {
       this.setState({isImageUpdated2:false},()=>{
         axios({
         method: 'post',
-        url: 'http://223.255.146.2:8081/api/getVolumeRendering',
+        url: 'http://223.255.146.2:8083/api/getVolumeRendering',
         data: {
           series: series,
           id: this.props.socket.id,
-          input:{ preset: 1, 
-                  shift: 0, 
-                  opacity: 1,
+          input:{ preset: curPreset, 
+                  shift: curShift, 
+                  opacity: curOpacity,
                   size:[this.state.dicomImage.clientWidth, this.state.dicomImage.clientHeight],
                   dolly:{ 
                   current: [ -lastMousePosX, lastMousePosY ],
@@ -187,6 +201,9 @@ class ThreeDViewer extends React.Component {
   }
 
   panView(series){
+    var curPreset = this.state.preset
+    var curOpacity = this.state.opacity
+    var curShift = this.state.shift
     var curMousePosX = this.state.curMousePosX
     var curMousePosY = this.state.curMousePosY
     var lastMousePosX = this.state.lastMousePosX
@@ -201,9 +218,9 @@ class ThreeDViewer extends React.Component {
         data: {
           series: series,
           id: this.props.socket.id,
-          input:{ preset: 1, 
-                  shift: 0, 
-                  opacity: 1,
+          input:{ preset: curPreset, 
+                  shift: curShift, 
+                  opacity: curOpacity,
                   size:[this.state.dicomImage.clientWidth, this.state.dicomImage.clientHeight],
                   pan:{ 
                   current: [ -lastMousePosX, lastMousePosY ],
@@ -294,7 +311,7 @@ class ThreeDViewer extends React.Component {
   }
 
   render() {
-    const {drawerOpen, orientation, classes} = this.props
+    const {classes} = this.props
 
   	return(
         <div className={classes.paper}>

@@ -17,6 +17,7 @@ export default class dcmViewer{
         this.currentMode = null;
         this.renderedCallBack = null;
         this.timer = null;
+        this.checkFlag = false;
         cornerstone.enable(inputElement);
         cornerstoneTools.external.cornerstone = cornerstone;
         cornerstoneTools.external.cornerstoneMath = cornerstoneMath;
@@ -24,6 +25,7 @@ export default class dcmViewer{
 	}
     destructor(){
         if (this.element){
+            dcmLoader.GlobalDcmLoadManager.abortLoadingSeries(this.currentLoaderHint);
             if (this.renderedCallBack){
                 try{
                     this.element.removeEventListener("cornerstoneimagerendered", this.callBack);
@@ -42,8 +44,39 @@ export default class dcmViewer{
             }
         }
     }
+    reloadImage(){
+        if (this.element){
+            if (this.checkFlag){
+                console.log("Busying checking for invalid image");
+                return;
+            }
+            this.checkFlag = true;
+            var cache = cornerstone.imageCache;
+            if (cache){
+                if (cache.cachedImages){
+                    if (cache.cachedImages.length){
+                        for (var i=0;i<cache.cachedImages.length;i++){
+                            var image = cache.cachedImages[i];
+                            if (image.loaded && image.imageLoadObject){
+                                if (image.imageLoadObject.promise){
+                                    const imageId = image.imageId;
+                                    image.imageLoadObject.promise.then(res=>{
+                                        if (res.color){
+                                            cornerstone.imageCache.removeImageLoadObject(imageId);
+                                            cornerstone.loadAndCacheImage(imageId);
+                                        }
+                                    })
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        this.checkFlag = false;
+    }
 	displayImage(inputLoaderHint){
-		const returningPromise = new Promise((resolve,reject)=>{cornerstone.loadImage(inputLoaderHint)
+		const returningPromise = new Promise((resolve,reject)=>{cornerstone.loadAndCacheImage(inputLoaderHint)
         .then(image => {
             cornerstone.displayImage(this.element,image);
             resolve();
@@ -56,9 +89,9 @@ export default class dcmViewer{
 		if (inputOrderedImageList === null){
 			loaderHint = "noImage"
 		}
-        const cacheimageLoaderHintsArray = [...Array(inputOrderedImageList.length).keys()].map(function(number){
-          return loaderHint+"://" + String(number);
-        });
+        // const cacheimageLoaderHintsArray = [...Array(inputOrderedImageList.length).keys()].map(function(number){
+        //   return loaderHint+"://" + String(number);
+        // });
         dcmLoader.GlobalDcmLoadManager.loadSeries(inputOrderedImageList, loaderHint);
         this.currentLoaderHint = inputLoaderHint;
 	}
@@ -112,7 +145,6 @@ export default class dcmViewer{
         })
     }
     initialiseSeries(inputSeries){
-        const self = this;
         const cacheInputSeries = inputSeries;
 
         var returningPromise = new Promise((resolve,reject)=>{
@@ -158,7 +190,6 @@ export default class dcmViewer{
         });
         cornerstoneTools.mouseInput.enable(this.element);
         cornerstoneTools.mouseWheelInput.enable(this.element);
-        const stack = this.stack;
         cornerstoneTools.addStackStateManager(this.element, ['stack']);
         cornerstoneTools.addToolState(this.element, 'stack', this.stack);
         cornerstoneTools.stackScrollWheel.activate(this.element);
@@ -307,7 +338,7 @@ export default class dcmViewer{
         if (viewPort){
             viewPort.invert = !viewPort.invert;
         }
-        cornerstone.setViewport(this.element, viewPort)
+        cornerstone.setViewport(this.element, viewPort);
     }
     vflipImage(){
         var viewPort = cornerstone.getViewport(this.element);
@@ -407,7 +438,7 @@ export default class dcmViewer{
         if (this.element){
             const viewport = cornerstone.getViewport(this.element);
             if (viewport.voi){
-                return viewport.voi.windowWidth;
+                return viewport.voi.windowCenter;
             }
         }
         return '';

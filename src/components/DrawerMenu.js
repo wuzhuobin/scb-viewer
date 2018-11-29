@@ -35,9 +35,6 @@ const styles = theme=> ({
   }
 })
 class DrawerMenu extends React.Component {
-    constructor(props){
-        super(props);
-    }
 
     render(){
         const {onDrawerClose, onChangePage, open, classes} = this.props
@@ -64,7 +61,7 @@ class DrawerMenu extends React.Component {
                 <ListItemIcon className={classes.button}>
                   <Collections />
                 </ListItemIcon>
-                <ListItemText primary={<Typography variant="h6" style={{ color: 'white' }}>PACS</Typography>} />
+                <ListItemText primary={<Typography variant="body1" style={{ color: 'white' }}>PACS</Typography>} />
               </ListItem>
             </List>
             <Divider className={classes.divider} />
@@ -74,13 +71,13 @@ class DrawerMenu extends React.Component {
                 <ListItemIcon>
                   <Visibility className={classes.button} />
                 </ListItemIcon>
-                <ListItemText primary={<Typography variant="h6" style={{ color: 'white' }}>Planar Viewer</Typography>} />
+                <ListItemText primary={<Typography variant="body1" style={{ color: 'white' }}>Planar Viewer</Typography>} />
                 </ListItem>
                 <ListItem button onClick={() => {onChangePage(3);}} className={classes.button}>
                 <ListItemIcon>
                   <ThreeDRotation className={classes.button} />
                 </ListItemIcon>
-                <ListItemText primary={<Typography variant="h6" style={{ color: 'white' }}>MPR Viewer</Typography>} />
+                <ListItemText primary={<Typography variant="body1" style={{ color: 'white' }}>MPR Viewer</Typography>} />
                 </ListItem>
             </List>
             <Divider className={classes.divider} />

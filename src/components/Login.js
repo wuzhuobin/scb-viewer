@@ -2,7 +2,6 @@ import {Avatar, Button, CssBaseline, Paper, Typography, FormControl, InputLabel,
 	Input, FormControlLabel, Checkbox, Snackbar} from '@material-ui/core';
 import React, { Component } from 'react';
 import {withStyles} from '@material-ui/core/styles'
-import PropTypes from 'prop-types';
 import {Lock} from '@material-ui/icons';
 import axios from 'axios';
 
@@ -59,8 +58,8 @@ class Login extends Component {
 		console.log("username: " + this.state.username)
 		console.log("password: " + this.state.password)
 		const formData = new FormData();
-		const userName = this.state.username;
-		const passWord = this.state.password;
+		//const userName = this.state.username;
+		//const passWord = this.state.password;
 	  	formData.append('headers', {'Access-Control-Allow-Origin': '*'});
 	  	formData.append('body',{'username': this.state.username});
 	  	//formData.append({'password': 'sucabot'});
@@ -76,7 +75,7 @@ class Login extends Component {
 			})
 	      .then(res => {
 	         console.log(res);
-	        if (res.data.Status == 'Success' )
+	        if (res.data.Status === 'Success' )
 	        {
 	        	console.log("correct");
 	        	this.props.onAuth();
@@ -105,7 +104,7 @@ class Login extends Component {
   	};
 
 	render(){
-		const {username, password, showWrong, showLoginMsg} = this.state
+		const {showWrong, showLoginMsg} = this.state
 		const {classes} = this.props
 
 		return(

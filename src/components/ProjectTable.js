@@ -37,25 +37,25 @@ const styles = theme => ({
   },
 });
 
-let id = 0;
-function createData(name, calories, fat, carbs, protein) {
-  id += 1;
-  return { id, name, calories, fat, carbs, protein };
-}
+// let id = 0;
+// function createData(name, calories, fat, carbs, protein) {
+//   id += 1;
+//   return { id, name, calories, fat, carbs, protein };
+// }
 
-function getProjectData(){
-  axios({
-      method: 'get',
-      url: 'http://192.168.1.112:8080/api/project/user3',
-      headers:  {'Access-Control-Allow-Origin': '*'},
-  })
-    .then(res => {
-        console.log(res.data);
-        return(res.data);
-    }).catch((error)=>{
-      console.log(error)
-    })
-}
+// function getProjectData(){
+//   axios({
+//       method: 'get',
+//       url: 'http://192.168.1.112:8080/api/project/user3',
+//       headers:  {'Access-Control-Allow-Origin': '*'},
+//   })
+//     .then(res => {
+//         console.log(res.data);
+//         return(res.data);
+//     }).catch((error)=>{
+//       console.log(error)
+//     })
+// }
 
 //const rows = [
 //  createData('Frozen yoghurt', 159, 6.0, 24, 4.0),
@@ -66,12 +66,6 @@ function getProjectData(){
 //];
 
 class ProjectTable extends React.Component {
-  constructor(props){
-        super(props);
-        this.state = {
-            rows: [],
-    };
-  }
   
   componentDidMount(){
     axios({

@@ -39,6 +39,9 @@ const styles = theme=> ({
       },
      grow: {
         flexGrow: 1,
+        MozUserSelect:'none',
+        WebkitUserSelect:'none',
+        msUserSelect:'none',
      },
     menuButton:{
         marginLeft: -12,
@@ -74,7 +77,7 @@ class NavBar extends React.Component {
     };
 
     render(){
-        const {auth, open, onDrawerOpen, classes, theme} = this.props
+        const {auth, open, onDrawerOpen, classes} = this.props
         const meunOpen = Boolean(this.state.anchorEl);
         return(
         <div className={classes.root}>
@@ -82,7 +85,7 @@ class NavBar extends React.Component {
                 position="absolute" 
                 className={classNames(classes.appBar, {[classes.appBarShift]: open,})}
                 style={styles.appBar} 
-                containerStyle={{height: 'calc(100% - 64px)', top: 64}}>
+                containerstyle={{height: 'calc(100% - 64px)', top: 64}}>
                 <Toolbar>
                     { auth && (<IconButton 
                                 className={classNames(classes.menuButton, open && classes.hide)} 

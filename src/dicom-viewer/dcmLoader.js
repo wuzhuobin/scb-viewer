@@ -2,8 +2,7 @@
 import * as daikon from "daikon";
 import pngjs from "pngjs";
 import * as cornerstone from "cornerstone-core";
-import * as cornerstoneTools from "cornerstone-tools";
-import * as cornerstoneMath from "cornerstone-math";
+
 
 function getString(inputObject){
 	if (inputObject === null){
@@ -12,6 +11,10 @@ function getString(inputObject){
 	else {
 		return inputObject.toString();
 	}
+}
+
+function fakeImage(){
+	return [0];
 }
 
 function getArrayMinMax(a){
@@ -47,14 +50,24 @@ function centerRange(center, numElement, exclusiveMax){
 	return returnArray;
 }
 
+function newAbortController(){
+	signal = null;
+	controller = null;
+	controller = new AbortController();
+	signal = controller.signal;
+}
 
-function httpFetch(url, requestMethod){
+function httpFetch(url){
 	// const fetch = require('node-fetch');
 	var output;
-
-	output = fetch(url)
+	// console.log(signal);
+	output = fetch(url, {signal})
 	.then(response=> response.arrayBuffer())
-	.catch(error=>null);
+	.catch(error=>{
+		// console.log(error)
+		console.log("Stop http request");
+		return null;
+	});
 	return output;
 }
 
@@ -79,23 +92,49 @@ class dcmLoader{
 		this.BatchLoadImage(centerRange(parseInt((inputImagePathArray.length/2)|0),this.bufferSize, inputImagePathArray.length));
 	}
 
+
 	BatchLoadImage(inputArray){//The input array is expected to contain only number, corresponding to the n-th slice of the required
 		const self = this;
+		newAbortController();
 		for (var i=0;i<inputArray.length;i++){
 			const imageId = inputArray[i];
 			this.onceReadSeries.push(imageId);
-
 			this.failedSeries = this.failedSeries.filter(item=>item!==imageId);
 			if (this.imageSeries[imageId]!== null){
-				console.log("rewriting " + imageId + " -th image to null");
+				// console.log("rewriting " + imageId + " -th image to null");
 				this.imageSeries[imageId] = null;
 			}
 			this.imageSeries[imageId] = new Promise(function (resolve, reject){
 				httpFetch(self.imagePathArray[imageId])
 				.then(response=>{
 					if (response===null){
-						this.failedSeries.push(imageId);
-						reject("Get image failed");
+						self.failedSeries.push(imageId);
+						resolve({
+							minPixelValue: 0,
+							maxPixelValue: 255,
+							patientPos: [0,0,0],
+							patientOri: [1,0,0,0,1,0],
+							patientName:'',
+							windowCenter: 0,
+							windowWidth: 0,
+							getPixelData: fakeImage,
+							rows: 1,
+							columns: 1,
+							height: 1,
+							width: 1,
+							color:true,
+							columnPixelSpacing: 1,
+							rowPixelSpacing: 1,
+							sliceThickness:1,
+							studyDescription : '',
+							seriesDescription: '',
+							studyDate:'',
+							protocolName: '',
+							institutionName: '',
+							seriesNumber:'',
+							sliceLocation: '',
+							sizeInBytes: 2,
+						});
 					}
 					else {
 						const data = new DataView(response);
@@ -212,7 +251,7 @@ class dcmLoader{
 									columns:data.width,
 									height:data.height,
 									width:data.width,
-									color:true,
+									color:false,
 									columnPixelSpacing:1,
 									rowPixelSpacing:1,
 									sizeInBytes:data.width*data.height*2,
@@ -229,6 +268,11 @@ class dcmLoader{
 
 
 	UpdateImagesData(inputId){
+		for (var i=0;i<this.numDcm;i++){
+			if (this.imageSeries[i].color){
+				console.log("abc");
+			}
+		}
 		const numFailed = this.failedSeries.length;
 		if (numFailed){
 			console.log(numFailed+" image(s) is not loaded properly");
@@ -274,10 +318,15 @@ class dcmLoader{
 			this.minQueriedId = sliceId;
 		}
 		if (this.failedSeries.includes(sliceId)){
-			alert("The " + sliceId + "-th image is not loaded");
+			// alert("The " + sliceId + "-th image is not loaded");
+			return null;
 		}
 		this.UpdateImagesData(sliceId);
 		return this.imageSeries[sliceId];
+	}
+	stopLoading(){
+		console.log("Abort!!!!!!!!!!!!!!!!!!!!!!");
+		controller.abort();
 	}
 }
 
@@ -325,7 +374,15 @@ export class dcmManager{
 		}
 		return hitIndex;
 	}
-
+	abortLoadingSeries(inputLoaderHint){
+		const hitIndex = this.findSeries(inputLoaderHint)
+		if (hitIndex === null){
+			console.log("no need to delete");
+		}
+		else {
+			this.loadedBuffer[hitIndex].dcmLoader.stopLoading();
+		}
+	}
 	removeSeries(inputLoaderHint){
 		console.log('remove')
 		var self = this
@@ -379,7 +436,7 @@ export class dcmManager{
 						columns: pixelData.width,
 						height:1024,
 						width:1024,
-						color: false,
+						color: true,
 						// columnPixelSpacing: 1,
 						// rowPixelSpacing: 1,
 						// sizeInBytes: 128 * 128 * 2,
@@ -394,5 +451,7 @@ export class dcmManager{
 
 
 }
+var controller = new AbortController();
+var signal = controller.signal;
 
 export var GlobalDcmLoadManager = new dcmManager(cornerstone)
