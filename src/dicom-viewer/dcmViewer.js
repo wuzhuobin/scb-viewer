@@ -159,7 +159,7 @@ export default class dcmViewer{
                 const cacheimageLoaderHintsArray = [...Array(queryList.length).keys()].map(function(number){
                     return loaderHint+"://" + String(number);
                 });
-                console.log(cacheimageLoaderHintsArray);
+                // console.log(cacheimageLoaderHintsArray);
                 for (let i=0;i<queryList.length;i++){
                     cacheImagePathArray.push(queryList[i]);
                 }

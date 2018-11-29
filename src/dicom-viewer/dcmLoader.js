@@ -122,6 +122,8 @@ class dcmLoader{
 							columns: 1,
 							height: 1,
 							width: 1,
+							imageRows: '',
+							imageCols: '',	
 							color:true,
 							columnPixelSpacing: 1,
 							rowPixelSpacing: 1,
@@ -219,6 +221,8 @@ class dcmLoader{
 								columns: image.getCols(),
 								height: image.getCols(),
 								width: image.getRows(),
+								imageRows: imageRows,
+								imageCols: imageColumns,
 								color:false,
 								columnPixelSpacing: colSpacing,
 								rowPixelSpacing: rowSpacing,
@@ -283,23 +287,23 @@ class dcmLoader{
 			if (this.maxQueriedId > minMax[1] - this.cacheBuffer){
 				const currentMaxRead = minMax[1];
 				const numAdditionalRead = Math.min(this.numDcm-1-currentMaxRead, this.bufferSize);
-				var toReadArray = [];
-				for (var j=0;j<numAdditionalRead;j++){
-					toReadArray.push(currentMaxRead+j+1);
+				var toReadArray1 = [];
+				for (var j1=0;j1<numAdditionalRead;j1++){
+					toReadArray1.push(currentMaxRead+j1+1);
 				}
 				if (numAdditionalRead){
-					this.BatchLoadImage(toReadArray);
+					this.BatchLoadImage(toReadArray1);
 				}
 			}
 			else if (this.minQueriedId<minMax[0]+this.cacheBuffer){
 				const currentMinRead = minMax[0];
 				const numAdditionalRead = Math.min(currentMinRead,this.bufferSize);
-				var toReadArray = [];
-				for (var j=0;j<numAdditionalRead;j++){
-					toReadArray.push(currentMinRead-j-1);
+				var toReadArray2 = [];
+				for (var j2=0;j2<numAdditionalRead;j2++){
+					toReadArray2.push(currentMinRead-j2-1);
 				}
 				if (numAdditionalRead){
-					this.BatchLoadImage(toReadArray);
+					this.BatchLoadImage(toReadArray2);
 				}
 			}
 		}
