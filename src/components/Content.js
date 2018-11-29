@@ -65,7 +65,7 @@ class Content extends React.Component {
 
     componentDidMount(){
       // websocket to mpr backend
-      var endPoint = "http://223.255.146.2:8081"
+      var endPoint = "http://223.255.146.2:8083"
       const socket = socketIOClient(endPoint)
       socket.on('connect', ()=>{
         this.setState({socket: socket});
@@ -89,6 +89,7 @@ class Content extends React.Component {
               {page === 1 && <Projects />}         
               {page === 2 && <DicomViewer series={this.state.series} drawerOpen={this.props.open}/>}
               {page === 3 && <DicomViewer3D series={this.state.series} drawerOpen={this.props.open} socket={socket}/>} 
+              {page === 4}
           </main>
         </div>
     );
