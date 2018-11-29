@@ -1,14 +1,15 @@
 import React from "react";
 import classNames from 'classnames';
 import {withStyles} from '@material-ui/core/styles'
-import {AppBar,Toolbar, Button, Grid, Snackbar, Popover}  from '@material-ui/core';
+import {AppBar,Toolbar, Button, Grid, Snackbar, Popover, List, ListItem, ListItemText, 
+  ListItemIcon, Typography, Divider}  from '@material-ui/core';
 import SeriesPreviewVertical from '../components/SeriesPreviewVertical'
-import {NavigationOutlined} from '@material-ui/icons';
-import MprViewer from './MprViewer'
+import {NavigationOutlined, LibraryAdd} from '@material-ui/icons';
+import VtkMprViewer from './vtkMprViewer'
 import ThreeDViewer from './threeDViewer'
-import Cursor3D from "../components/cursor3D"
 import TuneIcon from '@material-ui/icons/Tune';
 import axios from 'axios';
+import Cursor3D from "../components/cursor3D";
 import Slider from '@material-ui/lab/Slider';
 
 const styles = theme=> ({
@@ -40,27 +41,49 @@ const styles = theme=> ({
           },
     },
     gridRoot: {
-      width: 'calc(100vw - 170px)',
+      width: 'calc(100vw - 170px - 240px)',
       height: 'calc(100vh - 64px - 64px)',
       borderColor: theme.palette.primary.main,
       borderStyle: "solid",
       borderWidth: 1,
     },
     drawerOpenGrid:{
-      width: 'calc(100vw - 240px - 170px)',
+      width: 'calc(100vw - 240px - 170px - 240px)',
     },
     loadingProgressSnackbar:{
 
     },
-
     slider: {
       padding: '22px 10px',
       width: 200,
     },
-
+    implantList:{
+      background: theme.palette.secondary.main,
+      width: 240,
+      height: 'calc(100vh - 64px - 64px)',
+      position: "relative",
+      top: 'calc(-100vh + 64px + 64px)',
+      left: 'calc(100vw - 240px)',
+    },
+    drawerOpenImplantList:{
+      position: "relative",
+      left: 'calc(100vw - 240px - 240px)',
+    },
+    listSubHeader:{
+      color: 'white',
+    },
+    button:{
+      color: theme.palette.primary.contrastText,
+      '&:hover': {
+          backgroundColor: theme.palette.secondary.light,
+        }
+    },
+    divider:{
+      backgroundColor: theme.palette.secondary.light,
+    },
 })
 
-class DicomViewer3D extends React.Component {
+class SurgicalPlanner extends React.Component {
   constructor(props)
   {
     super(props);
@@ -220,7 +243,7 @@ class DicomViewer3D extends React.Component {
 
     	return(
         <div className={classNames(classes.root, {[classes.drawerOpen]: this.props.drawerOpen,})}>
-            <AppBar className={classes.appBar}>
+          <AppBar className={classes.appBar}>
               <Toolbar>
                 
                 <Button classes={{label: classes.label}} color="inherit" >
@@ -356,51 +379,63 @@ class DicomViewer3D extends React.Component {
           </AppBar>
 
           <SeriesPreviewVertical series={series} selectedSeries={this.state.selectedSeries} onSelectSeries={this.onSelectSeries}/>
-            <Grid container className={classNames(classes.gridRoot, {[classes.drawerOpenGrid]: this.props.drawerOpen,})}>
-              <Grid container spacing={0}>
-                <Grid item xs={6}>
-                  <MprViewer 
-                    orientation={"Axial"} 
-                    series={this.state.displaySeries} 
-                    socket={this.props.socket} 
-                    drawerOpen={drawerOpen}
-                    cursor3D={cursor3D}
-                    onCursorChange={this.onCursorChange}
-                    ijkPos={ijkPos}/>
-                </Grid>
-                <Grid item xs={6}>
-                  <MprViewer 
-                    orientation={"Sagittal"} 
-                    series={this.state.displaySeries} 
-                    socket={this.props.socket} 
-                    drawerOpen={drawerOpen}
-                    cursor3D={cursor3D}
-                    onCursorChange={this.onCursorChange}
-                    ijkPos={ijkPos}/>
-                </Grid>
-                <Grid item xs={6}>
-                  <ThreeDViewer
+          <Grid container className={classNames(classes.gridRoot, {[classes.drawerOpenGrid]: this.props.drawerOpen,})}>
+            <Grid container spacing={0}>
+              <Grid item xs={6}>
+                <VtkMprViewer 
+                  orientation={"Axial"} 
                   series={this.state.displaySeries} 
                   socket={this.props.socket} 
                   drawerOpen={drawerOpen}
-                  preset={preset}
-                  shift={shift}
-                  opacity={opacity}
-                  />
+                  cursor3D={cursor3D}
+                  onCursorChange={this.onCursorChange}
+                  ijkPos={ijkPos}/>
+              </Grid>
+              <Grid item xs={6}>
+                <VtkMprViewer 
+                  orientation={"Sagittal"} 
+                  series={this.state.displaySeries} 
+                  socket={this.props.socket} 
+                  drawerOpen={drawerOpen}
+                  cursor3D={cursor3D}
+                  onCursorChange={this.onCursorChange}
+                  ijkPos={ijkPos}/>
+              </Grid>
+              <Grid item xs={6}>
+                <ThreeDViewer
+                series={this.state.displaySeries} 
+                socket={this.props.socket} 
+                drawerOpen={drawerOpen}
+                preset={preset}
+                shift={shift}
+                opacity={opacity}
+                />
 
-                </Grid>
-                <Grid item xs={6}>
-                  <MprViewer 
-                    orientation={"Coronal"} 
-                    series={this.state.displaySeries} 
-                    socket={this.props.socket} 
-                    drawerOpen={drawerOpen}
-                    cursor3D={cursor3D}
-                    onCursorChange={this.onCursorChange}
-                    ijkPos={ijkPos}/>
-                </Grid>
+              </Grid>
+              <Grid item xs={6}>
+                <VtkMprViewer 
+                  orientation={"Coronal"} 
+                  series={this.state.displaySeries} 
+                  socket={this.props.socket} 
+                  drawerOpen={drawerOpen}
+                  cursor3D={cursor3D}
+                  onCursorChange={this.onCursorChange}
+                  ijkPos={ijkPos}/>
               </Grid>
             </Grid>
+          </Grid>
+
+          <div className={classNames(classes.implantList, {[classes.drawerOpenImplantList]: this.props.drawerOpen,})}>
+            <List>
+              <ListItem button className={classes.button}>
+                <ListItemIcon className={classes.button} onClick={() => {return;}}>
+                  <LibraryAdd />
+                </ListItemIcon>
+                <ListItemText primary={<Typography variant="body1" style={{ color: 'white' }}>Insert New Implant</Typography>} />
+              </ListItem>
+            </List>
+            <Divider className={classes.divider} />
+          </div>
 
             <Snackbar
               anchorOrigin={{vertical:'bottom',horizontal:'right'}}
@@ -434,14 +469,4 @@ class DicomViewer3D extends React.Component {
     };
 }
 
-export default withStyles(styles)(DicomViewer3D);
-
-
-                // <Button classes={{label: classes.label}} value="2" color="inherit" size="small" onClick={() => {}}>
-                //   <Brightness6Icon />
-                //   Levels
-                // </Button>
-                // <Button classes={{label: classes.label}} color="inherit" size="small" onClick={() => {}}>
-                //   <SearchIcon />
-                //   Zoom
-                // </Button>
+export default withStyles(styles)(SurgicalPlanner);

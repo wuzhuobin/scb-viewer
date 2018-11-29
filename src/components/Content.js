@@ -3,6 +3,7 @@ import {withStyles} from '@material-ui/core/styles'
 import Images from './Images';
 import DicomViewer from "../dicom-viewer";
 import DicomViewer3D from "../dicom-viewer/dicom-viewer3D";
+import SurgicalPlanner from "../surgical-planner/surgicalPlanner"
 import classNames from 'classnames';
 import DrawerMenu from "./DrawerMenu";
 import Projects from './Projects';
@@ -43,7 +44,7 @@ class Content extends React.Component {
     constructor(props){
         super(props);
         this.state = {
-            page: 0,
+            page: 4,
             series: null,
             socket: null,
         };
@@ -89,7 +90,7 @@ class Content extends React.Component {
               {page === 1 && <Projects />}         
               {page === 2 && <DicomViewer series={this.state.series} drawerOpen={this.props.open}/>}
               {page === 3 && <DicomViewer3D series={this.state.series} drawerOpen={this.props.open} socket={socket}/>} 
-              {page === 4}
+              {page === 4 && <SurgicalPlanner series={this.state.series} drawerOpen={this.props.open} socket={socket}/>}
           </main>
         </div>
     );
