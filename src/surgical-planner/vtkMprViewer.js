@@ -118,6 +118,9 @@ class VtkMprViewer extends React.Component {
       canvas2.width = element.clientWidth;
       canvas2.height = element.clientHeight;
 
+       console.log(this.state.cursorViewportX, this.state.cursorViewportY)
+
+
       this.setState({
         dicomImage: element},
         ()=>{
@@ -176,6 +179,7 @@ class VtkMprViewer extends React.Component {
     else if (this.props.orientation === "Coronal"){
       canvas = document.getElementById("canvasCoronal")
     }
+
     if (canvas){
       var ctx = canvas.getContext('2d');
 
@@ -268,6 +272,9 @@ class VtkMprViewer extends React.Component {
   componentWillReceiveProps(nextProps) {
     // cursor 3d
     if (this.props.ijkPos !==  nextProps.ijkPos){
+
+      console.log(nextProps.ijkPos)
+
       // cursor3D update
       if (this.props.orientation === "Axial"){
         if (this.props.ijkPos[0] === nextProps.ijkPos[0] && this.props.ijkPos[1] === nextProps.ijkPos[1]){
@@ -486,7 +493,7 @@ class VtkMprViewer extends React.Component {
       this.props.cursor3D.setViewportAxialSize(canvas0.width, canvas0.height) 
 
       this.props.cursor3D.update()
-      //var ijkPos = this.props.cursor3D.getIjkPositionFromAxial(this.state.cursorViewportX, this.state.cursorViewportY)
+      var ijkPos = this.props.cursor3D.getIjkPositionFromAxial(this.state.cursorViewportX, this.state.cursorViewportY)
       
       if (this.props.cursor3D.cursorWithinBound()){
         this.props.onCursorChange()
@@ -497,8 +504,8 @@ class VtkMprViewer extends React.Component {
       this.props.cursor3D.setViewportSagittalSize(canvas1.width, canvas1.height) 
 
       this.props.cursor3D.update()
-      //var ijkPos = this.props.cursor3D.getIjkPositionFromSagittal(this.state.cursorViewportX, this.state.cursorViewportY)
-     
+      var ijkPos = this.props.cursor3D.getIjkPositionFromSagittal(this.state.cursorViewportX, this.state.cursorViewportY)
+
       if (this.props.cursor3D.cursorWithinBound()){
         this.props.onCursorChange()
       }
@@ -508,7 +515,7 @@ class VtkMprViewer extends React.Component {
       this.props.cursor3D.setViewportCoronalSize(canvas2.width, canvas2.height) 
 
       this.props.cursor3D.update()
-      //var ijkPos = this.props.cursor3D.getIjkPositionFromCoronal(this.state.cursorViewportX, this.state.cursorViewportY)
+      var ijkPos = this.props.cursor3D.getIjkPositionFromCoronal(this.state.cursorViewportX, this.state.cursorViewportY)
       if (this.props.cursor3D.cursorWithinBound()){
         this.props.onCursorChange()
       }

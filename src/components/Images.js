@@ -1,8 +1,8 @@
 import React from "react";
 
 import {Button, Divider, Table, TableBody, TableCell, TableHead, TableRow, TablePagination,
-TableSortLabel, IconButton, Menu, MenuItem} from '@material-ui/core';
-import {CloudUpload, MoreVert} from '@material-ui/icons'
+TableSortLabel, IconButton, Menu, MenuItem, ListItemIcon, Typography} from '@material-ui/core';
+import {CloudUpload, MoreVert, Visibility, ThreeDRotation, Assignment} from '@material-ui/icons'
 
 import { withStyles } from '@material-ui/core/styles';
 import Upload from './Upload';
@@ -117,6 +117,10 @@ const styles = theme => ({
     },
     '&:hover': {backgroundColor: "#272727"},
   },
+  menuSubheader:{
+    outlineColor: "transparent",
+    paddingLeft: 10,
+  }
 });
 
 const tableHeadStyles = theme => ({
@@ -354,20 +358,38 @@ class Images extends React.Component {
               onClose={this.handleStudyMenuClose}
               onContextMenu={(event)=>{event.preventDefault();this.handleStudyMenuClose()}}
             >
+              <Typography className={classes.menuSubheader}>Open Series In:</Typography>
               <MenuItem onClick={(event)=>{
                 PACS.studyInfo(this.state.selectedStudy).then((json)=>{
                   let series = json.Series;
                   onSelectSeries(event, series, "planar");
                   })}}>
-                Open in Planar Viewer
-                </MenuItem>
+                  <ListItemIcon>
+                    <Visibility/>
+                  </ListItemIcon>  
+                  Planar Viewer
+              </MenuItem>
               <MenuItem onClick={(event)=>{
                 PACS.studyInfo(this.state.selectedStudy).then((json)=>{
                   let series = json.Series;
                   onSelectSeries(event, series, "mpr");
                   })}}>
-                Open in MPR Viewer
+                  <ListItemIcon>
+                    <ThreeDRotation/>
+                  </ListItemIcon> 
+                MPR Viewer
               </MenuItem>
+              <MenuItem onClick={(event)=>{
+                PACS.studyInfo(this.state.selectedStudy).then((json)=>{
+                  let series = json.Series;
+                  onSelectSeries(event, series, "implant");
+                  })}}>
+                <ListItemIcon>
+                    <Assignment/>
+                </ListItemIcon> 
+                Implant Planner
+              </MenuItem>
+
             </Menu>
             </TableBody>
           </Table>

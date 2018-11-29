@@ -56,11 +56,18 @@ class Content extends React.Component {
 
     onSelectSeries = (event, series, viewer)=>{
       this.setState({series: series})
-      if (viewer === "planar"){
-        this.setState({page: 2})
-      }
-      else if (viewer === "mpr"){
-        this.setState({page: 3})
+      switch (viewer){
+        case "planar":
+          this.setState({page: 2})
+          break;
+        case "mpr":
+          this.setState({page: 3})
+          break;
+        case "implant":
+          this.setState({page: 4})
+          break;
+        default:
+          this.setState({page: 2})
       }
     }
 
