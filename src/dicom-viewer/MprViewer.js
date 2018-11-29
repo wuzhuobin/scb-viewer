@@ -1,6 +1,7 @@
 import React from "react";
 import classNames from 'classnames';
 import {withStyles} from '@material-ui/core/styles'
+import {Paper}  from '@material-ui/core'
 import * as cornerstone from "cornerstone-core";
 import pngViewer from "./pngViewer"
 import axios from 'axios';
@@ -62,10 +63,10 @@ class MprViewer extends React.Component {
     if (this.props.orientation === "Axial")
     {
       const element = document.getElementById('dicomImageAxial');
-      var canvas0 = document.getElementById('canvasAxial');
+      var canvas = document.getElementById('canvasAxial');
 
-      canvas0.width = element.clientWidth;
-      canvas0.height = element.clientHeight;
+      canvas.width = element.clientWidth;
+      canvas.height = element.clientHeight;
 
       this.setState({
         dicomImage: element},
@@ -87,10 +88,10 @@ class MprViewer extends React.Component {
     else if (this.props.orientation === "Sagittal")
     {
       const element = document.getElementById('dicomImageSagittal');
-      var canvas1 = document.getElementById('canvasSagittal');
+      var canvas = document.getElementById('canvasSagittal');
 
-      canvas1.width = element.clientWidth;
-      canvas1.height = element.clientHeight;
+      canvas.width = element.clientWidth;
+      canvas.height = element.clientHeight;
 
       this.setState({
         dicomImage: element},
@@ -113,10 +114,10 @@ class MprViewer extends React.Component {
     else if (this.props.orientation === "Coronal")
     {
       const element = document.getElementById('dicomImageCoronal');
-      var canvas2 = document.getElementById('canvasCoronal');
+      var canvas = document.getElementById('canvasCoronal');
 
-      canvas2.width = element.clientWidth;
-      canvas2.height = element.clientHeight;
+      canvas.width = element.clientWidth;
+      canvas.height = element.clientHeight;
 
       this.setState({
         dicomImage: element},
@@ -267,15 +268,15 @@ class MprViewer extends React.Component {
   }
   componentWillReceiveProps(nextProps) {
     // cursor 3d
-    if (this.props.ijkPos !==  nextProps.ijkPos){
+    if (this.props.ijkPos !=  nextProps.ijkPos){
       // cursor3D update
       if (this.props.orientation === "Axial"){
         if (this.props.ijkPos[0] === nextProps.ijkPos[0] && this.props.ijkPos[1] === nextProps.ijkPos[1]){
           return;
         }
         
-        var canvas0 = document.getElementById("canvasAxial")
-        this.props.cursor3D.setViewportAxialSize(canvas0.width,canvas0.height);
+        var canvas = document.getElementById("canvasAxial")
+        this.props.cursor3D.setViewportAxialSize(canvas.width,canvas.height);
 
         this.props.cursor3D.update()
 
@@ -299,8 +300,8 @@ class MprViewer extends React.Component {
         if (this.props.ijkPos[1] === nextProps.ijkPos[1] && this.props.ijkPos[2] === nextProps.ijkPos[2]){
           return;
         }
-        var canvas1 = document.getElementById("canvasSagittal")
-        this.props.cursor3D.setViewportSagittalSize(canvas1.width,canvas1.height);
+        var canvas = document.getElementById("canvasSagittal")
+        this.props.cursor3D.setViewportSagittalSize(canvas.width,canvas.height);
 
         this.props.cursor3D.update()
 
@@ -327,8 +328,8 @@ class MprViewer extends React.Component {
           return;
         }
 
-        var canvas2 = document.getElementById("canvasCoronal")
-        this.props.cursor3D.setViewportCoronalSize(canvas2.width,canvas2.height);
+        var canvas = document.getElementById("canvasCoronal")
+        this.props.cursor3D.setViewportCoronalSize(canvas.width,canvas.height);
 
         this.props.cursor3D.update()
 
@@ -352,7 +353,7 @@ class MprViewer extends React.Component {
     }
 
       if (this.state.dicomImage){
-        if (this.props.drawerOpen !== nextProps.drawerOpen){          
+        if (this.props.drawerOpen != nextProps.drawerOpen){          
           if (nextProps.drawerOpen){
               this.state.dicomImage.style.width = 'calc(50vw - 120px - 85px - 3px)'
           }
@@ -368,7 +369,7 @@ class MprViewer extends React.Component {
         } 
       }
 
-      if (this.props.series !== nextProps.series){
+      if (this.props.series != nextProps.series){
         if (!nextProps.series){
           return;
         }
@@ -441,12 +442,12 @@ class MprViewer extends React.Component {
 
 
   handleResize(event, dicomImage){
-    //console.log('handleResize');
+    console.log('handleResize');
     // this.viewerLoadImage('http://192.168.1.108:8081/0001.png');
     // console.log(cornerstone.getImage(dicomImage))
     if (dicomImage)
     {
-      //console.log('updateSize')
+      console.log('updateSize')
 
         dicomImage.style.height = 'calc(50vh - 32px - 32px - 3px)'
         dicomImage.style.width = 'calc(50vw - 85px - 3px)'
@@ -463,16 +464,15 @@ class MprViewer extends React.Component {
     if (! this.state.isMouseDown){
       return;
     }
-    var canvas;
 
     if (orientation === "Axial"){
-      canvas = document.getElementById("canvasAxial")
+      var canvas = document.getElementById("canvasAxial")
     }
     else if (orientation === "Sagittal"){
-      canvas = document.getElementById("canvasSagittal")
+      var canvas = document.getElementById("canvasSagittal")
     }
     else if (orientation === "Coronal"){
-      canvas = document.getElementById("canvasCoronal")
+      var canvas = document.getElementById("canvasCoronal")
     }
 
     var rect = canvas.getBoundingClientRect();
@@ -482,33 +482,33 @@ class MprViewer extends React.Component {
     })
 
     if (orientation === "Axial"){
-      var canvas0 = document.getElementById("canvasAxial")
-      this.props.cursor3D.setViewportAxialSize(canvas0.width, canvas0.height) 
+      var canvas = document.getElementById("canvasAxial")
+      this.props.cursor3D.setViewportAxialSize(canvas.width, canvas.height) 
 
       this.props.cursor3D.update()
-      //var ijkPos = this.props.cursor3D.getIjkPositionFromAxial(this.state.cursorViewportX, this.state.cursorViewportY)
+      var ijkPos = this.props.cursor3D.getIjkPositionFromAxial(this.state.cursorViewportX, this.state.cursorViewportY)
       
       if (this.props.cursor3D.cursorWithinBound()){
         this.props.onCursorChange()
       }
     }
     if (orientation === "Sagittal"){
-      var canvas1 = document.getElementById("canvasSagittal")
-      this.props.cursor3D.setViewportSagittalSize(canvas1.width, canvas1.height) 
+      var canvas = document.getElementById("canvasSagittal")
+      this.props.cursor3D.setViewportSagittalSize(canvas.width, canvas.height) 
 
       this.props.cursor3D.update()
-      //var ijkPos = this.props.cursor3D.getIjkPositionFromSagittal(this.state.cursorViewportX, this.state.cursorViewportY)
+      var ijkPos = this.props.cursor3D.getIjkPositionFromSagittal(this.state.cursorViewportX, this.state.cursorViewportY)
      
       if (this.props.cursor3D.cursorWithinBound()){
         this.props.onCursorChange()
       }
     }
     if (orientation === "Coronal"){
-      var canvas2 = document.getElementById("canvasCoronal")
-      this.props.cursor3D.setViewportCoronalSize(canvas2.width, canvas2.height) 
+      var canvas = document.getElementById("canvasCoronal")
+      this.props.cursor3D.setViewportCoronalSize(canvas.width, canvas.height) 
 
       this.props.cursor3D.update()
-      //var ijkPos = this.props.cursor3D.getIjkPositionFromCoronal(this.state.cursorViewportX, this.state.cursorViewportY)
+      var ijkPos = this.props.cursor3D.getIjkPositionFromCoronal(this.state.cursorViewportX, this.state.cursorViewportY)
       if (this.props.cursor3D.cursorWithinBound()){
         this.props.onCursorChange()
       }
@@ -610,7 +610,8 @@ class MprViewer extends React.Component {
   }
 
     render() {
-      const {orientation, classes} = this.props
+      const {series, drawerOpen, orientation, classes} = this.props
+      const {canvasWidth, canvasHeight} = this.state
 
     	return(
           <div className={classes.paper}>
