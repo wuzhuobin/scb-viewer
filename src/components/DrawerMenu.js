@@ -1,7 +1,7 @@
 import React from 'react'
-import {List, ListItem, ListItemIcon, ListItemText, Drawer, Divider, IconButton, Typography} from '@material-ui/core'
+import {List, ListItem, ListItemIcon, ListItemText, Drawer, Divider, IconButton, Typography, ListSubheader} from '@material-ui/core'
 import {withStyles} from '@material-ui/core/styles'
-import {Collections, Portrait, Visibility, ChevronLeft, ThreeDRotation} from '@material-ui/icons'
+import {Collections, Portrait, Visibility, ChevronLeft, ThreeDRotation, Assignment} from '@material-ui/icons'
 
 const drawerWidth =240;
 
@@ -30,6 +30,9 @@ const styles = theme=> ({
    divider:{
    		backgroundColor: theme.palette.secondary.light,
     },
+  listSubHeader:{
+    color: 'white',
+  }
 })
 class DrawerMenu extends React.Component {
     constructor(props){
@@ -56,6 +59,7 @@ class DrawerMenu extends React.Component {
             </div>
             <Divider className={classes.divider} />
             <List>
+              <ListSubheader className={classes.listSubHeader}>Database</ListSubheader>
               <ListItem button onClick={() => {onChangePage(0)}} className={classes.button}>
                 <ListItemIcon className={classes.button}>
                   <Collections />
@@ -65,6 +69,7 @@ class DrawerMenu extends React.Component {
             </List>
             <Divider className={classes.divider} />
             <List>
+                <ListSubheader className={classes.listSubHeader}>Image Viewers</ListSubheader>
                 <ListItem button onClick={() => {onChangePage(2);}} className={classes.button}>
                 <ListItemIcon>
                   <Visibility className={classes.button} />
@@ -76,6 +81,16 @@ class DrawerMenu extends React.Component {
                   <ThreeDRotation className={classes.button} />
                 </ListItemIcon>
                 <ListItemText primary={<Typography variant="h6" style={{ color: 'white' }}>MPR Viewer</Typography>} />
+                </ListItem>
+            </List>
+            <Divider className={classes.divider} />
+            <List>
+              <ListSubheader className={classes.listSubHeader}>Extension Modules</ListSubheader>
+              <ListItem button onClick={() => {onChangePage(4);}} className={classes.button}>
+                <ListItemIcon>
+                  <Assignment className={classes.button} />
+                </ListItemIcon>
+                <ListItemText primary={<Typography variant="h6" style={{ color: 'white' }}>Implant Planner</Typography>} />
                 </ListItem>
             </List>
           </Drawer>

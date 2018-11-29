@@ -91,6 +91,7 @@ class Content extends React.Component {
               {page === 1 && <Projects />}         
               {page === 2 && <DicomViewer series={this.state.series} drawerOpen={this.props.open}/>}
               {page === 3 && <DicomViewer3D series={this.state.series} drawerOpen={this.props.open} socket={socket}/>} 
+              {page === 4}
           </main>
         </div>
     );
