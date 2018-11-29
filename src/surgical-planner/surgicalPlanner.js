@@ -64,6 +64,7 @@ const styles = theme=> ({
       position: "relative",
       top: 'calc(-100vh + 64px + 64px)',
       left: 'calc(100vw - 240px)',
+      zIndex: 0,
     },
     drawerOpenImplantList:{
       position: "relative",

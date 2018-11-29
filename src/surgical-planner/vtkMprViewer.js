@@ -354,10 +354,10 @@ class VtkMprViewer extends React.Component {
       if (this.state.dicomImage){
         if (this.props.drawerOpen !== nextProps.drawerOpen){          
           if (nextProps.drawerOpen){
-              this.state.dicomImage.style.width = 'calc(50vw - 120px - 85px - 3px)'
+              this.state.dicomImage.style.width = 'calc(50vw - 120px - 85px - 3px - 120px)'
           }
           else{
-            this.state.dicomImage.style.width = 'calc(50vw - 85px - 3px)'
+            this.state.dicomImage.style.width = 'calc(50vw - 85px - 3px - 120px)'
           }
 
           if (this.singleViewer){
