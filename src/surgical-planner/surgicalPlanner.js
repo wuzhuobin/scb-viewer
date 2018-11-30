@@ -4,7 +4,7 @@ import {withStyles} from '@material-ui/core/styles'
 import {AppBar,Toolbar, Button, Grid, Snackbar, Popover, List, ListItem, ListItemText, 
   ListItemIcon, Typography, Divider}  from '@material-ui/core';
 import SeriesPreviewVertical from '../components/SeriesPreviewVertical'
-import {NavigationOutlined} from '@material-ui/icons';
+import {NavigationOutlined, Style} from '@material-ui/icons';
 import VtkMprViewer from './vtkMprViewer'
 import ThreeDViewer from './threeDViewer'
 import TuneIcon from '@material-ui/icons/Tune';
@@ -282,7 +282,7 @@ class SurgicalPlanner extends React.Component {
 
                 <Button classes={{label: classes.label}} color="inherit" size="small" aria-owns={openPreset ? "simple-popper" : null} aria-haspopup="true"
                   onClick={this.handlePresetOpen}>
-                  <TuneIcon />
+                  <Style />
                   Preset
                 </Button>
 

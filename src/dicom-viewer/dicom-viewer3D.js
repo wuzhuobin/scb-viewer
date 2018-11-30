@@ -3,11 +3,10 @@ import classNames from 'classnames';
 import {withStyles} from '@material-ui/core/styles'
 import {AppBar,Toolbar, Button, Grid, Snackbar, Popover}  from '@material-ui/core';
 import SeriesPreviewVertical from '../components/SeriesPreviewVertical'
-import {NavigationOutlined} from '@material-ui/icons';
+import {NavigationOutlined, Style, Tune} from '@material-ui/icons';
 import MprViewer from './MprViewer'
 import ThreeDViewer from './threeDViewer'
 import Cursor3D from "../components/cursor3D"
-import TuneIcon from '@material-ui/icons/Tune';
 import axios from 'axios';
 import Slider from '@material-ui/lab/Slider';
 
@@ -230,7 +229,7 @@ class DicomViewer3D extends React.Component {
 
                 <Button classes={{label: classes.label}} color="inherit" size="small" aria-owns={openPreset ? "simple-popper" : null} aria-haspopup="true"
                   onClick={this.handlePresetOpen}>
-                  <TuneIcon />
+                  <Style />
                   Preset
                 </Button>
 
@@ -323,7 +322,7 @@ class DicomViewer3D extends React.Component {
 
                 <Button classes={{label: classes.label}} color="inherit" size="small" aria-owns={openShift ? "simple-popper2" : null} aria-haspopup="true"
                   onClick={this.handleShiftOpen}>
-                  <TuneIcon />
+                  <Tune />
                   Shift
                 </Button>
 
