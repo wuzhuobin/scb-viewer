@@ -4,17 +4,16 @@ import {withStyles} from '@material-ui/core/styles'
 import {AppBar,Toolbar, Button, Grid, Snackbar, Popover, List, ListItem, ListItemText, 
   ListItemIcon, Typography, Divider}  from '@material-ui/core';
 import SeriesPreviewVertical from '../components/SeriesPreviewVertical'
-import {NavigationOutlined, LibraryAdd} from '@material-ui/icons';
+import {NavigationOutlined} from '@material-ui/icons';
 import VtkMprViewer from './vtkMprViewer'
 import ThreeDViewer from './threeDViewer'
 import TuneIcon from '@material-ui/icons/Tune';
 import axios from 'axios';
 import Cursor3D from "../components/cursor3D";
 import Slider from '@material-ui/lab/Slider';
-import ExpansionPanel from '@material-ui/core/ExpansionPanel';
-import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
-import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+
+
+import ImplantList from './implantList';
 
 const styles = theme=> ({
     root:{    
@@ -265,7 +264,7 @@ class SurgicalPlanner extends React.Component {
 
     render() {
       const {drawerOpen, series, classes} = this.props
-      const {cursor3D, ijkPos, preset, opacity, shift,value, rotate1, rotate2, rotate3} = this.state
+      const {cursor3D, ijkPos, preset, opacity, shift,value} = this.state
       const { anchorPreset, anchorShift } = this.state;
       const openPreset = Boolean(anchorPreset)
       const openShift = Boolean(anchorShift)
@@ -456,61 +455,7 @@ class SurgicalPlanner extends React.Component {
           </Grid>
 
           <div className={classNames(classes.implantList, {[classes.drawerOpenImplantList]: this.props.drawerOpen,})}>
-            <List>
-              <ListItem button className={classes.button}>
-                <ListItemIcon className={classes.button} onClick={() => {return;}}>
-                  <LibraryAdd />
-                </ListItemIcon>
-                <ListItemText primary={<Typography variant="body1" style={{ color: 'white' }}>Insert New Implant</Typography>} />
-              </ListItem>
-            </List>
-
-            <div>
-              <Button classes={{label: classes.label}} color="inherit" size="small" 
-                onClick={() => {}}
-              >
-                Set Position
-              </Button>
-            </div>
-
-            <div>
-              <Slider
-                classes={{ container: classes.slider }}
-                value={rotate1}
-                aria-labelledby="label"
-                onChange={(event,rotate1)=>{
-                  var val = (rotate1-50)/50*180;
-                  this.setState({ rotate1 }); 
-                  //this.setState({shift:val})
-                }}
-              />
-            </div>
-
-            <div>
-              <Slider
-                classes={{ container: classes.slider }}
-                value={rotate2}
-                aria-labelledby="label"
-                onChange={(event,rotate2)=>{
-                  var val = (rotate2-50)/50*180;
-                  this.setState({ rotate2 }); 
-                }}
-              />
-            </div>
-
-            <div>
-              <Slider
-                classes={{ container: classes.slider }}
-                value={rotate3}
-                aria-labelledby="label"
-                onChange={(event,rotate3)=>{
-                  var val = (rotate3-50)/50*180;
-                  this.setState({ rotate3 }); 
-                }}
-              />
-            </div>
-
-            <Divider className={classes.divider} />
+            <ImplantList />
           </div>
 
             <Snackbar
