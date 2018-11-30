@@ -160,8 +160,10 @@ class SurgicalPlanner extends React.Component {
               },
               headers:  {'Access-Control-Allow-Origin': '*'},
             }).then(res=>{
-              this.state.cursor3D.setSize(res.data.Size[0],res.data.Size[1],res.data.Size[2])
-              this.state.cursor3D.setIjkPosition(res.data.Size[0]/2,res.data.Size[1]/2, res.data.Size[2]/2)
+              // this.state.cursor3D.setSize(res.data.Size[0],res.data.Size[1],res.data.Size[2])
+              // this.state.cursor3D.setIjkPosition(res.data.Size[0]/2,res.data.Size[1]/2, res.data.Size[2]/2)
+              this.state.cursor3D.setSize(1,1,1)
+              this.state.cursor3D.setIjkPosition(0.5,0.5, 0.5)
 
               // console.log(this.state.cursor3D.getIjkPosition())
               this.setState({ijkPos: this.state.cursor3D.getIjkPosition()})

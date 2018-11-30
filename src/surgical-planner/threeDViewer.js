@@ -12,14 +12,14 @@ const styles = theme=> ({
     },
     threeDViewer: {
       height: 'calc(50vh - 32px - 32px - 3px)', // last term is 2*borderWidth + large frame boarderWidth
-      width: 'calc(50vw - 85px - 3px)',
+      width: 'calc(50vw - 85px - 3px - 120px)',
       borderColor: "gray",
       borderStyle: "solid",
       borderWidth: 1, 
       background: "black"
     },
     drawerOpenThreeDViewer:{
-        width: 'calc(50vw - 85px - 120px - 3px)',
+        width: 'calc(50vw - 85px - 120px - 3px  - 120px)',
     },
 })
 
