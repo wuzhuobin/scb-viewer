@@ -11,7 +11,7 @@ const styles = theme=> ({
     },
     dicomViewer: {
       height: 'calc(50vh - 32px - 32px - 3px)', // last term is 2*borderWidth + large frame boarderWidth
-      width: 'calc(50vw - 85px - 3px - 120px)',
+      width: 'calc(50vw - 85px - 3px - 150px)',
       borderColor: "gray",
       borderStyle: "solid",
       borderWidth: 1, 
@@ -19,15 +19,15 @@ const styles = theme=> ({
     },
     canvas: {
       height: 'calc(50vh - 32px - 32px - 3px)', // last term is 2*borderWidth + large frame boarderWidth
-      width: 'calc(50vw - 85px - 3px - 120px)',
+      width: 'calc(50vw - 85px - 3px - 150px)',
       backgroundColor: "transparent",
       position: "fixed",
     },
     drawerOpenDicomViewer:{
-      width: 'calc(50vw - 85px - 120px - 3px - 120px)',
+      width: 'calc(50vw - 85px - 120px - 3px - 150px)',
     },
     drawerOpenCanvas:{
-      width: 'calc(50vw - 85px - 120px - 3px  - 120px)',
+      width: 'calc(50vw - 85px - 120px - 3px  - 150px)',
     }
 })
 
@@ -290,7 +290,7 @@ class VtkMprViewer extends React.Component {
           "cursorViewportX": this.props.cursor3D.getAxialViewportPosition()[0],
           "cursorViewportY": this.props.cursor3D.getAxialViewportPosition()[1]
         }, ()=>{
-          console.log(this.state.cursorViewportX, this.state.cursorViewportY)
+          // console.log(this.state.cursorViewportX, this.state.cursorViewportY)
 
           this.setCursor()
           // change slice

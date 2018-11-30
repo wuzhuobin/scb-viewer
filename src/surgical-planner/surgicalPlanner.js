@@ -30,7 +30,7 @@ const styles = theme=> ({
       background: theme.palette.secondary.main,
     },
     drawerOpen:{
-        width: 'calc(100vw - 240px)',
+        width: 'calc(100vw - 300px)',
         height: 'calc(100vh - 64px)',
     },
     label: {
@@ -44,14 +44,14 @@ const styles = theme=> ({
           },
     },
     gridRoot: {
-      width: 'calc(100vw - 170px - 240px)',
+      width: 'calc(100vw - 170px - 300px)',
       height: 'calc(100vh - 64px - 64px)',
       borderColor: theme.palette.primary.main,
       borderStyle: "solid",
       borderWidth: 1,
     },
     drawerOpenGrid:{
-      width: 'calc(100vw - 240px - 170px - 240px)',
+      width: 'calc(100vw - 240px - 170px - 300px)',
     },
     loadingProgressSnackbar:{
 
@@ -62,16 +62,16 @@ const styles = theme=> ({
     },
     implantList:{
       background: theme.palette.secondary.main,
-      width: 240,
+      width: 300,
       height: 'calc(100vh - 64px - 64px)',
       position: "relative",
       top: 'calc(-100vh + 64px + 64px)',
-      left: 'calc(100vw - 240px)',
+      left: 'calc(100vw - 300px)',
       zIndex: 0,
     },
     drawerOpenImplantList:{
       position: "relative",
-      left: 'calc(100vw - 240px - 240px)',
+      left: 'calc(100vw - 240px - 300px)',
     },
     listSubHeader:{
       color: 'white',

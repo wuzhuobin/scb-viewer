@@ -9,7 +9,7 @@ import {withStyles} from '@material-ui/core/styles'
 
 const styles = theme=> ({
     root:{    
-        width: '240px',
+        width: '300px',
         height: 'calc(100vh - 64px - 64px)',
     },
     slider: {
