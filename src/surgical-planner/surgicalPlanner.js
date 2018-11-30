@@ -11,6 +11,10 @@ import TuneIcon from '@material-ui/icons/Tune';
 import axios from 'axios';
 import Cursor3D from "../components/cursor3D";
 import Slider from '@material-ui/lab/Slider';
+import ExpansionPanel from '@material-ui/core/ExpansionPanel';
+import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
+import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
 const styles = theme=> ({
     root:{    
@@ -82,6 +86,21 @@ const styles = theme=> ({
     divider:{
       backgroundColor: theme.palette.secondary.light,
     },
+    heading: {
+      fontSize: theme.typography.pxToRem(15),
+      flexBasis: '33.33%',
+      flexShrink: 0,
+      color: theme.palette.primary.contrastText,
+
+    },
+    secondaryHeading: {
+      fontSize: theme.typography.pxToRem(15),
+      color: theme.palette.primary.contrastText,
+    },
+
+    expansionPanel:{
+      backgroundColor: theme.palette.secondary.light,
+    },
 })
 
 class SurgicalPlanner extends React.Component {
@@ -103,6 +122,7 @@ class SurgicalPlanner extends React.Component {
       shift: 0,
       preset: 1,
       opacity:1,
+      expanded: null,
    	};
   }
 
@@ -231,6 +251,12 @@ class SurgicalPlanner extends React.Component {
     });
   }
 
+  handleImplantPanelChange = panel => (event, expanded) => {
+    this.setState({
+      expanded: expanded ? panel : false,
+    });
+  };
+
   onCursorChange = () =>{
     // console.log("cursor change")
     // console.log(this.state.cursor3D.getIjkPosition())
@@ -239,10 +265,11 @@ class SurgicalPlanner extends React.Component {
 
     render() {
       const {drawerOpen, series, classes} = this.props
-      const {cursor3D, ijkPos, preset, opacity, shift,value} = this.state
+      const {cursor3D, ijkPos, preset, opacity, shift,value, rotate1, rotate2, rotate3} = this.state
       const { anchorPreset, anchorShift } = this.state;
       const openPreset = Boolean(anchorPreset)
       const openShift = Boolean(anchorShift)
+      const { expanded } = this.state;
 
     	return(
         <div className={classNames(classes.root, {[classes.drawerOpen]: this.props.drawerOpen,})}>
@@ -437,6 +464,52 @@ class SurgicalPlanner extends React.Component {
                 <ListItemText primary={<Typography variant="body1" style={{ color: 'white' }}>Insert New Implant</Typography>} />
               </ListItem>
             </List>
+
+            <div>
+              <Button classes={{label: classes.label}} color="inherit" size="small" 
+                onClick={() => {}}
+              >
+                Set Position
+              </Button>
+            </div>
+
+            <div>
+              <Slider
+                classes={{ container: classes.slider }}
+                value={rotate1}
+                aria-labelledby="label"
+                onChange={(event,rotate1)=>{
+                  var val = (rotate1-50)/50*180;
+                  this.setState({ rotate1 }); 
+                  //this.setState({shift:val})
+                }}
+              />
+            </div>
+
+            <div>
+              <Slider
+                classes={{ container: classes.slider }}
+                value={rotate2}
+                aria-labelledby="label"
+                onChange={(event,rotate2)=>{
+                  var val = (rotate2-50)/50*180;
+                  this.setState({ rotate2 }); 
+                }}
+              />
+            </div>
+
+            <div>
+              <Slider
+                classes={{ container: classes.slider }}
+                value={rotate3}
+                aria-labelledby="label"
+                onChange={(event,rotate3)=>{
+                  var val = (rotate3-50)/50*180;
+                  this.setState({ rotate3 }); 
+                }}
+              />
+            </div>
+
             <Divider className={classes.divider} />
           </div>
 
