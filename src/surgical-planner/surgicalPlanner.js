@@ -26,8 +26,12 @@ const styles = theme=> ({
       overflow: 'auto',
       position: 'relative',
       height: '64px',
+      width: "calc(100vw)",
       justifyContent: 'center',
       background: theme.palette.secondary.main,
+    },
+    drawerOpenAppBar:{
+      width: "calc(100vw - 240px)",
     },
     drawerOpen:{
         width: 'calc(100vw - 300px)',
@@ -272,7 +276,7 @@ class SurgicalPlanner extends React.Component {
 
     	return(
         <div className={classNames(classes.root, {[classes.drawerOpen]: this.props.drawerOpen,})}>
-          <AppBar className={classes.appBar}>
+          <AppBar className={classNames(classes.appBar,{[classes.drawerOpenAppBar]: this.props.drawerOpen})}>
               <Toolbar>
                 
                 <Button classes={{label: classes.label}} color="inherit" >
