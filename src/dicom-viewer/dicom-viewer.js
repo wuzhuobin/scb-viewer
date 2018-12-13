@@ -13,7 +13,7 @@ import AdjustIcon from '@material-ui/icons/Adjust';
 import PanoramaFishEyeIcon from '@material-ui/icons/PanoramaFishEye';
 import CropDinIcon from '@material-ui/icons/CropDin';
 import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
-import AnnotateIcon from '@material-ui/icons/Edit';
+import AnnotateIcon from '@material-ui/icons/FontDownload';
 import CropFreeIcon from '@material-ui/icons/CropFree';
 import NavigationIcon from '@material-ui/icons/NavigationOutlined';
 import MoreIcon from '@material-ui/icons/AddCircleOutline';
@@ -23,10 +23,12 @@ import VFlipIcon from '@material-ui/icons/MoreVert';
 import HFlipIcon from '@material-ui/icons/MoreHoriz';
 import RotateRightIcon from '@material-ui/icons/RotateRight';
 import ReplayIcon from '@material-ui/icons/Replay';
-import SaveIcon from '@material-ui/icons/SaveAlt';
+import ExportIcon from '@material-ui/icons/SaveAlt';
 import TextIcon from '@material-ui/icons/Title';
 import FreeFormIcon from '@material-ui/icons/RoundedCorner';
 import PlayIcon from '@material-ui/icons/PlayArrowOutlined';
+import SaveIcon from '@material-ui/icons/Save';
+import DrawIcon from '@material-ui/icons/Edit';
 
 import Paper from '@material-ui/core/Paper';
 import Popover from "@material-ui/core/Popover";
@@ -469,6 +471,16 @@ class DicomViewer extends React.Component {
       <Button classes={{label: classes.label}} color="inherit" size="small"
       onClick={() => {
         if (this.viewer){
+        }
+      }}
+      >
+      <DrawIcon />
+      Draw
+      </Button>
+
+      <Button classes={{label: classes.label}} color="inherit" size="small"
+      onClick={() => {
+        if (this.viewer){
           this.viewer.toPlayMode();
         }
       }}
@@ -608,8 +620,21 @@ class DicomViewer extends React.Component {
         this.handleClose()
       }}
       >
-      <SaveIcon />
+      <ExportIcon />
       Export
+      </Button>
+
+      <Button classes={{label: classes.label}} color="inherit" size="small" 
+      onClick={() => {
+        if (this.viewer){
+          
+          
+        }
+        this.handleClose()
+      }}
+      >
+      <SaveIcon />
+      Save
       </Button>
 
       <Button classes={{label: classes.label}} color="inherit" size="small" 
@@ -636,6 +661,7 @@ class DicomViewer extends React.Component {
       <ReplayIcon />
       Reset
       </Button>
+
       </Popover>           
       </Toolbar>
       </AppBar>
