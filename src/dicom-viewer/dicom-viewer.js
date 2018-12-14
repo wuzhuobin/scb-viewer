@@ -29,6 +29,13 @@ import FreeFormIcon from '@material-ui/icons/RoundedCorner';
 import PlayIcon from '@material-ui/icons/PlayArrowOutlined';
 import SaveIcon from '@material-ui/icons/Save';
 import DrawIcon from '@material-ui/icons/Edit';
+import Slider from  '@material-ui/lab/Slider';
+import Typography from '@material-ui/core/Typography';
+import FormControl from '@material-ui/core/FormControl';
+import Select from '@material-ui/core/Select';
+import FilledInput from '@material-ui/core/FilledInput';
+import InputLabel from '@material-ui/core/InputLabel';
+import MenuItem from '@material-ui/core/MenuItem';
 
 import Paper from '@material-ui/core/Paper';
 import Popover from "@material-ui/core/Popover";
@@ -81,16 +88,29 @@ const styles = theme=> ({
           width: "calc(100vw - 2px - 240px - 170px)"
         },
 
+
+        panel:{
+          padding: "10px",
+          height: "150px",
+          width: "100px",
+          backgroundColor: theme.palette.secondary.main,
+          borderRadius: "0px",
+        },
+
+        slider: {
+          padding: '15px 0px',
+        },
+
         label: {
-    // Aligns the content of the button vertically.
-    width: '55px',
-    height: '40px',
-    flexDirection: 'column',
-    textTransform: 'none',
-      // fontSize: '3px',
-      color: theme.palette.primary.contrastText,
-      '&:hover': {
-        color: theme.palette.secondary.contrastText,
+           // Aligns the content of the button vertically.
+          width: '55px',
+          height: '40px',
+          flexDirection: 'column',
+          textTransform: 'none',
+            // fontSize: '3px',
+            color: theme.palette.primary.contrastText,
+            '&:hover': {
+              color: theme.palette.secondary.contrastText,
       },
     },
 
@@ -102,7 +122,24 @@ const styles = theme=> ({
     },
     loadingProgressSnackbar:{
       minWidth: 100
-    }
+    },
+
+    fab: {
+    position: 'absolute',
+    bottom: theme.spacing.unit * 5,
+    right: theme.spacing.unit * 5,
+    backgroundColor: theme.palette.primary.dark,
+    '&:hover': {
+        backgroundColor: theme.palette.primary.main,
+      },
+    },
+
+    formControl: {
+      margin: theme.spacing.unit,
+      minWidth: 120,
+      backgroundColor: theme.palette.secondary.light,
+      color: theme.palette.primary.contrastText,
+    },
   })
 
 class DicomViewer extends React.Component {
@@ -111,10 +148,13 @@ class DicomViewer extends React.Component {
     this.state={
       username: '',
       anchorEl:null,
+      anchorDraw:null,
       selectedSeries: null,
       dicomImage:null,
       loadingProgress: 100,
       infoDialog:false,
+      brushSize:4,
+      brushColor:0,
     };
     this.viewer = null;
     this.anonymized = false;
@@ -287,6 +327,18 @@ class DicomViewer extends React.Component {
     });
   };
 
+  handleDrawPanelOpen = (event)=>{
+    this.setState({
+      anchorDraw: event.currentTarget
+    });
+  };
+
+  handleDrawPanelClose= ()=>{
+    this.setState({
+      anchorDraw: null
+    });
+  };
+
   dicomImageRef= el => {
     if (el !== this.state.dicomImage){
       this.setState({dicomImage: el});
@@ -353,8 +405,9 @@ class DicomViewer extends React.Component {
 
   render() {
     const {series, classes} = this.props
-    const { anchorEl } = this.state;
+    const { anchorEl, anchorDraw, brushSize, brushColor} = this.state;
     const open = Boolean(anchorEl)
+    const open2 = Boolean(anchorDraw)
 
     return (
       <div className={classNames(classes.root, {[classes.drawerOpen]: this.props.drawerOpen,})}>
@@ -760,7 +813,54 @@ class DicomViewer extends React.Component {
               </span>}
               />
               </Paper>
-              </div>
+
+              <Button variant="fab" color="secondary" className={classes.fab} aria-owns={open2 ? "simple-popper2" : null} aria-haspopup="true"
+                   onClick={this.handleDrawPanelOpen}>
+                <DrawIcon />
+              </Button>
+
+              <Popover id="simple-popper2" className={classes.popover} open={open2} anchorEl={anchorDraw}
+                anchorOrigin={{ vertical: "top", horizontal: "center"}}
+                transformOrigin={{vertical: "bottom", horizontal: "center"}}
+                onClose={this.handleDrawPanelClose}
+              >
+                <Paper className={classes.panel}>                
+                  <Typography  color="primary">
+                    Size
+                  </Typography>
+
+                <Slider
+                  classes={{ container: classes.slider }}
+                  value={brushSize}
+                  min={1}
+                  max={10}
+                  aria-labelledby="label"
+                    onChange={(event,brushSize)=>{
+                      this.setState({brushSize})
+                    }}
+                />
+
+                <FormControl variant="filled" className={classes.formControl}>
+                <InputLabel htmlFor="filled-color-simple" >Color</InputLabel>
+                  <Select
+                    value={this.state.brushColor}
+                     onChange={(event)=>{
+                      this.setState({ brushColor: event.target.value });}}
+                    input={<FilledInput name="Color" id="filled-color-simple" />}
+                  >
+                    <MenuItem value={0}>Red</MenuItem>
+                    <MenuItem value={1}>Cyan</MenuItem>
+                    <MenuItem value={2}>Yellow</MenuItem>
+                    <MenuItem value={3}>Blue</MenuItem>
+                    <MenuItem value={4}>Orange</MenuItem>
+                  </Select>
+                </FormControl>
+
+                </Paper>
+              </Popover>
+            </div>
+
+
 
               );
   }
