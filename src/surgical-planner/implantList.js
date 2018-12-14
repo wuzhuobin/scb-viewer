@@ -17,7 +17,7 @@ const styles = theme=> ({
       width: 200,
     },
     button:{
-      color: theme.palette.primary.contrastText,
+      color: theme.palette.primary.main,
       '&:hover': {
           backgroundColor: theme.palette.secondary.light,
         }
@@ -54,14 +54,16 @@ class ImplantList extends React.Component {
 
     return(
       <div className={classes.root}>
+
       <List>
         <ListItem button className={classes.button}>
           <ListItemIcon className={classes.button} onClick={() => {return;}}>
             <LibraryAdd />
                 </ListItemIcon>
-                <ListItemText primary={<Typography variant="body1" style={{ color: 'white' }}>Insert New Implant</Typography>} />
+                <ListItemText primary={<Typography variant="body1" style={{ color: 'white' }}>Insert New Implant </Typography>} />
               </ListItem>
             </List>
+
 
             <Button classes={{label: classes.label}} color="inherit" size="small" 
                 onClick={() => {}}
