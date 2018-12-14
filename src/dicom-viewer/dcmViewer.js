@@ -210,6 +210,10 @@ export default class dcmViewer{
             cornerstoneTools.simpleAngle.deactivate(this.element,1);
             cornerstoneTools.arrowAnnotate.deactivate(this.element,1);
             cornerstoneTools.highlight.disable(this.element);
+            if (cornerstoneTools.getToolState(this.element, 'brush')){
+                cornerstoneTools.brush.deactivate(this.element,1);
+            }
+
 
             if (cornerstoneTools.getToolState(this.element, 'freehand')){
                 const a = cornerstoneTools.getToolState(this.element, 'freehand');
@@ -333,6 +337,13 @@ export default class dcmViewer{
             this.currentMode = 'playClip';
         }
     }
+    toDrawMode(){
+        this.disableAllMode();
+        cornerstoneTools.brush.enable(this.element);
+        cornerstoneTools.brush.activate(this.element,1);
+        cornerstoneTools.pan.activate(this.element, 2); // 2 is middle mouse button
+        cornerstoneTools.zoom.activate(this.element, 4); // 4 is right mouse button
+    }
     invertImage(){
         var viewPort = cornerstone.getViewport(this.element);
         if (viewPort){
@@ -377,6 +388,16 @@ export default class dcmViewer{
         cornerstoneTools.clearToolState(this.element, "rectangleRoi");
         cornerstoneTools.clearToolState(this.element, "freehand");
         cornerstoneTools.clearToolState(this.element, "arrowAnnotate");
+        console.log(cornerstoneTools.getToolState(this.element, "brush"));
+        // cornerstoneTools.clearToolState(this.element, "brush");
+        // console.log(cornerstoneTools.getToolState(this.element, "brush"));
+        if (cornerstoneTools.getToolState(this.element, "brush")){
+            var dataArray = cornerstoneTools.getToolState(this.element, "brush").data
+            for (var i=0;i<dataArray.length;i++){
+                dataArray[i].pixelData.fill(0)
+            } 
+            console.log(dataArray)
+        }
         cornerstone.updateImage(this.element);
     }
     resetImage(){

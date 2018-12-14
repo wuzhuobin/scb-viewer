@@ -471,6 +471,7 @@ class DicomViewer extends React.Component {
       <Button classes={{label: classes.label}} color="inherit" size="small"
       onClick={() => {
         if (this.viewer){
+          this.viewer.toDrawMode()
         }
       }}
       >
@@ -627,8 +628,7 @@ class DicomViewer extends React.Component {
       <Button classes={{label: classes.label}} color="inherit" size="small" 
       onClick={() => {
         if (this.viewer){
-          
-          
+            this.viewer.saveState()
         }
         this.handleClose()
       }}
