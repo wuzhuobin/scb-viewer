@@ -193,6 +193,8 @@ export default class dcmViewer{
         cornerstoneTools.addStackStateManager(this.element, ['stack']);
         cornerstoneTools.addToolState(this.element, 'stack', this.stack);
         cornerstoneTools.stackScrollWheel.activate(this.element);
+        // cornerstoneTools.brush.enable(this.element);
+
 
     }
     disableAllMode(){
@@ -380,6 +382,7 @@ export default class dcmViewer{
             console.log("Export image failed");
         }
     }
+
     clearImage(){
         cornerstoneTools.clearToolState(this.element, "length");
         cornerstoneTools.clearToolState(this.element, "simpleAngle");
@@ -388,16 +391,27 @@ export default class dcmViewer{
         cornerstoneTools.clearToolState(this.element, "rectangleRoi");
         cornerstoneTools.clearToolState(this.element, "freehand");
         cornerstoneTools.clearToolState(this.element, "arrowAnnotate");
-        console.log(cornerstoneTools.getToolState(this.element, "brush"));
-        // cornerstoneTools.clearToolState(this.element, "brush");
-        // console.log(cornerstoneTools.getToolState(this.element, "brush"));
-        if (cornerstoneTools.getToolState(this.element, "brush")){
-            var dataArray = cornerstoneTools.getToolState(this.element, "brush").data
-            for (var i=0;i<dataArray.length;i++){
-                dataArray[i].pixelData.fill(0)
-            } 
-            console.log(dataArray)
+
+        //clear brush data
+        if (cornerstoneTools.globalImageIdSpecificToolStateManager){
+            var curToolState = cornerstoneTools.globalImageIdSpecificToolStateManager.toolState
+            console.log(curToolState)
+            console.log(Array.from(curToolState))
+            for (var imageid in curToolState){
+                console.log(imageid)
+                if (curToolState.hasOwnProperty(imageid)){
+                    if(curToolState[imageid].brush){
+                        if (curToolState[imageid].brush.data){
+                            for (var i=0;i<curToolState[imageid].brush.data.length;i++){
+                                curToolState[imageid].brush.data[i].pixelData.fill(0)
+                            } 
+                        }
+                    }
+                }
+
+            }
         }
+        
         cornerstone.updateImage(this.element);
     }
     resetImage(){
@@ -420,8 +434,6 @@ export default class dcmViewer{
         cornerstoneTools.ellipticalRoi.enable(this.element);
         cornerstoneTools.rectangleRoi.enable(this.element);
     }
-
-
 
     getImage(){
         return cornerstone.getImage(this.element);
@@ -493,5 +505,32 @@ export default class dcmViewer{
         }
         return 0;
     }
+    setBrushSize(input_size){
+        var size = Math.round(input_size);
+        if(input_size >=20){
+            size = 20;
+        }
+        if (input_size<=1){
+            size = 1;
+        }
+        // console.log(size);
+        var brushConfig = cornerstoneTools['brush'].getConfiguration();
+        if(brushConfig){
+            brushConfig.radius = size
+            cornerstoneTools['brush'].setConfiguration(brushConfig)
+        }
+    }
+    setBrushColor(input_colour_enum){
+        var color_enum = Math.round(input_colour_enum);
+        if(input_colour_enum >=5){
+            color_enum = 5;
+        }
+        if (input_colour_enum<=1){
+            color_enum = 1;
+        }
+        // console.log(color_enum);
+        cornerstoneTools['brush'].changeDrawColor(color_enum)
+    }
+
 }
 

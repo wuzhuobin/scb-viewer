@@ -833,9 +833,12 @@ class DicomViewer extends React.Component {
                   classes={{ container: classes.slider }}
                   value={brushSize}
                   min={1}
-                  max={10}
+                  max={20}
                   aria-labelledby="label"
                     onChange={(event,brushSize)=>{
+                      if (this.viewer){
+                        this.viewer.setBrushSize(brushSize)
+                      }
                       this.setState({brushSize})
                     }}
                 />
@@ -845,6 +848,9 @@ class DicomViewer extends React.Component {
                   <Select
                     value={this.state.brushColor}
                      onChange={(event)=>{
+                      if (this.viewer){
+                        this.viewer.setBrushColor(event.target.value+1)
+                      }
                       this.setState({ brushColor: event.target.value });}}
                     input={<FilledInput name="Color" id="filled-color-simple" />}
                   >
