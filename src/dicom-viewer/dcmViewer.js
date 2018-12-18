@@ -18,6 +18,7 @@ export default class dcmViewer{
         this.renderedCallBack = null;
         this.timer = null;
         this.checkFlag = false;
+        this.brush_color = 1;
         cornerstone.enable(inputElement);
         cornerstoneTools.external.cornerstone = cornerstone;
         cornerstoneTools.external.cornerstoneMath = cornerstoneMath;
@@ -43,6 +44,8 @@ export default class dcmViewer{
                 }
             }
         }
+        this.element.removeEventListener('mousedown', this.brushModeRightButtonDownEvent)
+        this.element.removeEventListener('mouseup', this.brushModeRightButtonUpEvent)
     }
     reloadImage(){
         if (this.element){
@@ -231,6 +234,8 @@ export default class dcmViewer{
         catch(err){
             console.log("CornerstoneTools disabling failed");
         }
+        this.element.removeEventListener('mousedown', this.brushModeRightButtonDownEvent)
+        this.element.removeEventListener('mouseup', this.brushModeRightButtonUpEvent)
     }
     toNavigateMode(){
         this.disableAllMode();
@@ -342,9 +347,11 @@ export default class dcmViewer{
     toDrawMode(){
         this.disableAllMode();
         cornerstoneTools.brush.enable(this.element);
-        cornerstoneTools.brush.activate(this.element,1);
+        cornerstoneTools.brush.activate(this.element,5);
         cornerstoneTools.pan.activate(this.element, 2); // 2 is middle mouse button
-        cornerstoneTools.zoom.activate(this.element, 4); // 4 is right mouse button
+        // cornerstoneTools.zoom.activate(this.element, 4); // 4 is right mouse button
+        this.element.addEventListener('mousedown', this.brushModeRightButtonDownEvent)
+        this.element.addEventListener('mouseup', this.brushModeRightButtonUpEvent)
     }
     invertImage(){
         var viewPort = cornerstone.getViewport(this.element);
@@ -395,10 +402,7 @@ export default class dcmViewer{
         //clear brush data
         if (cornerstoneTools.globalImageIdSpecificToolStateManager){
             var curToolState = cornerstoneTools.globalImageIdSpecificToolStateManager.toolState
-            console.log(curToolState)
-            console.log(Array.from(curToolState))
             for (var imageid in curToolState){
-                console.log(imageid)
                 if (curToolState.hasOwnProperty(imageid)){
                     if(curToolState[imageid].brush){
                         if (curToolState[imageid].brush.data){
@@ -528,9 +532,21 @@ export default class dcmViewer{
         if (input_colour_enum<=1){
             color_enum = 1;
         }
+        this.brush_color = color_enum;
         // console.log(color_enum);
         cornerstoneTools['brush'].changeDrawColor(color_enum)
     }
-
+    brushModeRightButtonDownEvent = (event) => {
+        // console.log('down')
+        if (event.which == 3){
+            cornerstoneTools['brush'].changeDrawColor(0)
+        }
+    }
+    brushModeRightButtonUpEvent = (event) => {
+        // console.log('up')
+        if (event.which == 3){
+            cornerstoneTools['brush'].changeDrawColor(this.brush_color)
+        }
+    }
 }
 

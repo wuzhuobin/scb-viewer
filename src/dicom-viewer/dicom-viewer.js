@@ -841,6 +841,10 @@ class DicomViewer extends React.Component {
                       }
                       this.setState({brushSize})
                     }}
+                    onDragEnd={(event)=>{
+                      this.handleDrawPanelClose()
+                    }}
+                    
                 />
 
                 <FormControl variant="filled" className={classes.formControl}>
@@ -850,6 +854,7 @@ class DicomViewer extends React.Component {
                      onChange={(event)=>{
                       if (this.viewer){
                         this.viewer.setBrushColor(event.target.value+1)
+                        this.handleDrawPanelClose()
                       }
                       this.setState({ brushColor: event.target.value });}}
                     input={<FilledInput name="Color" id="filled-color-simple" />}
