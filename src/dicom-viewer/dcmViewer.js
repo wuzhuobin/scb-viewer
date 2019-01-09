@@ -18,6 +18,7 @@ export default class dcmViewer{
         this.renderedCallBack = null;
         this.timer = null;
         this.checkFlag = false;
+        this.brush_color = 1;
         cornerstone.enable(inputElement);
         cornerstoneTools.external.cornerstone = cornerstone;
         cornerstoneTools.external.cornerstoneMath = cornerstoneMath;
@@ -43,6 +44,8 @@ export default class dcmViewer{
                 }
             }
         }
+        this.element.removeEventListener('mousedown', this.brushModeRightButtonDownEvent)
+        this.element.removeEventListener('mouseup', this.brushModeRightButtonUpEvent)
     }
     reloadImage(){
         if (this.element){
@@ -193,6 +196,8 @@ export default class dcmViewer{
         cornerstoneTools.addStackStateManager(this.element, ['stack']);
         cornerstoneTools.addToolState(this.element, 'stack', this.stack);
         cornerstoneTools.stackScrollWheel.activate(this.element);
+        // cornerstoneTools.brush.enable(this.element);
+
 
     }
     disableAllMode(){
@@ -210,6 +215,10 @@ export default class dcmViewer{
             cornerstoneTools.simpleAngle.deactivate(this.element,1);
             cornerstoneTools.arrowAnnotate.deactivate(this.element,1);
             cornerstoneTools.highlight.disable(this.element);
+            if (cornerstoneTools.getToolState(this.element, 'brush')){
+                cornerstoneTools.brush.deactivate(this.element,1);
+            }
+
 
             if (cornerstoneTools.getToolState(this.element, 'freehand')){
                 const a = cornerstoneTools.getToolState(this.element, 'freehand');
@@ -225,6 +234,8 @@ export default class dcmViewer{
         catch(err){
             console.log("CornerstoneTools disabling failed");
         }
+        this.element.removeEventListener('mousedown', this.brushModeRightButtonDownEvent)
+        this.element.removeEventListener('mouseup', this.brushModeRightButtonUpEvent)
     }
     toNavigateMode(){
         this.disableAllMode();
@@ -333,6 +344,15 @@ export default class dcmViewer{
             this.currentMode = 'playClip';
         }
     }
+    toDrawMode(){
+        this.disableAllMode();
+        cornerstoneTools.brush.enable(this.element);
+        cornerstoneTools.brush.activate(this.element,5);
+        cornerstoneTools.pan.activate(this.element, 2); // 2 is middle mouse button
+        // cornerstoneTools.zoom.activate(this.element, 4); // 4 is right mouse button
+        this.element.addEventListener('mousedown', this.brushModeRightButtonDownEvent)
+        this.element.addEventListener('mouseup', this.brushModeRightButtonUpEvent)
+    }
     invertImage(){
         var viewPort = cornerstone.getViewport(this.element);
         if (viewPort){
@@ -369,6 +389,7 @@ export default class dcmViewer{
             console.log("Export image failed");
         }
     }
+
     clearImage(){
         cornerstoneTools.clearToolState(this.element, "length");
         cornerstoneTools.clearToolState(this.element, "simpleAngle");
@@ -377,6 +398,24 @@ export default class dcmViewer{
         cornerstoneTools.clearToolState(this.element, "rectangleRoi");
         cornerstoneTools.clearToolState(this.element, "freehand");
         cornerstoneTools.clearToolState(this.element, "arrowAnnotate");
+
+        //clear brush data
+        if (cornerstoneTools.globalImageIdSpecificToolStateManager){
+            var curToolState = cornerstoneTools.globalImageIdSpecificToolStateManager.toolState
+            for (var imageid in curToolState){
+                if (curToolState.hasOwnProperty(imageid)){
+                    if(curToolState[imageid].brush){
+                        if (curToolState[imageid].brush.data){
+                            for (var i=0;i<curToolState[imageid].brush.data.length;i++){
+                                curToolState[imageid].brush.data[i].pixelData.fill(0)
+                            } 
+                        }
+                    }
+                }
+
+            }
+        }
+        
         cornerstone.updateImage(this.element);
     }
     resetImage(){
@@ -384,6 +423,22 @@ export default class dcmViewer{
         // var viewPort = cornerstone.getViewport(this.element);
         // console.log(viewPort);
     }
+    saveState(){
+        var appState = cornerstoneTools.appState.save([this.element]);
+        var serializedState = JSON.stringify(appState);
+        console.log(serializedState);
+    }
+    loadState(){
+        const hardCode = '{"imageIdToolState":{"8fc4af35-81453fdd-94399d36-7cc2c958-a6965de4://28":{"length":{"data":[{"visible":true,"active":false,"handles":{"start":{"x":213.22772277227722,"y":89.34653465346534,"highlight":true,"active":false},"end":{"x":116.27722772277227,"y":180.59405940594058,"highlight":true,"active":false},"textBox":{"active":false,"hasMoved":false,"movesIndependently":false,"drawnIndependently":true,"allowedOutsideImage":true,"hasBoundingBox":true,"x":213.22772277227722,"y":89.34653465346534,"boundingBox":{"width":76.6943359375,"height":25,"left":355,"top":128.5}}},"length":41.605369413607434,"invalidated":true}]},"simpleAngle":{"data":[{"visible":true,"active":false,"handles":{"start":{"x":273.42574257425747,"y":77.94059405940594,"highlight":true,"active":false},"middle":{"x":257.5841584158416,"y":168.55445544554456,"highlight":true,"active":false},"end":{"x":348.19801980198025,"y":117.86138613861387,"highlight":true,"active":false},"textBox":{"active":false,"hasMoved":false,"movesIndependently":false,"drawnIndependently":true,"allowedOutsideImage":true,"hasBoundingBox":true,"x":214.15594059405944,"y":168.55445544554456,"boundingBox":{"width":53.53515625,"height":25,"left":346.46484375000006,"top":253.5}}},"rAngle":50.76}]},"probe":{"data":[{"visible":true,"active":false,"handles":{"end":{"x":194.21782178217822,"y":182.4950495049505,"highlight":true,"active":false}},"invalidated":true}]},"ellipticalRoi":{"data":[{"visible":true,"active":false,"invalidated":false,"handles":{"start":{"x":112.47524752475248,"y":252.1980198019802,"highlight":true,"active":false},"end":{"x":217.02970297029702,"y":359.28712871287127,"highlight":true,"active":false},"textBox":{"active":false,"hasMoved":false,"movesIndependently":false,"drawnIndependently":true,"allowedOutsideImage":true,"hasBoundingBox":true,"x":217.02970297029702,"y":305.74257425742576,"boundingBox":{"width":130.05126953125,"height":65,"left":351,"top":450}}},"meanStdDev":{"count":8796,"mean":309.84515688949523,"variance":23412.773204147743,"stdDev":153.0123302356635},"area":861.713707594759}]},"rectangleRoi":{"data":[{"visible":true,"active":false,"invalidated":false,"handles":{"start":{"x":313.34653465346537,"y":244.59405940594058,"highlight":true,"active":false},"end":{"x":389.3861386138614,"y":382.73267326732673,"highlight":true,"active":false},"textBox":{"active":false,"hasMoved":false,"movesIndependently":false,"drawnIndependently":true,"allowedOutsideImage":true,"hasBoundingBox":true,"x":389.3861386138614,"y":313.66336633663366,"boundingBox":{"width":142.56103515625,"height":65,"left":623,"top":462.5}}},"meanStdDev":{"count":10703,"mean":332.54068952630104,"variance":16108.833974559588,"stdDev":126.92058136708793},"area":1025.7817860994023}]}}},"elementToolState":{"":{"stack":{"data":[{"currentImageIdIndex":28,"imageIds":["8fc4af35-81453fdd-94399d36-7cc2c958-a6965de4://0","8fc4af35-81453fdd-94399d36-7cc2c958-a6965de4://1","8fc4af35-81453fdd-94399d36-7cc2c958-a6965de4://2","8fc4af35-81453fdd-94399d36-7cc2c958-a6965de4://3","8fc4af35-81453fdd-94399d36-7cc2c958-a6965de4://4","8fc4af35-81453fdd-94399d36-7cc2c958-a6965de4://5","8fc4af35-81453fdd-94399d36-7cc2c958-a6965de4://6","8fc4af35-81453fdd-94399d36-7cc2c958-a6965de4://7","8fc4af35-81453fdd-94399d36-7cc2c958-a6965de4://8","8fc4af35-81453fdd-94399d36-7cc2c958-a6965de4://9","8fc4af35-81453fdd-94399d36-7cc2c958-a6965de4://10","8fc4af35-81453fdd-94399d36-7cc2c958-a6965de4://11","8fc4af35-81453fdd-94399d36-7cc2c958-a6965de4://12","8fc4af35-81453fdd-94399d36-7cc2c958-a6965de4://13","8fc4af35-81453fdd-94399d36-7cc2c958-a6965de4://14","8fc4af35-81453fdd-94399d36-7cc2c958-a6965de4://15","8fc4af35-81453fdd-94399d36-7cc2c958-a6965de4://16","8fc4af35-81453fdd-94399d36-7cc2c958-a6965de4://17","8fc4af35-81453fdd-94399d36-7cc2c958-a6965de4://18","8fc4af35-81453fdd-94399d36-7cc2c958-a6965de4://19","8fc4af35-81453fdd-94399d36-7cc2c958-a6965de4://20","8fc4af35-81453fdd-94399d36-7cc2c958-a6965de4://21","8fc4af35-81453fdd-94399d36-7cc2c958-a6965de4://22","8fc4af35-81453fdd-94399d36-7cc2c958-a6965de4://23","8fc4af35-81453fdd-94399d36-7cc2c958-a6965de4://24","8fc4af35-81453fdd-94399d36-7cc2c958-a6965de4://25","8fc4af35-81453fdd-94399d36-7cc2c958-a6965de4://26","8fc4af35-81453fdd-94399d36-7cc2c958-a6965de4://27","8fc4af35-81453fdd-94399d36-7cc2c958-a6965de4://28","8fc4af35-81453fdd-94399d36-7cc2c958-a6965de4://29","8fc4af35-81453fdd-94399d36-7cc2c958-a6965de4://30","8fc4af35-81453fdd-94399d36-7cc2c958-a6965de4://31","8fc4af35-81453fdd-94399d36-7cc2c958-a6965de4://32","8fc4af35-81453fdd-94399d36-7cc2c958-a6965de4://33","8fc4af35-81453fdd-94399d36-7cc2c958-a6965de4://34","8fc4af35-81453fdd-94399d36-7cc2c958-a6965de4://35","8fc4af35-81453fdd-94399d36-7cc2c958-a6965de4://36","8fc4af35-81453fdd-94399d36-7cc2c958-a6965de4://37","8fc4af35-81453fdd-94399d36-7cc2c958-a6965de4://38","8fc4af35-81453fdd-94399d36-7cc2c958-a6965de4://39","8fc4af35-81453fdd-94399d36-7cc2c958-a6965de4://40","8fc4af35-81453fdd-94399d36-7cc2c958-a6965de4://41","8fc4af35-81453fdd-94399d36-7cc2c958-a6965de4://42","8fc4af35-81453fdd-94399d36-7cc2c958-a6965de4://43","8fc4af35-81453fdd-94399d36-7cc2c958-a6965de4://44","8fc4af35-81453fdd-94399d36-7cc2c958-a6965de4://45","8fc4af35-81453fdd-94399d36-7cc2c958-a6965de4://46","8fc4af35-81453fdd-94399d36-7cc2c958-a6965de4://47","8fc4af35-81453fdd-94399d36-7cc2c958-a6965de4://48","8fc4af35-81453fdd-94399d36-7cc2c958-a6965de4://49","8fc4af35-81453fdd-94399d36-7cc2c958-a6965de4://50","8fc4af35-81453fdd-94399d36-7cc2c958-a6965de4://51","8fc4af35-81453fdd-94399d36-7cc2c958-a6965de4://52","8fc4af35-81453fdd-94399d36-7cc2c958-a6965de4://53","8fc4af35-81453fdd-94399d36-7cc2c958-a6965de4://54","8fc4af35-81453fdd-94399d36-7cc2c958-a6965de4://55"]}]}}},"elementViewport":{"":{"scale":1.578125,"translation":{"x":0,"y":0},"voi":{"windowWidth":1503,"windowCenter":751},"pixelReplication":false,"rotation":0,"hflip":false,"vflip":false,"labelmap":false,"displayedArea":{"tlhc":{"x":1,"y":1},"brhc":{"x":512,"y":512},"rowPixelSpacing":0.3125,"columnPixelSpacing":0.3125,"presentationSizeMode":"NONE"}}}}'
+        var appState = JSON.parse(hardCode);
+        cornerstoneTools.appState.restore(appState);
+        cornerstoneTools.length.enable(this.element);
+        cornerstoneTools.simpleAngle.enable(this.element);
+        cornerstoneTools.probe.enable(this.element);
+        cornerstoneTools.ellipticalRoi.enable(this.element);
+        cornerstoneTools.rectangleRoi.enable(this.element);
+    }
+
     getImage(){
         return cornerstone.getImage(this.element);
     }
@@ -453,6 +508,45 @@ export default class dcmViewer{
             return loader.numLoaded/loader.numDcm;
         }
         return 0;
+    }
+    setBrushSize(input_size){
+        var size = Math.round(input_size);
+        if(input_size >=20){
+            size = 20;
+        }
+        if (input_size<=1){
+            size = 1;
+        }
+        // console.log(size);
+        var brushConfig = cornerstoneTools['brush'].getConfiguration();
+        if(brushConfig){
+            brushConfig.radius = size
+            cornerstoneTools['brush'].setConfiguration(brushConfig)
+        }
+    }
+    setBrushColor(input_colour_enum){
+        var color_enum = Math.round(input_colour_enum);
+        if(input_colour_enum >=5){
+            color_enum = 5;
+        }
+        if (input_colour_enum<=1){
+            color_enum = 1;
+        }
+        this.brush_color = color_enum;
+        // console.log(color_enum);
+        cornerstoneTools['brush'].changeDrawColor(color_enum)
+    }
+    brushModeRightButtonDownEvent = (event) => {
+        // console.log('down')
+        if (event.which == 3){
+            cornerstoneTools['brush'].changeDrawColor(0)
+        }
+    }
+    brushModeRightButtonUpEvent = (event) => {
+        // console.log('up')
+        if (event.which == 3){
+            cornerstoneTools['brush'].changeDrawColor(this.brush_color)
+        }
     }
 }
 

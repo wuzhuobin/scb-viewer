@@ -120,8 +120,6 @@ class SurgicalPlanner extends React.Component {
       serverStatus: "",
       serverStatusOpen: false,
       displaySeries: null,
-      // cursor3D: new Cursor3D(),
-      // ijkPos: [0,0,0],
       axialPos: [0,0],
       coronalPos: [0,0],
       sagittalPos: [0,0],
@@ -132,7 +130,15 @@ class SurgicalPlanner extends React.Component {
       shift: 0,
       preset: 1,
       opacity:1,
+      shift:0,
+      value:20,
       expanded: null,
+      value1: 50,
+      value2: 50,
+      value3: 50,
+      rotate1: 0,
+      rotate2: 0,
+      rotate3: 0,
    	};
   }
 
@@ -348,7 +354,7 @@ class SurgicalPlanner extends React.Component {
 
     render() {
       const {drawerOpen, series, classes} = this.props
-      const {axialPos, coronalPos, sagittalPos, preset, opacity, shift,value} = this.state
+      const {axialPos, coronalPos, sagittalPos, cursor3D, ijkPos, preset, shift, value, opacity,value1, value2, value3, rotate1, rotate2, rotate3} = this.state
       const { anchorPreset, anchorShift } = this.state;
       const openPreset = Boolean(anchorPreset)
       const openShift = Boolean(anchorShift)

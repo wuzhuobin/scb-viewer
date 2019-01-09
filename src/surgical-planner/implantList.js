@@ -17,7 +17,7 @@ const styles = theme=> ({
       width: 200,
     },
     button:{
-      color: theme.palette.primary.contrastText,
+      color: theme.palette.primary.main,
       '&:hover': {
           backgroundColor: theme.palette.secondary.light,
         }
@@ -39,6 +39,9 @@ class ImplantList extends React.Component {
   {
     super(props);
     this.state = {
+      value1: 50,
+      value2: 50,
+      value3: 50,
       rotateX: 0,
       rotateY: 0,
       rotateZ: 0
@@ -47,18 +50,20 @@ class ImplantList extends React.Component {
 
   render() {
     const {classes} = this.props
-    const {rotateX, rotateY, rotateZ} = this.state
+    const {value1, value2, value3, rotateX, rotateY, rotateZ} = this.state
 
     return(
       <div className={classes.root}>
+
       <List>
         <ListItem button className={classes.button}>
           <ListItemIcon className={classes.button} onClick={() => {return;}}>
             <LibraryAdd />
                 </ListItemIcon>
-                <ListItemText primary={<Typography variant="body1" style={{ color: 'white' }}>Insert New Implant</Typography>} />
+                <ListItemText primary={<Typography variant="body1" style={{ color: 'white' }}>Insert New Implant </Typography>} />
               </ListItem>
             </List>
+
 
             <Button classes={{label: classes.label}} color="inherit" size="small" 
                 onClick={() => {}}
@@ -68,30 +73,32 @@ class ImplantList extends React.Component {
 
               <Slider
                 classes={{ container: classes.slider }}
-                value={rotateX}
+                value={value1}
                 aria-labelledby="label"
-                onChange={(event,rotate1)=>{
-                  var val = (rotateX-50)/50*180;
-                  this.setState({ rotateX }); 
-                  //this.setState({shift:val})
+                onChange={(event,value1)=>{
+                  var val = (value1-50)/50*180;
+                  this.setState({ value1}); 
+                  this.setState({ rotateX:val }); 
                 }}
               />
               <Slider
                 classes={{ container: classes.slider }}
-                value={rotateY}
+                value={value2}
                 aria-labelledby="label"
-                onChange={(event,rotate2)=>{
-                  var val = (rotateY-50)/50*180;
-                  this.setState({ rotateY }); 
+                onChange={(event,value2)=>{
+                  var val = (value2-50)/50*180;
+                  this.setState({ value2 }); 
+                  this.setState({ rotateY:val }); 
                 }}
               />
               <Slider
                 classes={{ container: classes.slider }}
-                value={rotateZ}
+                value={value3}
                 aria-labelledby="label"
-                onChange={(event,rotate3)=>{
-                  var val = (rotateZ-50)/50*180;
-                  this.setState({ rotateZ}); 
+                onChange={(event,value3)=>{
+                  var val = (value3-50)/50*180;
+                  this.setState({ value3 }); 
+                  this.setState({ rotateZ:val }); 
                 }}
               />
     </div>
