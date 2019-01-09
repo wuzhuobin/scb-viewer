@@ -12,14 +12,14 @@ const styles = theme=> ({
     },
     threeDViewer: {
       height: 'calc(50vh - 32px - 32px - 3px)', // last term is 2*borderWidth + large frame boarderWidth
-      width: 'calc(50vw - 85px - 3px - 120px)',
+      width: 'calc(50vw - 85px - 3px - 150px)',
       borderColor: "gray",
       borderStyle: "solid",
       borderWidth: 1, 
       background: "black"
     },
     drawerOpenThreeDViewer:{
-        width: 'calc(50vw - 85px - 120px - 3px  - 120px)',
+        width: 'calc(50vw - 85px - 120px - 3px  - 150px)',
     },
 })
 
@@ -84,15 +84,14 @@ class ThreeDViewer extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    // console.log("receivedProps");
     if (this.state.dicomImage){
       if (this.props.drawerOpen !== nextProps.drawerOpen){
         if (nextProps.drawerOpen){
-          this.state.dicomImage.style.width = 'calc(50vw - 120px - 85px - 3px)'
+          this.state.dicomImage.style.width = 'calc(50vw - 120px - 85px - 3px - 150px)'
             
         }
         else{
-          this.state.dicomImage.style.width = 'calc(50vw - 85px - 3px)'
+          this.state.dicomImage.style.width = 'calc(50vw - 85px - 3px - 150px)'
         }
 
       }
@@ -102,6 +101,20 @@ class ThreeDViewer extends React.Component {
         this.rotateView(nextProps.series);
     }
 
+    if (this.state.dicomImage){
+        if (this.props.drawerOpen !== nextProps.drawerOpen){          
+          if (nextProps.drawerOpen){
+              this.state.dicomImage.style.width = 'calc(50vw - 120px - 85px - 3px - 150px)'
+          }
+          else{
+            this.state.dicomImage.style.width = 'calc(50vw - 85px - 3px - 150px)'
+          }
+
+          if (this.singleViewer){
+            this.singleViewer.resizeImage();
+          }
+        } 
+      }
   }
 
   componentDidUpdate(prevProps, prevState){
@@ -299,7 +312,8 @@ class ThreeDViewer extends React.Component {
         console.log('updateSize')
 
         dicomImage.style.height = 'calc(50vh - 32px - 32px - 3px)'
-        dicomImage.style.width = 'calc(50vw - 85px - 3px)'
+        dicomImage.style.width = 'calc(50vw - 85px - 3px - 150px)'
+
         try{
             cornerstone.resize(dicomImage)          
         }

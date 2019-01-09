@@ -9,7 +9,7 @@ import VtkMprViewer from './vtkMprViewer'
 import ThreeDViewer from './threeDViewer'
 import TuneIcon from '@material-ui/icons/Tune';
 import axios from 'axios';
-import Cursor3D from "../components/cursor3D";
+// import Cursor3D from "../components/cursor3D";
 import Slider from '@material-ui/lab/Slider';
 
 
@@ -119,9 +119,16 @@ class SurgicalPlanner extends React.Component {
       loadingPromise: null,
       serverStatus: "",
       serverStatusOpen: false,
-      displaySEries: null,
-      cursor3D: new Cursor3D(),
-      ijkPos: [0,0,0],
+      displaySeries: null,
+      // cursor3D: new Cursor3D(),
+      // ijkPos: [0,0,0],
+      axialPos: [0,0],
+      coronalPos: [0,0],
+      sagittalPos: [0,0],
+      axialSlice: 0,
+      coronalSlice: 0,
+      sagittalSlice: 0,
+      seriesSize: [0,0,0],
       shift: 0,
       preset: 1,
       opacity:1,
@@ -185,14 +192,18 @@ class SurgicalPlanner extends React.Component {
             }).then(res=>{
               // this.state.cursor3D.setSize(res.data.Size[0],res.data.Size[1],res.data.Size[2])
               // this.state.cursor3D.setIjkPosition(res.data.Size[0]/2,res.data.Size[1]/2, res.data.Size[2]/2)
-              this.state.cursor3D.setSize(1,1,1)
-              this.state.cursor3D.setIjkPosition(0.5,0.5, 0.5)
+              // this.state.cursor3D.setSize(1,1,1)
+              // this.state.cursor3D.setIjkPosition(0.5,0.5, 0.5)
 
               // console.log(this.state.cursor3D.getIjkPosition())
-              this.setState({ijkPos: this.state.cursor3D.getIjkPosition()})
+              this.setState({
+                displaySeries: series, 
+                axialSlice: Math.floor(res.data.Size[2]/2), 
+                sagittalSlice: Math.floor(res.data.Size[0]/2), 
+                coronalSlice: Math.floor(res.data.Size[1]/2)})
+              this.setState({seriesSize: res.data.Size})
               this.setState({loadingProgress: 100})
               this.setState({serverStatus: "MPR Loading Success", serverStatusOpen:true})
-              this.setState({displaySeries: series})
             })
           }
           
@@ -258,17 +269,86 @@ class SurgicalPlanner extends React.Component {
     this.setState({
       expanded: expanded ? panel : false,
     });
-  };
+  }
 
-  onCursorChange = () =>{
-    // console.log("cursor change")
+  onCursorChange = (orientation, viewportX, viewportY, canvasWidth, canvasHeight) =>{
+    console.log("cursor change")
+
+    var orientation_enum
+    var slice
+    switch (orientation){
+      case "Axial":
+        orientation_enum = 2
+        slice = this.state.axialSlice
+        this.setState({axialPos: [viewportX, viewportY]})
+        break;
+      case "Sagittal":
+        orientation_enum = 0
+        slice = this.state.sagittalSlice
+        this.setState({sagittalPos: [viewportX, viewportY]})
+        break;
+      case "Coronal":
+        orientation_enum = 1
+        slice = this.state.coronalSlice
+        this.setState({coronalPos: [viewportX, viewportY]})
+        break;
+    }
+
+    // query for 3d coordinate
+    // console.log("res",viewportX, viewportY, canvasWidth, canvasHeight)
+
+    axios({
+          method: 'post',
+          url: 'http://223.255.146.2:8083/api/getCoordinateNumber',
+          data: {
+            series: this.state.displaySeries,
+            id: this.props.socket.id,
+            orientation: orientation_enum,
+            opacity: 1,
+            slice: slice,
+            posX: viewportX,
+            posY: viewportY,
+            sizeX: canvasWidth,
+            sizeY: canvasHeight
+          },
+          headers:  {
+            'Access-Control-Allow-Origin': '*',
+          },
+        }).then(res=>{
+          if (res.data.Status === true){
+            console.log(res.data)
+            switch (orientation){
+              case "Axial":
+                this.setState({sagittalPos: [res.data.Sagittal[1]/canvasWidth, (canvasHeight - res.data.Sagittal[2])/canvasHeight]})
+                this.setState({coronalPos: [res.data.Coronal[1]/canvasWidth, (canvasHeight - res.data.Coronal[2])/canvasHeight]})
+                this.setState({sagittalSlice: res.data.Sagittal[0]})
+                this.setState({coronalSlice: res.data.Coronal[0]})
+                break;
+              case "Sagittal":
+                this.setState({axialPos: [res.data.Axial[1]/canvasWidth, (canvasHeight - res.data.Axial[2])/canvasHeight]})
+                this.setState({coronalPos: [res.data.Coronal[1]/canvasWidth, (canvasHeight - res.data.Coronal[2])/canvasHeight]})
+                this.setState({axialSlice: res.data.Axial[0]})
+                this.setState({coronalSlice: res.data.Coronal[0]})
+                break;
+              case "Coronal":
+                this.setState({sagittalPos: [res.data.Sagittal[1]/canvasWidth, (canvasHeight - res.data.Sagittal[2])/canvasHeight]})
+                this.setState({axialPos: [res.data.Axial[1]/canvasWidth, (canvasHeight - res.data.Axial[2])/canvasHeight]})
+                this.setState({sagittalSlice: res.data.Sagittal[0]})
+                this.setState({axialSlice: res.data.Axial[0]})
+                break;
+            }
+          }
+        }).catch(err=>{
+          console.log(err)
+        })
+
     // console.log(this.state.cursor3D.getIjkPosition())
-    this.setState({ijkPos: this.state.cursor3D.getIjkPosition()})
+    // this.setState({ijkPos: this.state.cursor3D.getIjkPosition()})
   }
 
     render() {
       const {drawerOpen, series, classes} = this.props
-      const {cursor3D, ijkPos, preset, opacity, shift,value} = this.state
+      const {axialPos, coronalPos, sagittalPos, preset, opacity, shift,value} = this.state
       const { anchorPreset, anchorShift } = this.state;
       const openPreset = Boolean(anchorPreset)
       const openShift = Boolean(anchorShift)
@@ -420,9 +500,10 @@ class SurgicalPlanner extends React.Component {
                   series={this.state.displaySeries} 
                   socket={this.props.socket} 
                   drawerOpen={drawerOpen}
-                  cursor3D={cursor3D}
                   onCursorChange={this.onCursorChange}
-                  ijkPos={ijkPos}/>
+                  viewportX={axialPos[0]}
+                  viewportY={axialPos[1]}
+                  slice={this.state.axialSlice}/>
               </Grid>
               <Grid item xs={6}>
                 <VtkMprViewer 
@@ -430,9 +511,10 @@ class SurgicalPlanner extends React.Component {
                   series={this.state.displaySeries} 
                   socket={this.props.socket} 
                   drawerOpen={drawerOpen}
-                  cursor3D={cursor3D}
                   onCursorChange={this.onCursorChange}
-                  ijkPos={ijkPos}/>
+                  viewportX={sagittalPos[0]}
+                  viewportY={sagittalPos[1]}
+                  slice={this.state.sagittalSlice}/>
               </Grid>
               <Grid item xs={6}>
                 <ThreeDViewer
@@ -451,9 +533,10 @@ class SurgicalPlanner extends React.Component {
                   series={this.state.displaySeries} 
                   socket={this.props.socket} 
                   drawerOpen={drawerOpen}
-                  cursor3D={cursor3D}
                   onCursorChange={this.onCursorChange}
-                  ijkPos={ijkPos}/>
+                  viewportX={coronalPos[0]}
+                  viewportY={coronalPos[1]}
+                  slice={this.state.coronalSlice}/>
               </Grid>
             </Grid>
           </Grid>
