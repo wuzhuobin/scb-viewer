@@ -2,7 +2,7 @@ import React from "react";
 
 import {Grid, Paper, Typography} from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
-import PACS from "orthanc";
+// import PACS from "orthanc";
 
 const styles = theme => ({
 	root:{
@@ -79,33 +79,33 @@ class SeriesPreview extends React.Component {
 
 
   updateSeries = (study)=>{
-    PACS.studyInfo(study,
-      (json)=> {
-        let promises = [];
-        for (let i = 0; i < json.Series.length; i++) {
-          promises.push(PACS.serieInfo(json.Series[i]));
-          promises.push(PACS.seriesPreview(json.Series[i]));
-        }
-        Promise.all(promises).then((jsons) => {
-          let seriesInfo = [];
-          let imgs = [];
-          for (let i = 0; i < jsons.length; i += 2) {
-            let serie = createData(
-              jsons[i].MainDicomTags.BodyPartExamined,
-              jsons[i].MainDicomTags.Modality,
-              jsons[i].MainDicomTags.ProtocolName,
-              jsons[i].MainDicomTags.SeriesNumber,
-              jsons[i].MainDicomTags.StationName
-            );
-            serie.id = json.Series[i/2];
-            serie.slicesCount = jsons[i].Instances.length;
-            seriesInfo.push(serie);
-            imgs.push(jsons[i + 1]);
-          }
-          this.setState({ series: seriesInfo, imgs: imgs });
-        });
-      }
-    )
+    // PACS.studyInfo(study,
+    //   (json)=> {
+    //     let promises = [];
+    //     for (let i = 0; i < json.Series.length; i++) {
+    //       promises.push(PACS.serieInfo(json.Series[i]));
+    //       promises.push(PACS.seriesPreview(json.Series[i]));
+    //     }
+    //     Promise.all(promises).then((jsons) => {
+    //       let seriesInfo = [];
+    //       let imgs = [];
+    //       for (let i = 0; i < jsons.length; i += 2) {
+    //         let serie = createData(
+    //           jsons[i].MainDicomTags.BodyPartExamined,
+    //           jsons[i].MainDicomTags.Modality,
+    //           jsons[i].MainDicomTags.ProtocolName,
+    //           jsons[i].MainDicomTags.SeriesNumber,
+    //           jsons[i].MainDicomTags.StationName
+    //         );
+    //         serie.id = json.Series[i/2];
+    //         serie.slicesCount = jsons[i].Instances.length;
+    //         seriesInfo.push(serie);
+    //         imgs.push(jsons[i + 1]);
+    //       }
+    //       this.setState({ series: seriesInfo, imgs: imgs });
+    //     });
+    //   }
+    // )
   }
    
     render() {

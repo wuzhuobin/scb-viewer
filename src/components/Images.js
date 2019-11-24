@@ -7,7 +7,6 @@ import {CloudUpload, MoreVert, Visibility, ThreeDRotation, Assignment} from '@ma
 import { withStyles } from '@material-ui/core/styles';
 import Upload from './Upload';
 import SeriesPreview from './SeriesPreview';
-import PACS from 'orthanc';
 
 // function getToday(){
 //   var today = new Date();
@@ -205,47 +204,47 @@ class Images extends React.Component {
   }
 
   componentDidMount(){
-    PACS.allPatients((patientIdjsons) => {
-      let patientPromises = [];
-      for (let i = 0; i < patientIdjsons.length; ++i) {
-        patientPromises.push(PACS.patientInfo(patientIdjsons[i]));
-      }
+    // PACS.allPatients((patientIdjsons) => {
+    //   let patientPromises = [];
+    //   for (let i = 0; i < patientIdjsons.length; ++i) {
+    //     patientPromises.push(PACS.patientInfo(patientIdjsons[i]));
+    //   }
 
-      let studies = []
-      Promise.all(patientPromises).then((patientInfoJsons)=>{
-        let promises = [];
-        for(let i in patientInfoJsons){
-          let studiesID = patientInfoJsons[i].Studies; 
-          for(let j in studiesID){
-            promises.push(PACS.studyInfo(studiesID[j]));
-            studies.push(
-              createStudyData(
-                patientInfoJsons[i].MainDicomTags.PatientName,
-                patientInfoJsons[i].MainDicomTags.PatientID,
-                patientInfoJsons[i].MainDicomTags.PatientBirthDate, 
-                patientInfoJsons[i].MainDicomTags.PatientSex,
-                null,
-                null,
-                null,
-                null,
-                null
-              )
-            )
-            studies[studies.length-1].id = studiesID[j];
-          }
-        }
-        Promise.all(promises).then((studiesInfoJsons)=>{
-          for(let i in studiesInfoJsons){
-            studies[i].institution = studiesInfoJsons[i].MainDicomTags.InstitutionName;
-            studies[i].description = studiesInfoJsons[i].MainDicomTags.StudyDescription;
-            studies[i].requestedProcedure =  studiesInfoJsons[i].MainDicomTags.RequestedProcedureDescription;
-            studies[i].studyDate = studiesInfoJsons[i].MainDicomTags.StudyDate;
-            studies[i].studyID = studiesInfoJsons[i].MainDicomTags.StudyID;
-          }
-          this.setState({studies: studies});
-        });
-      });
-    });
+    //   let studies = []
+    //   Promise.all(patientPromises).then((patientInfoJsons)=>{
+    //     let promises = [];
+    //     for(let i in patientInfoJsons){
+    //       let studiesID = patientInfoJsons[i].Studies; 
+    //       for(let j in studiesID){
+    //         promises.push(PACS.studyInfo(studiesID[j]));
+    //         studies.push(
+    //           createStudyData(
+    //             patientInfoJsons[i].MainDicomTags.PatientName,
+    //             patientInfoJsons[i].MainDicomTags.PatientID,
+    //             patientInfoJsons[i].MainDicomTags.PatientBirthDate, 
+    //             patientInfoJsons[i].MainDicomTags.PatientSex,
+    //             null,
+    //             null,
+    //             null,
+    //             null,
+    //             null
+    //           )
+    //         )
+    //         studies[studies.length-1].id = studiesID[j];
+    //       }
+    //     }
+    //     Promise.all(promises).then((studiesInfoJsons)=>{
+    //       for(let i in studiesInfoJsons){
+    //         studies[i].institution = studiesInfoJsons[i].MainDicomTags.InstitutionName;
+    //         studies[i].description = studiesInfoJsons[i].MainDicomTags.StudyDescription;
+    //         studies[i].requestedProcedure =  studiesInfoJsons[i].MainDicomTags.RequestedProcedureDescription;
+    //         studies[i].studyDate = studiesInfoJsons[i].MainDicomTags.StudyDate;
+    //         studies[i].studyID = studiesInfoJsons[i].MainDicomTags.StudyID;
+    //       }
+    //       this.setState({studies: studies});
+    //     });
+    //   });
+    // });
   }
 
   handleUploadOpen = () => {
@@ -292,7 +291,7 @@ class Images extends React.Component {
     return (
       <div className={classes.root}>
         <div className={classes.tableWrapper}>
-          <TablePagination
+          {/* <TablePagination
               component="div"
               colSpan={20}
               count={this.state.studiesCount}
@@ -308,9 +307,7 @@ class Images extends React.Component {
                 select: classes.tablePaginationSelect,
                 actions: classes.tablePaginationActions,
               }}
-              // ActionsComponent={TablePaginationActionsWrapped}
-            />
-
+            /> */}
           <Table className={classes.table}>
             <EnhancedTableHead />
             <TableBody >
@@ -319,12 +316,12 @@ class Images extends React.Component {
                 <TableRow 
                     id={study.id} 
                     className={classes.study}
-                    onClick={event=>{this.handleStudyClick(event, study.id)}}
-                    onDoubleClick={event => {
-                      PACS.studyInfo(study.id).then((json)=>{
-                        let series = json.Series;
-                        onSelectSeries(event, series, "planar");
-                      })}}
+                    // onClick={event=>{this.handleStudyClick(event, study.id)}}
+                    // onDoubleClick={event => {
+                    //   PACS.studyInfo(study.id).then((json)=>{
+                    //     let series = json.Series;
+                    //     onSelectSeries(event, series, "planar");
+                    //   })}}
                     onContextMenu={event=>{event.preventDefault()}}
                     >
                     <TableCell className={classes.tableCell} >
@@ -359,7 +356,7 @@ class Images extends React.Component {
               onContextMenu={(event)=>{event.preventDefault();this.handleStudyMenuClose()}}
             >
               <Typography className={classes.menuSubheader}>Open Series In:</Typography>
-              <MenuItem onClick={(event)=>{
+              {/* <MenuItem onClick={(event)=>{
                 PACS.studyInfo(this.state.selectedStudy).then((json)=>{
                   let series = json.Series;
                   onSelectSeries(event, series, "planar");
@@ -378,18 +375,7 @@ class Images extends React.Component {
                     <ThreeDRotation/>
                   </ListItemIcon> 
                 MPR Viewer
-              </MenuItem>
-              <MenuItem onClick={(event)=>{
-                PACS.studyInfo(this.state.selectedStudy).then((json)=>{
-                  let series = json.Series;
-                  onSelectSeries(event, series, "implant");
-                  })}}>
-                <ListItemIcon>
-                    <Assignment/>
-                </ListItemIcon> 
-                Implant Planner
-              </MenuItem>
-
+              </MenuItem> */}
             </Menu>
             </TableBody>
           </Table>

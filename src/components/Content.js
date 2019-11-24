@@ -1,17 +1,14 @@
 import React from 'react'
-import {withStyles} from '@material-ui/core/styles'
+import { withStyles } from '@material-ui/core/styles'
 import Images from './Images';
 import DicomViewer from "../dicom-viewer";
 import DicomViewer3D from "../dicom-viewer/dicom-viewer3D";
-import SurgicalPlanner from "../surgical-planner/surgicalPlanner"
 import classNames from 'classnames';
 import DrawerMenu from "./DrawerMenu";
-import Projects from './Projects';
-import socketIOClient from "socket.io-client";
 
 const drawerWidth = 240;
 
-const styles = theme=> ({
+const styles = theme => ({
   root: {
     display: 'flex',
     backgroundColor: "black"
@@ -27,80 +24,67 @@ const styles = theme=> ({
     width: '100%',
     backgroundColor: theme.palette.background.default,
     transition: theme.transitions.create('margin', {
-        easing: theme.transitions.easing.sharp,
-        duration: theme.transitions.duration.leavingScreen,
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen,
     }),
   },
   contentShift: {
-      marginLeft: drawerWidth,
-      width: 'calc(100vw - 240px)',
-      transition: theme.transitions.create('margin', {
-          easing: theme.transitions.easing.easeOut,
-          duration: theme.transitions.duration.enteringScreen,
-  })}
+    marginLeft: drawerWidth,
+    width: 'calc(100vw - 240px)',
+    transition: theme.transitions.create('margin', {
+      easing: theme.transitions.easing.easeOut,
+      duration: theme.transitions.duration.enteringScreen,
+    })
+  }
 })
 
 class Content extends React.Component {
-    constructor(props){
-        super(props);
-        this.state = {
-            page: 4,
-            series: null,
-            socket: null,
-        };
+  constructor(props) {
+    super(props);
+    this.state = {
+      page: 0,
+      series: null,
+      socket: null,
+    };
+  }
+
+  handleChangePage = (value) => {
+    this.setState({ page: value });
+  }
+
+  onSelectSeries = (event, series, viewer) => {
+    this.setState({ series: series })
+    switch (viewer) {
+      case "planar":
+        this.setState({ page: 1 })
+        break;
+      case "mpr":
+        this.setState({ page: 2 })
+        break;
+      default:
+        this.setState({ page: 0 })
+        break;
     }
+  }
 
-    handleChangePage = (value)=>{
-    	this.setState({page: value});
-  	}
+  render() {
+    const { open, onDrawerClose, classes } = this.props
+    const { page, socket } = this.state
 
-    onSelectSeries = (event, series, viewer)=>{
-      this.setState({series: series})
-      switch (viewer){
-        case "planar":
-          this.setState({page: 2})
-          break;
-        case "mpr":
-          this.setState({page: 3})
-          break;
-        case "implant":
-          this.setState({page: 4})
-          break;
-        default:
-          this.setState({page: 2})
-      }
-    }
-
-    componentDidMount(){
-      // websocket to mpr backend
-      var endPoint = "http://223.255.146.2:8083"
-      const socket = socketIOClient(endPoint)
-      socket.on('connect', ()=>{
-        this.setState({socket: socket});
-      }
-      ) 
-    }
- 
-    render(){
-        const {open, onDrawerClose, classes} = this.props
-        const {page, socket} = this.state
-
-        return(
-        <div className={classes.root}>
-          <DrawerMenu open={open} onDrawerClose={onDrawerClose} onChangePage={this.handleChangePage}/>
-          <main 
-              className={classNames(classes.content,{
-                  [classes.contentShift]: open,
-                })}
-            >
-              {page === 0 && <Images onSelectSeries={this.onSelectSeries}/>}
-              {page === 1 && <Projects />}         
-              {page === 2 && <DicomViewer series={this.state.series} drawerOpen={this.props.open}/>}
-              {page === 3 && <DicomViewer3D series={this.state.series} drawerOpen={this.props.open} socket={socket}/>} 
-              {page === 4 && <SurgicalPlanner series={this.state.series} drawerOpen={this.props.open} socket={socket}/>}
-          </main>
-        </div>
+    return (
+      <div className={classes.root}>
+        <DrawerMenu open={open} onDrawerClose={onDrawerClose} onChangePage={this.handleChangePage} />
+        <main
+          className={classNames(classes.content, {
+            [classes.contentShift]: open,
+          })}
+        >
+          {page === 0 && <Images onSelectSeries={this.onSelectSeries} />}
+          {page === 1 && <DicomViewer series={this.state.series} drawerOpen={this.props.open} />}
+          {page === 2 && <DicomViewer3D series={this.state.series} drawerOpen={this.props.open} socket={socket} />}
+        </main>
+      </div>
     );
-}
+  }
 }
 export default withStyles(styles)(Content);

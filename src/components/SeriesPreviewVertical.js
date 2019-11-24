@@ -2,7 +2,7 @@ import React from "react";
 import classNames from 'classnames';
 import {GridList, GridListTile, Paper, Typography} from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
-import PACS from "orthanc";
+// import PACS from "orthanc";
 
 const styles = theme => ({
 	root:{
@@ -71,8 +71,8 @@ class SeriesPreviewVertical extends React.Component {
 		{
 			let promises = [];
 			for (let i = 0; i < this.props.series.length; i++) {
-				promises.push(PACS.serieInfo(this.props.series[i]));
-				promises.push(PACS.seriesPreview(this.props.series[i]));
+				// promises.push(PACS.serieInfo(this.props.series[i]));
+				// promises.push(PACS.seriesPreview(this.props.series[i]));
 			}
 			Promise.all(promises).then((jsons)=>{
 				let seriesInfo = [];

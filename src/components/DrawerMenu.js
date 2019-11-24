@@ -3,7 +3,7 @@ import {List, ListItem, ListItemIcon, ListItemText, Drawer, Divider, IconButton,
 import {withStyles} from '@material-ui/core/styles'
 import {Collections, Portrait, Visibility, ChevronLeft, ThreeDRotation, Assignment} from '@material-ui/icons'
 
-const drawerWidth =240;
+const drawerWidth = 240;
 
 const styles = theme=> ({
   root: {
@@ -67,13 +67,13 @@ class DrawerMenu extends React.Component {
             <Divider className={classes.divider} />
             <List>
                 <ListSubheader className={classes.listSubHeader}>Image Viewers</ListSubheader>
-                <ListItem button onClick={() => {onChangePage(2);}} className={classes.button}>
+                <ListItem button onClick={() => {onChangePage(1);}} className={classes.button}>
                 <ListItemIcon>
                   <Visibility className={classes.button} />
                 </ListItemIcon>
                 <ListItemText primary={<Typography variant="body1" style={{ color: 'white' }}>Planar Viewer</Typography>} />
                 </ListItem>
-                <ListItem button onClick={() => {onChangePage(3);}} className={classes.button}>
+                <ListItem button onClick={() => {onChangePage(2);}} className={classes.button}>
                 <ListItemIcon>
                   <ThreeDRotation className={classes.button} />
                 </ListItemIcon>
@@ -81,15 +81,6 @@ class DrawerMenu extends React.Component {
                 </ListItem>
             </List>
             <Divider className={classes.divider} />
-            <List>
-              <ListSubheader className={classes.listSubHeader}>Extension Modules</ListSubheader>
-              <ListItem button onClick={() => {onChangePage(4);}} className={classes.button}>
-                <ListItemIcon>
-                  <Assignment className={classes.button} />
-                </ListItemIcon>
-                <ListItemText primary={<Typography variant="h6" style={{ color: 'white' }}>Implant Planner</Typography>} />
-                </ListItem>
-            </List>
           </Drawer>
         	);
         </div>
